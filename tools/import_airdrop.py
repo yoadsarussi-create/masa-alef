@@ -9,8 +9,8 @@ def run_once():
     if not files:return 0
     mp=os.path.join(ROOT,"audio-manifest.json");man=json.load(open(mp,encoding="utf-8"));n=0
     for f in files:
-        iid=os.path.basename(f)[6:9];it=items.get(iid)
-        if not it:continue
+        iid=os.path.basename(f)[5:8];it=items.get(iid)
+        if not it:print("no item for",f);continue
         out="audio/r_%s.m4a"%iid
         subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f,"-af","highpass=f=70,loudnorm=I=-16:TP=-1.5,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.06:stop_periods=1:stop_threshold=-50dB:stop_silence=0.15,adelay=150,apad=pad_dur=0.12","-ac","1","-ar","32000","-c:a","aac","-b:a","56k",os.path.join(ROOT,out)],check=True)
         man[it["k"]]=out;shutil.move(f,os.path.join(DONE,os.path.basename(f)));n+=1;print("imported",iid,it["t"])
