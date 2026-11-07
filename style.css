@@ -366,3 +366,6 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .mcell .he-big{font-size:2.1rem;line-height:1.3}
 .multi-grid.five .mcell .num-big{font-size:2rem}
 @media (min-width:700px){.sw2{width:70px;height:70px;font-size:1.6rem}.mcell{min-height:110px}.mcell .he-big{font-size:3.2rem}.mcell img.pic{width:80px;height:80px}}
+.card.play .mcell .he-big{font-size:2.3rem;line-height:1.2}
+.card.play .mcell .num-big{font-size:2.1rem}
+@media (min-width:700px){.card.play .mcell .he-big{font-size:3.4rem}.card.play .mcell .num-big{font-size:3rem}}
