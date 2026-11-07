@@ -301,11 +301,11 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  const optHtml=o=>`<button class="ans ${o.cls}" data-o="${esc(o.v)}">${o.html}</button>`;
  app.innerHTML=`
  <div class="hud"><button class="x" id="quit" aria-label="חזרה למפה">✕</button><div class="dots">${dots}</div><span class="pill" id="hc">👥 ${S.coins}</span></div>
- <div class="card">
+ <div class="card play">
   <div class="row-tag"><span class="tag">${STEPS[item.step].n} · ${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
   ${easy?`<div class="feedback good" style="padding:8px 12px">זה בסדר! גם טיקי טועה לפעמים. הנה אחת קלה 💪</div>`:G.cur.retry?`<div class="feedback good" style="padding:8px 12px">עוד ניסיון — הקשיבי שוב 👂</div>`:""}
-  <div class="prompt">${q.p}</div>
-  <button class="ear" id="ear">🔊 עוד פעם</button>
+  <div class="pz"><div class="prompt">${q.p}</div>
+  <button class="ear" id="ear">🔊 עוד פעם</button></div>
   ${q.kind==="spell"?`<div class="slots" dir="${q.dir}">${q.ans.map((_,k)=>`<button class="slot ${q.dir==="ltr"?"wordslot":""}" data-k="${k}" aria-label="מקום ${k+1}"></button>`).join("")}</div>
      <div class="tiles" dir="${q.dir}">${q.tiles.map((c,k)=>`<button class="tile ${q.dir==="ltr"?"wordtile":""}" data-t="${k}">${c}</button>`).join("")}</div>`
   :q.kind==="row"?`<div class="row-opts" dir="ltr">${q.opts.map(optHtml).join("")}</div>`

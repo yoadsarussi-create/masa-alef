@@ -268,3 +268,25 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 @media (max-width:380px){.he-word{font-size:1.6rem}.ans.pic{font-size:2.8rem}.ans.pic img.pic{width:60px;height:60px}}
 @media (min-width:700px){body{font-size:20px}.app{max-width:640px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* מסך-משימה ממלא את הגובה: שאלה באמצע, תשובות בתחתית (אזור האגודל) */
+.card.play{min-height:calc(100vh - 130px);min-height:calc(-webkit-fill-available - 130px);justify-content:space-between}
+.card.play .pz{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;min-height:200px}
+.card.play .prompt{font-size:1.6rem}
+.card.play .emo{font-size:5.6rem}
+.card.play .he-big{font-size:5rem}
+.card.play .en-big{font-size:4rem}
+.card.play .he-word.big{font-size:3.6rem}
+.card.play .num-big,.card.play .eq{font-size:3rem}
+.card.play .answers .ans{min-height:118px;font-size:1.6rem}
+.card.play .answers .ans.pic{min-height:132px}
+.card.play .ans.pic img.pic{width:92px;height:92px}
+.card.play .ans.num{font-size:3rem}
+.card.play .row-opts .ans{min-height:120px}
+.card.play .row-opts .ans img.pic{width:72px;height:72px}
+.card.play .count{font-size:2.6rem;max-width:380px}
+.card.play .count img.pic{width:1em;height:1em}
+.card.play .draw-wrap{max-width:min(420px,calc(100vh - 360px))}
+.card.play .lane-wrap{height:min(360px,calc(100vh - 330px))}
+.card.play .tile{width:66px;height:70px;font-size:2.5rem}
+.card.play .slot{width:60px;height:68px;font-size:2.5rem}
+@media (min-width:700px){.card.play .answers .ans{min-height:150px}.card.play .ans.pic img.pic{width:120px;height:120px}.card.play .he-big{font-size:6.5rem}.card.play .emo{font-size:7rem}}
