@@ -4,6 +4,13 @@ import os,sys,json,time,subprocess,shutil,glob
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DL=os.path.expanduser("~/Downloads");DONE=os.path.join(ROOT,"tools","raw","imported");os.makedirs(DONE,exist_ok=True)
 items={x["id"]:x for x in json.load(open(os.path.join(ROOT,"tools/recpage/items.json"),encoding="utf-8"))}
+def update_got():
+    """מעדכן ב-rec.html את רשימת ההקלטות שכבר במחשב — כדי שהדף יסמן ⚠️ רק את מה שחסר"""
+    import re
+    rp=os.path.join(ROOT,"rec.html");h=open(rp,encoding="utf-8").read()
+    got=[i for i in sorted(items) if os.path.exists(os.path.join(ROOT,"audio","r_%s.m4a"%i))]
+    h=re.sub(r"const GOT=\[.*?\];","const GOT="+json.dumps(got)+";",h,count=1,flags=re.S)
+    open(rp,"w",encoding="utf-8").write(h)
 def run_once():
     files=sorted(glob.glob(os.path.join(DL,"agam_[0-9][0-9][0-9]*.*")))
     if not files:return 0
@@ -17,7 +24,8 @@ def run_once():
     json.dump(man,open(mp,"w",encoding="utf-8"),ensure_ascii=False,indent=0)
     open(os.path.join(ROOT,"audio-manifest.js"),"w",encoding="utf-8").write("window.AUDIO="+json.dumps(man,ensure_ascii=False)+";\n")
     if n:
-        subprocess.run(["git","-C",ROOT,"add","audio","audio-manifest.js","audio-manifest.json"],check=True)
+        update_got()
+        subprocess.run(["git","-C",ROOT,"add","audio","audio-manifest.js","audio-manifest.json","rec.html"],check=True)
         subprocess.run(["git","-C",ROOT,"-c","user.name=Yoad Sarussi","-c","user.email=yoad@maya-tour.co.il","commit","-qm","הקלטות אגם: %d קליפים בקול ההורים\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"%n],check=True)
         subprocess.run(["git","-C",ROOT,"push","-q","origin","main"],check=True);print("pushed",n)
     return n
