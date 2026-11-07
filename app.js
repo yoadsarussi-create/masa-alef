@@ -113,7 +113,10 @@ const GEN={
    return{sk:"let",key:"let:seq:"+LETTERS[i],tag:"סדר הא״ב",p:`${PROMPTS.letNext}<span class="he-seq">${seq.join(" ")}</span>`,say:[PROMPTS.letNext],opts:o.map(x=>opt(x,bigHe(x),"he")),a:LETTERS[i],after:[LETNAME[LETTERS[i-1]],LETNAME[LETTERS[i]],LETNAME[LETTERS[i+1]]]}}
   const lane=lv>=2&&Math.random()<.4;const n=lane?3:lv===1?3:4;const o=letterOpts(t,n,lv>=2);
   return{sk:"let",key:"let:"+t,tag:lane?"תפסי את האות":"שמות האותיות",p:lane?`${PROMPTS.lane} <span class="he-word">${LETNAME[t]}</span>`:PROMPTS.letHear,say:[lane?PROMPTS.lane:PROMPTS.letHear,LETNAME[t]],kind:lane?"lane":"opts",opts:o.map(x=>opt(x,bigHe(x),"he")),a:t,after:[LETNAME[t]]}},
- sound(lv){const last=lv===3||(lv===4&&Math.random()<.5);const pool=wordsBy(w=>last?true:w.syl<=3);const w=pick(pool);
+ sound(lv){if(Math.random()<.35){const t=pick(LETTERS.filter(l=>wordsBy(w=>w.w[0]===l).length>=1));const w=pick(wordsBy(x=>x.w[0]===t));const n=lv>=3?4:3;
+   const dis=others(wordsBy(x=>x.w[0]!==t&&(lv<2||!(CONFUSE_SOUND[t]||"").includes(x.w[0]))),[],n-1);const o=sh([w].concat(dis)).map(x=>Object.assign(opt(x.w,x.e,"pic"),{say:x.s}));
+   return{sk:"sound",key:"l2w:"+t,tag:"האות והצליל",p:`${PROMPTS.letterWord} ${bigHe(t)}`,say:[PROMPTS.letterWord,LETNAME[t]],playOpts:true,opts:o,a:w.w,after:[w.s,LETNAME[t]],info:`<span class="he-word">${w.s}</span>`}}
+  const last=lv===3||(lv===4&&Math.random()<.5);const pool=wordsBy(w=>last?true:w.syl<=3);const w=pick(pool);
   const t=last?w.w[w.w.length-1]:w.w[0];const base=FINAL_TO_BASE[t]||t;const n=lv===1?3:4;
   let o=letterOpts(base,n,lv>=2);if(FINAL_TO_BASE[t])o=o.map(x=>x===base?t:x);
   const pr=last?PROMPTS.soundLast:PROMPTS.soundFirst;
@@ -329,13 +332,15 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
   <div id="fb"></div>
  </div>`;
  app.querySelector("#quit").onclick=()=>{if(!quitArm){quitArm=true;toast("לצאת? ההתקדמות נשמרת. לחצי שוב על ✕",2500);return}home()};
- app.querySelector("#ear").onclick=()=>speak(q.say);
+ app.querySelector("#ear").onclick=()=>speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)});
  app.querySelectorAll(".ans").forEach(b=>b.onclick=()=>answer(b));
  if(q.kind==="spell")setupSpell(q);
  if(q.kind==="lane"){const f=app.querySelector(".fall");let loops=0;f.addEventListener("animationend",()=>{if(G.cur.done)return;loops++;if(loops===1){f.style.animation="none";void f.offsetWidth;f.style.animation="";speak(q.say)}else{f.classList.add("paused");f.style.transform="translateY(200px)";f.style.animation="none"}})}
  if(q.kind==="trace"){const wrap=app.querySelector("#draw");const t=setupTrace(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
  if(q.kind==="dots"){setupDots(q,app.querySelector("#draw"),(ok,st)=>{finishQ(true,null,null,st)})}
- scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say)},150)}
+ scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150)}
+async function playOptions(q){const tok=seqToken;const els=Array.prototype.slice.call(app.querySelectorAll(".ans"));
+ for(let i=0;i<els.length;i++){if(tok!==seqToken||!G.cur||G.cur.q!==q||G.cur.done)return;const o=q.opts.find(x=>x.v===els[i].dataset.o);els[i].classList.add("hl");await playOne(o&&o.say?o.say:"");els[i].classList.remove("hl");await new Promise(r=>setTimeout(r,150))}}
 function setupSpell(q){const slots=Array.prototype.slice.call(app.querySelectorAll(".slot")),tiles=Array.prototype.slice.call(app.querySelectorAll(".tile"));const fill=[];
  const render=()=>{slots.forEach((sl,k)=>{const t=fill[k];sl.textContent=t!=null?q.tiles[t]:"";sl.classList.toggle("on",t!=null)});tiles.forEach((t,k)=>t.disabled=fill.indexOf(k)>=0||G.cur.done)};
  tiles.forEach((t,k)=>t.onclick=()=>{if(G.cur.done)return;let pos=-1;for(let i=0;i<slots.length;i++)if(fill[i]==null){pos=i;break}if(pos<0)return;fill[pos]=k;tick();render();

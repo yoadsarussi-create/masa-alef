@@ -272,3 +272,4 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .sing-row span{width:30px;height:34px;border-radius:8px;background:#fff;border:2px solid #e2dcf5;display:flex;align-items:center;justify-content:center;color:#b9b0cc}
 .sing-row span.on{background:var(--gold);color:var(--ink);border-color:var(--gold-d)}
 .feedback .avatar.small{width:46px;height:60px}
+.ans.hl{box-shadow:0 0 0 6px var(--gold);transform:scale(1.06)}
