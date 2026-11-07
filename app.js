@@ -51,7 +51,7 @@ document.addEventListener("touchstart",unlock,{capture:true,passive:true});docum
 let seqToken=0;
 function clipKey(it){return typeof it==="string"?"he:"+strip(it).replace(/[!?,.]/g,"").trim():"en:"+it.en.toLowerCase()}
 function playOne(it){return new Promise(res=>{const key=clipKey(it),src=AUDIO[key];let done=false;const fin=()=>{if(!done){done=true;res()}};
- if(src){try{P.pause();P.onended=fin;P.onerror=()=>{tts(it).then(fin)};P.src=src;P.currentTime=0;const pr=P.play();if(pr&&pr.catch)pr.catch(()=>{tts(it).then(fin)});setTimeout(fin,6000);return}catch(e){}}
+ if(src){try{P.pause();P.onended=fin;P.onerror=()=>{tts(it).then(fin)};P.src=src;P.currentTime=0;const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true},()=>{tts(it).then(fin)});setTimeout(fin,6000);return}catch(e){}}
  tts(it).then(fin)})}
 function tts(it){if(!S.tts)return Promise.resolve();return new Promise(res=>{const text=typeof it==="string"?it:it.en;let started=false;
  try{if(!window.speechSynthesis)throw 0;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const he=typeof it==="string";
