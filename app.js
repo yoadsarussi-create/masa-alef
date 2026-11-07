@@ -43,8 +43,10 @@ function pickVoices(){try{const v=speechSynthesis.getVoices();voices.he=v.find(x
 try{pickVoices();speechSynthesis.onvoiceschanged=pickVoices}catch(e){}
 const P=new Audio();P.preload="auto";try{P.setAttribute("playsinline","")}catch(e){}
 let unlocked=false;
-function unlock(){if(unlocked)return;unlocked=true;try{if(AUDIO["__silence"]){P.src=AUDIO["__silence"];const pr=P.play();if(pr&&pr.catch)pr.catch(()=>{})}}catch(e){}
- try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume()}catch(e){}}
+let audioReady=false;
+function unlock(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume()}catch(e){}
+ if(audioReady||!P.paused)return;try{P.src=AUDIO["__silence"]||"";const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true;unlocked=true},()=>{})}catch(e){}
+}
 document.addEventListener("touchstart",unlock,{capture:true,passive:true});document.addEventListener("touchend",unlock,{capture:true,passive:true});document.addEventListener("pointerdown",unlock,{capture:true});document.addEventListener("click",unlock,{capture:true});
 let seqToken=0;
 function clipKey(it){return typeof it==="string"?"he:"+strip(it).replace(/[!?,.]/g,"").trim():"en:"+it.en.toLowerCase()}
@@ -242,7 +244,7 @@ function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const c
    ${st?`<span class="lstars">${starHtml(st)}</span>`:""}
   </div>`}).reverse().join("");
  app.innerHTML=`
- <div class="top"><h1>🎤 ${KID()} על הבמה</h1><span class="pill">⭐ ${totalStars}</span><span class="pill" aria-label="מעריצים">👥 ${S.coins}</span></div>
+ <div class="top"><h1>🎤 ${KID()} על הבמה</h1><button class="pill" id="sndtest" aria-label="בדיקת קול">🔊</button><span class="pill">⭐ ${totalStars}</span><span class="pill" aria-label="מעריצים">👥 ${S.coins}</span></div>
  <div class="buddy"><div class="bounce">${TURTLE}</div><div class="bubble">${buddyLine(cur)}</div></div>
  <div class="row3">
   <button class="small" id="smart"><span>🎯</span><span>אימון חכם</span></button>
@@ -263,6 +265,7 @@ function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const c
  app.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>start(b.dataset.sk));
  app.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{S.mapView=b.dataset.v;save();home()});
  app.querySelector("#col").onclick=collection;app.querySelector("#par").onclick=parentGate;app.querySelector("#stu").onclick=studio;
+ app.querySelector("#sndtest").onclick=()=>{const w=WORDS.filter(hasClip);const x=w.length?pick(w):null;if(!x){toast("אין עדיין הקלטות במכשיר הזה",2000);return}toast(`🔊 ${x.e} ${x.s}`,1800);speak([x.s])};
  installHint();
  if(S.mapView==="islands"){scrollTo(0,0);return}
  drawPath();const c=app.querySelector(".node.cur");if(c)c.scrollIntoView({block:"center"});else scrollTo(0,0)}
