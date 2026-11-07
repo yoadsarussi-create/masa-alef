@@ -89,7 +89,16 @@ function genFor(step,sub){const g=STEPS[step].gens;const st=subState(step,sub);
  if(/^E[A-Z]$/.test(sub))return{sk:"abc",lv:st.n<6?1:2,focus:sub.slice(1)};
  const pick1=g[Math.min(g.length-1,Math.floor(Math.random()*g.length))];return{sk:pick1[0],lv:pick1[1]}}
 function interleave(items){const out=[];let rest=items.slice();while(rest.length){const prev=out[out.length-1];let k=rest.findIndex(x=>!prev||x.step!==prev.step);if(k<0)k=0;out.push(rest.splice(k,1)[0])}return out}
+/* כל הופעה = נושא אחד (יועד 07/11: מעבר עברית↔אנגלית מבלבל). סבב: עברית, חשבון, עברית, אנגלית.
+   כל הופעה חמישית = "הופעת סיכום" מעורבת — רק אחרי שכל שלושת הנושאים עברו היכרות. */
+const DOM_CYCLE=["he","ma","he","en"],MIX_EVERY=5,PLACE_ROOTS={he:["he1","he2","he3"],ma:["ma1","ma2","ma3","ma4"],en:["en1","en4"]};
+const domOf=x=>STEPS[x.step].d;
+function pickDomain(){const e=E2();e.sc=e.sc||0;e.pd=e.pd||{};if(e.placed)["he","ma","en"].forEach(d=>{if(!e.pd[d])e.pd[d]=1});
+ const allPlaced=["he","ma","en"].every(d=>e.pd[d]);if(allPlaced)e.placed=true;const k=e.sc++;
+ if(allPlaced&&k%MIX_EVERY===MIX_EVERY-1)return "mix";
+ e.dc=e.dc||0;const d=DOM_CYCLE[e.dc%DOM_CYCLE.length];e.dc++;return d}
 function buildSession(focusStep,n){n=n||8;const e=E2();let plan=[];
+ if(!focusStep){const d=pickDomain();e.lastDom=d;if(d!=="mix"){const p=buildDomainSession(d,n);if(p&&p.length)return p;e.lastDom="mix"}}else e.lastDom=null;
  if(focusStep){const subs=subKeys(focusStep).map(sub=>({step:focusStep,sub}));const un=subs.filter(x=>!subPassed(x.step,x.sub));const pool=un.length?un:subs;
   for(let i=0;i<n;i++){const x=pool[i%pool.length];plan.push(Object.assign({role:"focus"},x,genFor(x.step,x.sub)))}return sh(plan)}
  /* מיקום: 3 הסשנים הראשונים דוגמים רחב */
@@ -103,6 +112,23 @@ function buildSession(focusStep,n){n=n||8;const e=E2();let plan=[];
  const warmPool=sh(passedSubs());const warm=warmPool.slice(0,Math.max(1,n-due.length-focus.length)).map(x=>Object.assign({role:"warm"},x,genFor(x.step,x.sub)));
  plan=interleave(sh(warm.concat(due,focus)));
  while(plan.length<n&&open.length){const x=pick(open);plan.push(Object.assign({role:"focus"},x,genFor(x.step,x.sub)))}
+ return plan.slice(0,n)}
+function buildDomainSession(d,n){const e=E2();let plan=[];
+ /* היכרות: הופעה ראשונה בכל נושא דוגמת את שורשי הנושא */
+ if(!e.pd[d]){const roots=PLACE_ROOTS[d];let k=0;while(plan.length<n){const step=roots[k%roots.length];k++;const sub=pick(subKeys(step));plan.push(Object.assign({role:"place",step,sub},genFor(step,sub)))}
+  e.pd[d]=1;return interleave(sh(plan)).slice(0,n)}
+ const inD=x=>domOf(x)===d;
+ const due=sh(dueSubs().filter(inD)).slice(0,2).map(x=>Object.assign({role:"review"},x,genFor(x.step,x.sub)));
+ const open=openSubs().filter(inD);
+ const weight=x=>{const st=subState(x.step,x.sub);const h=st.h.slice(-6);if(st.n===0)return 1.0+Math.random()*.4;const acc=h.length?h.reduce((a,b)=>a+b,0)/h.length:.5;return (acc>=.4&&acc<.85?2.2:acc<.4?1.6:.6)+Math.random()*.5};
+ const arr=open.slice().sort((a,b)=>weight(b)-weight(a));const focus=[];let newCount=0;
+ while(focus.length<n-due.length-2&&arr.length){let idx=Math.random()<.7?0:Math.floor(Math.random()*arr.length);if(newCount>=2){const j=arr.findIndex(y=>subState(y.step,y.sub).n>0);if(j>=0)idx=j}
+  const x=arr.splice(idx,1)[0];if(subState(x.step,x.sub).n===0)newCount++;focus.push(Object.assign({role:"focus"},x,genFor(x.step,x.sub)))}
+ const warm=sh(passedSubs().filter(inD)).slice(0,Math.max(1,n-due.length-focus.length)).map(x=>Object.assign({role:"warm"},x,genFor(x.step,x.sub)));
+ plan=interleave(sh(warm.concat(due,focus)));
+ /* חסר? משלימים מאותו נושא (גם תת-מיומנויות שכבר נפתחו), לא מנושא אחר */
+ let guard=0;while(plan.length<n&&guard++<40){const pool=open.length?open:passedSubs().filter(inD);if(!pool.length)break;const x=pick(pool);plan.push(Object.assign({role:open.length?"focus":"warm"},x,genFor(x.step,x.sub)))}
+ if(!plan.length){e.lastDom="mix";e.pd[d]=1;return null}
  return plan.slice(0,n)}
 /* מה להציג להורה */
 function parentLists(){const know=[],now=[],stuck=[];Object.keys(STEPS).forEach(step=>{subKeys(step).forEach(sub=>{const st=subState(step,sub);const name=STEPS[step].n+(/^[LE]./.test(sub)?" · "+sub.slice(1):"");

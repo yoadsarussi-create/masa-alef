@@ -304,7 +304,8 @@ function planSkills(focus,n){if(typeof focus==="string")return Array.from({lengt
  const w=keys.map(k=>{const m=mastery(k);const u=hist(k).length<3?1.2:0;return{k,s:(m===null?.5:1-m)*2+u+Math.random()*.6}}).sort((a,b)=>b.s-a.s);
  const out=[];let i=0;while(out.length<n){out.push(w[i%w.length].k);i++;if(i%w.length===0)w.sort((a,b)=>b.s+Math.random()*.8-(a.s+Math.random()*.8))}
  const res=[];let rest=out.slice();while(rest.length){const prev=res[res.length-1];let k=rest.findIndex(x=>!prev||x!==prev);if(k<0)k=0;res.push(rest.splice(k,1)[0])}return res}
-function start(step){const plan=buildSession(step||null,ROUND);G={step:step||null,plan,list:plan.map(x=>x.sk),i:0,res:[],combo:0,gain:0,retried:0,wrongRow:0,easy:false,ups:[],pendingUp:null,encore:false,hints:0};ask()}
+const DOM_TOAST={he:"📖 הופעה בעברית",ma:"🔢 הופעה בחשבון",en:"🔤 הופעה באנגלית",mix:"🎤 הופעת סיכום — קצת מהכל!"};
+function start(step){const plan=buildSession(step||null,ROUND);const dm=E2().lastDom;if(dm&&DOM_TOAST[dm])setTimeout(()=>toast(DOM_TOAST[dm],1800),300);G={step:step||null,plan,list:plan.map(x=>x.sk),i:0,res:[],combo:0,gain:0,retried:0,wrongRow:0,easy:false,ups:[],pendingUp:null,encore:false,hints:0};ask()}
 function ask(){view="play";quitArm=false;clearTimeout(advT);
  if(G.pendingUp){const sk=G.pendingUp;G.pendingUp=null;levelUp(sk);return}
  const item=G.plan[G.i];const sk=item.sk;let lv=item.lv;const easy=G.easy;G.easy=false;if(easy)lv=Math.max(1,lv-1);
