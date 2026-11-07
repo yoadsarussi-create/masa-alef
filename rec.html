@@ -29,7 +29,7 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}button:dis
 .done-badge{color:var(--ok)}
 </style></head><body><div class="app">
 <div class="top"><h1>🎙️ הקלטות למשחק של אגם</h1><span class="pill" id="cnt">0</span></div>
-<div class="tips" id="tips">קוראים את המשפט בדיוק כמו שכתוב, בקול חם ושמח, לאט וברור. לוחצים <b>הקלט</b>, אומרים, לוחצים <b>עצור</b>, שומעים, ואם טוב — <b>שמור והבא</b>. הכול נשמר בטלפון. בסוף (או מתי שרוצים) — <b>שליחה למחשב</b> ← AirDrop למחשב של יועד.</div>
+<div class="tips" id="tips">מתחילים מ<b>קבוצה 1</b> (60 משפטים) — זה מה שחשוב עכשיו. לוחצים <b>הקלט</b>, אומרים בקול חם וברור, לוחצים <b>עצור</b> — נשמר ועובר לבא. טעית? <b>→ הקודם</b> ומקליטים שוב. בסוף: <b>שליחה למחשב</b> ← AirDrop.</div>
 <select id="grp" aria-label="קבוצה"></select>
 <div class="bar"><i id="bar" style="width:0"></i></div>
 <div class="card">
@@ -37,9 +37,8 @@ button:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}button:dis
  <div class="say" id="say"></div>
  <div class="hint" id="hint"></div>
  <button class="rec" id="rec">🎙️ הקלט</button>
- <div class="st" id="st"></div>
- <div class="row"><button class="play" id="play" disabled>▶️ השמע</button><button class="save" id="save" disabled>✅ שמור והבא</button></div>
- <div class="row"><button class="nav" id="prev">→ הקודם</button><button class="nav" id="skip">דלג ←</button></div>
+ <div class="st" id="st">לוחצים, אומרים, לוחצים שוב — נשמר ועובר לבא</div>
+ <div class="row"><button class="nav" id="prev">→ הקודם</button><button class="play" id="play" disabled>▶️ השמע</button><button class="nav" id="skip">דלג ←</button></div>
 </div>
 <button class="send" id="send">📤 שליחה למחשב (<span id="unsent">0</span> חדשות)</button>
 </div>
@@ -52,28 +51,34 @@ const store=m=>DB.transaction("clips",m).objectStore("clips");
 const get=k=>new Promise(r=>{if(!DB)return r(null);const q=store("readonly").get(k);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)});
 const put=(k,v)=>new Promise(r=>{if(!DB)return r(false);const q=store("readwrite").put(v,k);q.onsuccess=()=>r(true);q.onerror=()=>r(false)});
 const keys=()=>new Promise(r=>{if(!DB)return r([]);const q=store("readonly").getAllKeys();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])});
-let idx=0,list=[],blob=null,mr=null,chunks=[],stream=null,player=new Audio(),busy=false;
+let idx=0,list=[],blob=null,mr=null,chunks=[],stream=null,player=new Audio(),busy=false,stopT=null;
 const $=id=>document.getElementById(id);
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}}function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 async function init(){sel.value=lsGet("grp",groups[0]);if(!sel.value)sel.value=groups[0];idx=+lsGet("idx_"+sel.value,0)||0;render()}
 async function render(){list=ITEMS.filter(x=>x.g===sel.value);if(idx>=list.length)idx=list.length-1;if(idx<0)idx=0;const it=list[idx];const ks=await keys();
- const doneG=list.filter(x=>ks.indexOf(x.id)>=0).length;$("pos").textContent=(idx+1)+" / "+list.length;$("done").innerHTML=ks.indexOf(it.id)>=0?'<span class="done-badge">✓ יש הקלטה</span>':"";
- $("bar").style.width=(doneG/list.length*100)+"%";$("say").textContent=it.t;$("hint").textContent=it.hint||"";$("cnt").textContent=ks.length+" / "+ITEMS.length;
+ const doneG=list.filter(x=>ks.indexOf(x.id)>=0).length;$("pos").textContent=(idx+1)+" / "+list.length;$("done").innerHTML=ks.indexOf(it.id)>=0?'<span class="done-badge">✓ יש הקלטה — אפשר להקליט מחדש</span>':"";
+ $("bar").style.width=(doneG/list.length*100)+"%";$("say").textContent=it.t;$("hint").textContent=it.hint||"";$("cnt").textContent=doneG+" / "+list.length;
  const sent=JSON.parse(lsGet("sent","[]"));$("unsent").textContent=ks.filter(k=>sent.indexOf(k)<0).length;
- const prev=await get(it.id);blob=prev?prev.blob:null;$("play").disabled=!blob;$("save").disabled=true;$("st").textContent="";lsSet("grp",sel.value);lsSet("idx_"+sel.value,idx)}
+ const prev=await get(it.id);blob=prev?prev.blob:null;$("play").disabled=!blob;lsSet("grp",sel.value);lsSet("idx_"+sel.value,idx)}
 sel.onchange=()=>{idx=+lsGet("idx_"+sel.value,0)||0;render()};
-$("rec").onclick=async()=>{const b=$("rec");
- if(mr&&mr.state==="recording"){mr.stop();b.textContent="🎙️ הקלט";b.classList.remove("on");setTimeout(finish,700);return}
- try{stream=stream||await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:true,autoGainControl:true}})}catch(e){$("st").textContent="אין גישה למיקרופון — אשרו מיקרופון ל-Safari ונסו שוב";return}
+async function startRec(){const b=$("rec");
+ /* זרם-מיקרופון חדש לכל הקלטה — באייפון זרם שהוקלט פעם לא מקליט שוב */
+ try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:true,autoGainControl:true}})}catch(e){$("st").textContent="אין גישה למיקרופון — אשרו מיקרופון ל-Safari ונסו שוב";return}
  const mime=["audio/mp4","audio/webm;codecs=opus","audio/webm"].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))||"";
  try{mr=new MediaRecorder(stream,mime?{mimeType:mime}:{})}catch(e){mr=new MediaRecorder(stream)}chunks=[];busy=false;
- mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};mr.onstop=finish;mr.start(250);b.textContent="⏹ עצור";b.classList.add("on");$("st").textContent="מקליט… אומרים את המשפט ואז עצור";$("save").disabled=true};
-function finish(){if(busy||!chunks.length)return;busy=true;blob=new Blob(chunks,{type:(mr&&mr.mimeType)||"audio/mp4"});$("play").disabled=false;$("save").disabled=false;$("st").textContent="הוקלט ✓ שומעים, ואם טוב — שמור והבא";play()}
+ mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};mr.onstop=()=>{clearTimeout(stopT);stopT=setTimeout(finish,150)};
+ mr.start(200);b.textContent="⏹ עצור ושמור";b.classList.add("on");$("st").textContent="מקליט… אומרים את המשפט"}
+function stopRec(){const b=$("rec");b.textContent="🎙️ הקלט";b.classList.remove("on");try{mr.requestData()}catch(e){}try{mr.stop()}catch(e){}clearTimeout(stopT);stopT=setTimeout(finish,1200)}
+async function finish(){if(busy)return;busy=true;try{stream&&stream.getTracks().forEach(t=>t.stop())}catch(e){}stream=null;
+ if(!chunks.length){$("st").textContent="לא נקלט קול — נסו שוב";busy=false;return}
+ blob=new Blob(chunks,{type:(mr&&mr.mimeType)||"audio/mp4"});const it=list[idx];
+ const ok=await put(it.id,{id:it.id,k:it.k,t:it.t,mime:blob.type,blob,at:Date.now()});
+ if(!ok){$("st").textContent="השמירה נכשלה — נסו שוב";return}
+ const sent=JSON.parse(lsGet("sent","[]")).filter(k=>k!==it.id);lsSet("sent",JSON.stringify(sent));
+ const was=idx;if(idx<list.length-1)idx++;await render();$("st").textContent="נשמר ✓ ("+(was+1)+") — אפשר להמשיך";}
+$("rec").onclick=()=>{if(mr&&mr.state==="recording")stopRec();else startRec()};
 function play(){if(!blob)return;try{player.pause();player.src=URL.createObjectURL(blob);player.play()}catch(e){}}
 $("play").onclick=play;
-$("save").onclick=async()=>{if(!blob)return;const it=list[idx];const ok=await put(it.id,{id:it.id,k:it.k,t:it.t,mime:blob.type,blob,at:Date.now()});
- if(!ok){$("st").textContent="השמירה נכשלה";return}const sent=JSON.parse(lsGet("sent","[]")).filter(k=>k!==it.id);lsSet("sent",JSON.stringify(sent));
- if(idx<list.length-1)idx++;await render();$("st").textContent="נשמר ✓"};
 $("skip").onclick=()=>{if(idx<list.length-1){idx++;render()}};$("prev").onclick=()=>{if(idx>0){idx--;render()}};
 $("send").onclick=async()=>{const ks=await keys();const sent=JSON.parse(lsGet("sent","[]"));const todo=ks.filter(k=>sent.indexOf(k)<0);if(!todo.length){$("st").textContent="אין הקלטות חדשות לשליחה";return}
  const files=[];for(const k of todo){const v=await get(k);if(!v)continue;const ext=(v.mime||"").indexOf("webm")>=0?"webm":"m4a";files.push(new File([v.blob],"agam_"+v.id+"."+ext,{type:v.mime||"audio/mp4"}))}
