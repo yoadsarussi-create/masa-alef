@@ -32,7 +32,7 @@ function lmazeSetup(q){let k=0,err=0;const W=q.W;const els=app.querySelectorAll(
   else if(!b.classList.contains("trail")){err++;b.classList.remove("wiggle");void b.offsetWidth;b.classList.add("wiggle");speak([{sfx:"wrong"}],0);if(err>=3)els[next].classList.add("hintblink")}})}
 
 /* ---------- רכבת-מספרים: לוחצים על הקרונות לפי הסדר ---------- */
-function trainQ(sk,lv){const n=lv>=2?6:4;const start=lv>=2?rnd(1,15):1;const step=lv>=3?pick([1,2]):1;const nums=Array.from({length:n},(_,i)=>start+i*step);
+function trainQ(sk,lv){const n=lv>=2?6:4;const step=lv>=3?pick([1,2]):1;const start=lv>=2?rnd(1,20-(n-1)*step):1;const nums=Array.from({length:n},(_,i)=>start+i*step);
  return{sk:sk,key:"train:"+start+":"+step,tag:"רכבת מספרים",kind:"train",nums:nums,shuf:sh(nums),p:"סַדְּרִי אֶת הַקְּרוֹנוֹת לְפִי הַסֵּדֶר 🚂",say:[PROMPTS.train],a:"done",after:nums.map(x=>NUMNAME[x]||String(x))}}
 function trainHtml(q){return`<div class="train" dir="ltr"><span class="loco">${picHtml("🚂")}</span>${q.nums.map((_,i)=>`<span class="car empty" data-k="${i}"></span>`).join("")}</div>
  <div class="cars">${q.shuf.map(x=>`<button class="car src" data-v="${x}">${x}</button>`).join("")}</div>`}
