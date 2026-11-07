@@ -12,7 +12,7 @@ def run_once():
         iid=os.path.basename(f)[5:8];it=items.get(iid)
         if not it:print("no item for",f);continue
         out="audio/r_%s.m4a"%iid
-        subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f,"-af","highpass=f=70,loudnorm=I=-16:TP=-1.5,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.06:stop_periods=1:stop_threshold=-50dB:stop_silence=0.15,adelay=150,apad=pad_dur=0.12","-ac","1","-ar","32000","-c:a","aac","-b:a","56k",os.path.join(ROOT,out)],check=True)
+        subprocess.run(["ffmpeg","-y","-loglevel","error","-i",f,"-af","highpass=f=60,silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.08,areverse,silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.15,areverse,loudnorm=I=-16:TP=-1.5:LRA=11,adelay=150,apad=pad_dur=0.12","-ac","1","-ar","32000","-c:a","aac","-b:a","56k",os.path.join(ROOT,out)],check=True)
         man[it["k"]]=out;shutil.move(f,os.path.join(DONE,os.path.basename(f)));n+=1;print("imported",iid,it["t"])
     json.dump(man,open(mp,"w",encoding="utf-8"),ensure_ascii=False,indent=0)
     open(os.path.join(ROOT,"audio-manifest.js"),"w",encoding="utf-8").write("window.AUDIO="+json.dumps(man,ensure_ascii=False)+";\n")
