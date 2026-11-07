@@ -1,0 +1,38 @@
+[in#0 @ 0x7c5b008000] Error opening input: Invalid data found when processing input
+Error opening input file /Users/sarussi-mac/masa-alef/tools/raw/En-us-pig.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original.
+Error opening input files: Invalid data found when processing input
+MISS he:כבשה
+MISS he:קיפוד
+MISS he:פינגווין
+MISS he:דינוזאור
+MISS he:ג'ירפה
+MISS he:עגבנייה
+MISS he:סוכרייה
+MISS he:עוגייה
+MISS he:תוף
+MISS he:דובי
+MISS he:הליקופטר
+MISS he:עפרון
+MISS he:גימל
+MISS he:חית
+MISS he:טית
+MISS he:סמך
+MISS he:פא
+MISS he:צדי
+MISS he:ריש
+MISS he:שין
+MISS he:חמש עשרה
+MISS he:עיגול
+MISS he:מלבן
+OK   en:pig <- File:En-us-pig.ogg CC BY-SA 3.0
+Traceback (most recent call last):
+  File "/Users/sarussi-mac/masa-alef/tools/audio_fetch.py", line 77, in <module>
+    if __name__=="__main__": main()
+                             ~~~~^^
+  File "/Users/sarussi-mac/masa-alef/tools/audio_fetch.py", line 66, in main
+    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",raw,"-af","silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=1:stop_threshold=-45dB,loudnorm=I=-16:TP=-1.5,apad=pad_dur=0.15","-ac","1","-ar","32000","-c:a","aac","-b:a","40k",os.path.join(ROOT,out)],check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['ffmpeg', '-y', '-loglevel', 'error', '-i', '/Users/sarussi-mac/masa-alef/tools/raw/En-us-pig.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original', '-af', 'silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=1:stop_threshold=-45dB,loudnorm=I=-16:TP=-1.5,apad=pad_dur=0.15', '-ac', '1', '-ar', '32000', '-c:a', 'aac', '-b:a', '40k', '/Users/sarussi-mac/masa-alef/audio/1952e9ea4e.m4a']' returned non-zero exit status 183.

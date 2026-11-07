@@ -1,0 +1,269 @@
+# קרדיטים — הקלטות קול
+
+כל קליפי המילים הם הקלטות של דוברים אנושיים מ-Wikimedia Commons (Lingua Libre / En-us). הומרו ל-m4a ונורמלו בעוצמה. רישיון לכל קובץ לפי השורה שלו (CC0 / CC BY-SA).
+
+- en:apple — File:En-us-apple.ogg — CC BY-SA 3.0
+- en:b — File:En-us-b.ogg — CC BY-SA 3.0
+- en:baby — File:En-us-baby.ogg — CC BY-SA 3.0
+- en:bag — File:En-us-bag.ogg — CC BY-SA 3.0
+- en:ball — File:En-us-ball.ogg — CC BY-SA 3.0
+- en:balloon — File:En-us-balloon.ogg — CC BY-SA 3.0
+- en:banana — File:En-us-banana.ogg — CC BY-SA 3.0
+- en:bear — File:En-us-bear.ogg — CC BY-SA 3.0
+- en:bed — File:En-us-bed.ogg — CC BY-SA 3.0
+- en:bee — File:En-us-bee.ogg — CC BY-SA 3.0
+- en:big — File:En-us-big.ogg — CC BY-SA 3.0
+- en:bird — File:En-us-bird.ogg — CC BY-SA 3.0
+- en:black — File:LL-Q1860 (eng)-Baswameenakshi-black.wav — CC0
+- en:blue — File:En-us-blue.ogg — CC BY-SA 3.0
+- en:boat — File:En-us-boat.ogg — CC BY-SA 3.0
+- en:book — File:En-us-book.ogg — CC BY-SA 3.0
+- en:boy — File:En-us-boy.ogg — CC BY-SA 3.0
+- en:bread — File:En-us-bread.ogg — CC BY-SA 3.0
+- en:brown — File:En-us-brown.ogg — CC BY-SA 3.0
+- en:bus — File:En-us-bus.ogg — CC BY-SA 3.0
+- en:butterfly — File:LL-Q1860 (eng)-Simplificationalizer-butterfly.wav — CC0
+- en:c — File:En-us-c.ogg — CC BY-SA 3.0
+- en:cake — File:En-us-cake.ogg — CC BY-SA 3.0
+- en:car — File:En-us-car.ogg — CC BY-SA 3.0
+- en:carrot — File:En-us-carrot.ogg — CC BY-SA 3.0
+- en:cat — File:En-us-cat.ogg — CC BY-SA 3.0
+- en:chair — File:En-us-chair.ogg — CC BY-SA 3.0
+- en:cheese — File:En-us-cheese.ogg — CC BY-SA 3.0
+- en:cold — File:En-us-cold.ogg — CC BY-SA 3.0
+- en:cookie — File:LL-Q1860 (eng)-Wodencafe-cookie.wav — CC0
+- en:cow — File:En-us-cow.ogg — CC BY-SA 3.0
+- en:d — File:En-us-d.ogg — CC BY-SA 3.0
+- en:dad — File:En-us-dad.ogg — CC BY-SA 3.0
+- en:dog — File:En-us-dog.ogg — CC BY-SA 3.0
+- en:door — File:En-us-door.ogg — CC BY-SA 3.0
+- en:duck — File:En-us-duck.ogg — CC BY-SA 3.0
+- en:e — File:En-us-e.ogg — CC BY-SA 3.0
+- en:ear — File:En-us-ear.ogg — CC BY-SA 3.0
+- en:egg — File:En-us-egg.ogg — CC BY-SA 3.0
+- en:eight — File:En-us-eight.ogg — CC BY-SA 3.0
+- en:f — File:En-us-f.ogg — CC BY-SA 3.0
+- en:flower — File:En-us-flower.ogg — CC BY-SA 3.0
+- en:foot — File:En-us-foot.ogg — CC BY-SA 3.0
+- en:frog — File:En-us-frog.ogg — CC BY-SA 3.0
+- en:g — File:En-us-g.ogg — CC BY-SA 3.0
+- en:gift — File:En-us-gift.ogg — CC BY-SA 3.0
+- en:girl — File:En-us-girl.ogg — CC BY-SA 3.0
+- en:grandma — File:LL-Q1860 (eng)-Grendelkhan-grandma.wav — CC0
+- en:grandpa — File:LL-Q1860 (eng)-Wodencafe-grandpa.wav — CC0
+- en:green — File:En-us-green.ogg — CC BY-SA 3.0
+- en:h — File:En-us-h.ogg — CC BY-SA 3.0
+- en:hand — File:En-us-hand.ogg — CC BY-SA 3.0
+- en:happy — File:En-us-happy.ogg — CC BY-SA 3.0
+- en:hat — File:En-us-hat.ogg — CC BY-SA 3.0
+- en:horse — File:En-us-horse.ogg — CC BY-SA 3.0
+- en:hot — File:En-us-hot.ogg — CC BY-SA 3.0
+- en:house — File:LL-Q1860 (eng)-Back ache-house.wav — CC BY-SA 4.0
+- en:ice cream — File:En-us-ice_cream.ogg — CC BY-SA 3.0
+- en:j — File:En-us-j.ogg — CC BY-SA 3.0
+- en:k — File:En-us-k.ogg — CC BY-SA 3.0
+- en:key — File:En-us-key.ogg — CC BY-SA 3.0
+- en:king — File:En-us-king.ogg — CC BY-SA 3.0
+- en:l — File:En-us-l.ogg — CC BY-SA 3.0
+- en:lion — File:En-us-lion.ogg — CC BY-SA 3.0
+- en:m — File:En-us-m.ogg — CC BY-SA 3.0
+- en:milk — File:En-us-milk.ogg — CC BY-SA 3.0
+- en:mom — File:En-us-mom.ogg — CC BY-SA 3.0
+- en:monkey — File:En-us-monkey.ogg — CC BY-SA 3.0
+- en:moon — File:En-us-moon.ogg — CC BY-SA 3.0
+- en:mouse — File:En-us-mouse.ogg — CC BY-SA 3.0
+- en:mouth — File:En-us-mouth.ogg — CC BY-SA 3.0
+- en:n — File:En-us-n.ogg — CC BY-SA 3.0
+- en:nine — File:En-us-nine.ogg — CC BY-SA 3.0
+- en:nose — File:En-us-nose.ogg — CC BY-SA 3.0
+- en:o — File:En-us-o.ogg — CC BY-SA 3.0
+- en:one — File:En-us-one.ogg — CC BY-SA 3.0
+- en:orange — File:LL-Q1860 (eng)-Samuel Muldoon (Muldoonsamuel55)-orange.wav — CC0
+- en:p — File:En-us-p.ogg — CC BY-SA 3.0
+- en:pig — File:En-us-pig.ogg — CC BY-SA 3.0
+- en:pink — File:LL-Q1860 (eng)-Grendelkhan-pink.wav — CC0
+- en:pizza — File:En-us-pizza.ogg — CC BY-SA 3.0
+- en:purple — File:En-us-purple.ogg — CC BY-SA 3.0
+- en:q — File:En-us-q.ogg — CC BY-SA 3.0
+- en:queen — File:En-us-queen.ogg — CC BY-SA 3.0
+- en:r — File:En-us-r.ogg — CC BY-SA 3.0
+- en:rabbit — File:En-us-rabbit.ogg — CC BY-SA 3.0
+- en:red — File:En-us-red.ogg — CC BY-SA 3.0
+- en:s — File:En-us-s.ogg — CC BY-SA 3.0
+- en:sad — File:En-us-sad.ogg — CC BY-SA 3.0
+- en:seven — File:En-us-seven.ogg — CC BY-SA 3.0
+- en:sheep — File:En-us-sheep.ogg — CC BY-SA 3.0
+- en:shoe — File:En-us-shoe.ogg — CC BY-SA 3.0
+- en:six — File:En-us-six.ogg — CC BY-SA 3.0
+- en:small — File:En-us-small.ogg — CC BY-SA 3.0
+- en:snake — File:En-us-snake.ogg — CC BY-SA 3.0
+- en:star — File:En-us-star.ogg — CC BY-SA 3.0
+- en:strawberry — File:En-us-strawberry.ogg — CC BY-SA 3.0
+- en:sun — File:En-us-sun.ogg — CC BY-SA 3.0
+- en:t — File:En-us-t.ogg — CC BY-SA 3.0
+- en:ten — File:En-us-ten.ogg — CC BY-SA 3.0
+- en:three — File:En-us-three.ogg — CC BY-SA 3.0
+- en:tree — File:En-us-tree.ogg — CC BY-SA 3.0
+- en:turtle — File:En-us-turtle.ogg — CC BY-SA 3.0
+- en:two — File:En-us-two.ogg — CC BY-SA 3.0
+- en:u — File:En-us-u.ogg — CC BY-SA 3.0
+- en:v — File:En-us-v.ogg — CC BY-SA 3.0
+- en:w — File:En-us-w.ogg — CC BY-SA 3.0
+- en:water — File:En-us-water.ogg — CC BY-SA 3.0
+- en:watermelon — File:En-us-watermelon.ogg — CC BY-SA 3.0
+- en:white — File:En-us-white.ogg — CC BY-SA 3.0
+- en:x — File:En-us-x.ogg — CC BY-SA 3.0
+- en:y — File:En-us-y.ogg — CC BY-SA 3.0
+- en:yellow — File:En-us-yellow.ogg — CC BY-SA 3.0
+- en:z — File:En-us-z.ogg — CC BY-SA 3.0
+- he:אבטיח — File:LL-Q9288 (heb)-Buffer-אבטיח.wav — CC BY-SA 4.0
+- he:אגס — File:LL-Q9288 (heb)-Buffer-אגס.wav — CC BY-SA 4.0
+- he:אוזן — File:LL-Q9288 (heb)-Buffer-אוזן.wav — CC BY-SA 4.0
+- he:אוטובוס — File:LL-Q9288 (heb)-Uziel302-אוטובוס.wav — CC0
+- he:אופניים — File:LL-Q9288 (heb)-Buffer-אופניים.wav — CC BY-SA 4.0
+- he:אחת עשרה — File:LL-Q9288 (heb)-YaronSh-אחת עשרה.wav — CC0
+- he:אחת — File:LL-Q9288 (heb)-Buffer-אחת.wav — CC BY-SA 4.0
+- he:אלף — File:LL-Q9288 (heb)-Buffer-אלף.wav — CC BY-SA 4.0
+- he:אף — File:LL-Q9288 (heb)-Buffer-אף.wav — CC BY-SA 4.0
+- he:ארבע עשרה — File:LL-Q9288 (heb)-YaronSh-ארבע עשרה.wav — CC0
+- he:ארבע — File:LL-Q9288 (heb)-Buffer-ארבע.wav — CC BY-SA 4.0
+- he:אריה — File:LL-Q9288 (heb)-Buffer-אריה.wav — CC BY-SA 4.0
+- he:ארנב — File:LL-Q9288 (heb)-Uziel302-ארנב.wav — CC0
+- he:אש — File:LL-Q9288 (heb)-Buffer-אש.wav — CC BY-SA 4.0
+- he:ביצה — File:LL-Q9288 (heb)-Buffer-ביצה.wav — CC BY-SA 4.0
+- he:בית — File:He-בית.ogg — CC BY-SA 3.0
+- he:בלון — File:LL-Q9288 (heb)-Yuvalyan-בלון.wav — CC BY-SA 4.0
+- he:בננה — File:LL-Q9288 (heb)-Buffer-בננה.wav — CC BY-SA 4.0
+- he:ברווז — File:LL-Q9288 (heb)-Buffer-ברווז.wav — CC BY-SA 4.0
+- he:גבינה — File:LL-Q9288 (heb)-Buffer-גבינה.wav — CC BY-SA 4.0
+- he:גזר — File:LL-Q9288 (heb)-Buffer-גזר.wav — CC BY-SA 4.0
+- he:גיטרה — File:LL-Q9288 (heb)-YaronSh-גיטרה.wav — CC0
+- he:גלידה — File:LL-Q9288 (heb)-Buffer-גלידה.wav — CC BY-SA 4.0
+- he:גמל — File:LL-Q9288 (heb)-Buffer-גמל.wav — CC BY-SA 4.0
+- he:גשם — File:LL-Q9288 (heb)-Buffer-גשם.wav — CC BY-SA 4.0
+- he:דבורה — File:LL-Q9288 (heb)-Buffer-דבורה.wav — CC BY-SA 4.0
+- he:דג — File:LL-Q9288 (heb)-Buffer-דג.wav — CC BY-SA 4.0
+- he:דוב — File:LL-Q9288 (heb)-Buffer-דוב.wav — CC BY-SA 4.0
+- he:דלי — File:LL-Q9288 (heb)-Uziel302-דלי.wav — CC0
+- he:דלת — File:LL-Q9288 (heb)-Buffer-דלת.wav — CC BY-SA 4.0
+- he:הא — File:LL-Q9288 (heb)-YaronSh-הא.wav — CC0
+- he:הר — File:LL-Q9288 (heb)-Buffer-הר.wav — CC BY-SA 4.0
+- he:וו — File:LL-Q9288 (heb)-YaronSh-וו.wav — CC0
+- he:ורד — File:LL-Q9288 (heb)-Buffer-ורד.wav — CC BY-SA 4.0
+- he:זאב — File:LL-Q9288 (heb)-Buffer-זאב.wav — CC BY-SA 4.0
+- he:זבוב — File:LL-Q9288 (heb)-Uziel302-זבוב.wav — CC0
+- he:זברה — File:LL-Q9288 (heb)-Yuvalyan-זברה.wav — CC BY-SA 4.0
+- he:זין — File:LL-Q9288 (heb)-Uziel302-זין.wav — CC0
+- he:זית — File:LL-Q9288 (heb)-Buffer-זית.wav — CC BY-SA 4.0
+- he:חג — File:LL-Q9288 (heb)-YaronSh-חג.wav — CC0
+- he:חזיר — File:LL-Q9288 (heb)-Buffer-חזיר.wav — CC BY-SA 4.0
+- he:חלב — File:LL-Q9288 (heb)-Buffer-חלב.wav — CC BY-SA 4.0
+- he:חליל — File:LL-Q9288 (heb)-YaronSh-חליל.wav — CC0
+- he:חמש — File:LL-Q9288 (heb)-Buffer-חמש.wav — CC BY-SA 4.0
+- he:חץ — File:LL-Q9288 (heb)-Ijon-חץ.wav — CC BY-SA 4.0
+- he:חתול — File:LL-Q9288 (heb)-Buffer-חתול.wav — CC BY-SA 4.0
+- he:טווס — File:LL-Q9288 (heb)-YaronSh-טווס.wav — CC0
+- he:טלוויזיה — File:LL-Q9288 (heb)-Uziel302-טלוויזיה.wav — CC0
+- he:טלפון — File:LL-Q9288 (heb)-Buffer-טלפון.wav — CC BY-SA 4.0
+- he:טרקטור — File:LL-Q9288 (heb)-Yuvalyan-טרקטור.wav — CC BY-SA 4.0
+- he:יד — File:LL-Q9288 (heb)-Buffer-יד.wav — CC BY-SA 4.0
+- he:יוד — File:LL-Q9288 (heb)-Uziel302-יוד.wav — CC0
+- he:יונה — File:LL-Q9288 (heb)-Uziel302-יונה.wav — CC0
+- he:ילד — File:LL-Q9288 (heb)-Buffer-ילד.wav — CC BY-SA 4.0
+- he:ילדה — File:LL-Q9288 (heb)-Buffer-ילדה.wav — CC BY-SA 4.0
+- he:ינשוף — File:LL-Q9288 (heb)-Uziel302-ינשוף.wav — CC0
+- he:ירח — File:LL-Q9288 (heb)-Buffer-ירח.wav — CC BY-SA 4.0
+- he:כדור — File:LL-Q9288 (heb)-Buffer-כדור.wav — CC BY-SA 4.0
+- he:כובע — File:LL-Q9288 (heb)-YaronSh-כובע.wav — CC0
+- he:כוכב — File:LL-Q9288 (heb)-Buffer-כוכב.wav — CC BY-SA 4.0
+- he:כוס — File:LL-Q9288 (heb)-Uziel302-כוס.wav — CC0
+- he:כיסא — File:LL-Q9288 (heb)-Uziel302-כיסא.wav — CC0
+- he:כלב — File:LL-Q9288 (heb)-Buffer-כלב.wav — CC BY-SA 4.0
+- he:כף — File:LL-Q9288 (heb)-Buffer-כף.wav — CC BY-SA 4.0
+- he:כריש — File:LL-Q9288 (heb)-Buffer-כריש.wav — CC BY-SA 4.0
+- he:לב — File:LL-Q9288 (heb)-Buffer-לב.wav — CC BY-SA 4.0
+- he:לווייתן — File:LL-Q9288 (heb)-YaronSh-לווייתן.wav — CC0
+- he:לחם — File:LL-Q9288 (heb)-Buffer-לחם.wav — CC BY-SA 4.0
+- he:לטאה — File:LL-Q9288 (heb)-YaronSh-לטאה.wav — CC0
+- he:לימון — File:LL-Q9288 (heb)-Uziel302-לימון.wav — CC0
+- he:למד — File:LL-Q9288 (heb)-Uziel302-למד.wav — CC0
+- he:מזלג — File:LL-Q9288 (heb)-Buffer-מזלג.wav — CC BY-SA 4.0
+- he:מחשב — File:LL-Q9288 (heb)-Uziel302-מחשב.wav — CC0
+- he:מטוס — File:LL-Q9288 (heb)-Buffer-מטוס.wav — CC BY-SA 4.0
+- he:מיטה — File:LL-Q9288 (heb)-Buffer-מיטה.wav — CC BY-SA 4.0
+- he:מים — File:LL-Q9288 (heb)-Buffer-מים.wav — CC BY-SA 4.0
+- he:מכונית — File:LL-Q9288 (heb)-Buffer-מכונית.wav — CC BY-SA 4.0
+- he:מלך — File:LL-Q9288 (heb)-Buffer-מלך.wav — CC BY-SA 4.0
+- he:מלכה — File:LL-Q9288 (heb)-Uziel302-מלכה.wav — CC0
+- he:מם — File:LL-Q9288 (heb)-Yuvalyan-מם.wav — CC BY-SA 4.0
+- he:מעיל — File:LL-Q9288 (heb)-YaronSh-מעיל.wav — CC0
+- he:מפתח — File:LL-Q9288 (heb)-Buffer-מפתח.wav — CC BY-SA 4.0
+- he:משולש — File:LL-Q9288 (heb)-Uziel302-משולש.wav — CC0
+- he:משקפיים — File:LL-Q9288 (heb)-YaronSh-משקפיים.wav — CC0
+- he:מתנה — File:LL-Q9288 (heb)-YaronSh-מתנה.wav — CC0
+- he:נון — File:LL-Q9288 (heb)-YaronSh-נון.wav — CC0
+- he:נחש — File:LL-Q9288 (heb)-Buffer-נחש.wav — CC BY-SA 4.0
+- he:נמלה — File:LL-Q9288 (heb)-Buffer-נמלה.wav — CC BY-SA 4.0
+- he:נעל — File:LL-Q9288 (heb)-Uziel302-נעל.wav — CC0
+- he:נר — File:LL-Q9288 (heb)-Buffer-נר.wav — CC BY-SA 4.0
+- he:סוס — File:LL-Q9288 (heb)-Buffer-סוס.wav — CC BY-SA 4.0
+- he:ספינה — File:LL-Q9288 (heb)-Uziel302-ספינה.wav — CC0
+- he:ספר — File:LL-Q9288 (heb)-Buffer-ספר.wav — CC BY-SA 4.0
+- he:סרטן — File:LL-Q9288 (heb)-Uziel302-סרטן.wav — CC0
+- he:עוגה — File:LL-Q9288 (heb)-YaronSh-עוגה.wav — CC0
+- he:עז — File:LL-Q9288 (heb)-Uziel302-עז.wav — CC0
+- he:עין — File:LL-Q9288 (heb)-Buffer-עין.wav — CC BY-SA 4.0
+- he:עכבר — File:LL-Q9288 (heb)-Ijon-עכבר.wav — CC BY-SA 4.0
+- he:ענב — File:LL-Q9288 (heb)-Uziel302-ענב.wav — CC0
+- he:ענן — File:LL-Q9288 (heb)-Buffer-ענן.wav — CC BY-SA 4.0
+- he:עץ — File:LL-Q9288 (heb)-Buffer-עץ.wav — CC BY-SA 4.0
+- he:עשר — File:LL-Q9288 (heb)-Buffer-עשר.wav — CC BY-SA 4.0
+- he:עשרים — File:LL-Q9288 (heb)-Uziel302-עשרים.wav — CC0
+- he:פה — File:LL-Q9288 (heb)-Buffer-פה.wav — CC BY-SA 4.0
+- he:פיל — File:LL-Q9288 (heb)-Buffer-פיל.wav — CC BY-SA 4.0
+- he:פיצה — File:LL-Q9288 (heb)-YaronSh-פיצה.wav — CC0
+- he:פרה — File:LL-Q9288 (heb)-Ijon-פרה.wav — CC BY-SA 4.0
+- he:פרח — File:LL-Q9288 (heb)-Buffer-פרח.wav — CC BY-SA 4.0
+- he:פרפר — File:LL-Q9288 (heb)-Buffer-פרפר.wav — CC BY-SA 4.0
+- he:צב — File:LL-Q9288 (heb)-Uziel302-צב.wav — CC0
+- he:ציפור — File:LL-Q9288 (heb)-Uziel302-ציפור.wav — CC0
+- he:צלחת — File:LL-Q9288 (heb)-YaronSh-צלחת.wav — CC0
+- he:צפרדע — File:LL-Q9288 (heb)-Uziel302-צפרדע.wav — CC0
+- he:קוף — File:LL-Q9288 (heb)-Buffer-קוף.wav — CC BY-SA 4.0
+- he:קשת — File:LL-Q9288 (heb)-YaronSh-קשת.wav — CC0
+- he:רגל — File:LL-Q9288 (heb)-Buffer-רגל.wav — CC BY-SA 4.0
+- he:רובוט — File:LL-Q9288 (heb)-YaronSh-רובוט.wav — CC0
+- he:ריבוע — File:LL-Q9288 (heb)-YaronSh-ריבוע.wav — CC0
+- he:רכבת — File:LL-Q9288 (heb)-Buffer-רכבת.wav — CC BY-SA 4.0
+- he:שבע עשרה — File:LL-Q9288 (heb)-YaronSh-שבע עשרה.wav — CC0
+- he:שבע — File:LL-Q9288 (heb)-Buffer-שבע.wav — CC BY-SA 4.0
+- he:שועל — File:LL-Q9288 (heb)-Buffer-שועל.wav — CC BY-SA 4.0
+- he:שלג — File:LL-Q9288 (heb)-Buffer-שלג.wav — CC BY-SA 4.0
+- he:שלוש עשרה — File:LL-Q9288 (heb)-YaronSh-שלוש עשרה.wav — CC0
+- he:שלוש — File:LL-Q9288 (heb)-Buffer-שלוש.wav — CC BY-SA 4.0
+- he:שמונה עשרה — File:LL-Q9288 (heb)-YaronSh-שמונה עשרה.wav — CC0
+- he:שמונה — File:LL-Q9288 (heb)-Uziel302-שמונה.wav — CC0
+- he:שמלה — File:LL-Q9288 (heb)-YaronSh-שמלה.wav — CC0
+- he:שמש — File:LL-Q9288 (heb)-Buffer-שמש.wav — CC BY-SA 4.0
+- he:שעון — File:LL-Q9288 (heb)-Uziel302-שעון.wav — CC0
+- he:שש עשרה — File:LL-Q9288 (heb)-YaronSh-שש עשרה.wav — CC0
+- he:שש — File:LL-Q9288 (heb)-Buffer-שש.wav — CC BY-SA 4.0
+- he:שתיים — File:LL-Q9288 (heb)-Uziel302-שתיים.wav — CC0
+- he:שתים עשרה — File:LL-Q9288 (heb)-YaronSh-שתים עשרה.wav — CC0
+- he:תו — File:LL-Q9288 (heb)-Uziel302-תו.wav — CC0
+- he:תות — File:LL-Q9288 (heb)-Uziel302-תות.wav — CC0
+- he:תינוק — File:LL-Q9288 (heb)-Uziel302-תינוק.wav — CC0
+- he:תיק — File:LL-Q9288 (heb)-Uziel302-תיק.wav — CC0
+- he:תירס — File:LL-Q9288 (heb)-Uziel302-תירס.wav — CC0
+- he:תמנון — File:LL-Q9288 (heb)-YaronSh-תמנון.wav — CC0
+- he:תפוח — File:LL-Q9288 (heb)-Buffer-תפוח.wav — CC BY-SA 4.0
+- he:תרנגול — File:LL-Q9288 (heb)-YaronSh-תרנגול.wav — CC0
+- he:תשע עשרה — File:LL-Q9288 (heb)-YaronSh-תשע עשרה.wav — CC0
+- he:תשע — File:LL-Q9288 (heb)-Uziel302-תשע.wav — CC0
+OK   en:a <- File:En-us-a.ogg Public domain
+OK   en:elephant <- File:En-us-elephant.ogg Public domain
+OK   en:eye <- File:En-us-eye.ogg Public domain
+OK   en:fish <- File:En-us-fish.ogg Public domain
+OK   en:five <- File:En-us-five.ogg Public domain
+OK   en:four <- File:En-us-four.ogg Public domain
+OK   en:i <- File:En-us-i.ogg Public domain

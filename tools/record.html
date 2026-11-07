@@ -1,0 +1,55 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>הקלטת הקול של המשחק</title>
+<style>body{font-family:-apple-system,"Varela Round",sans-serif;background:#1b1140;color:#fff;margin:0;padding:20px;max-width:640px;margin:auto}
+.card{background:#fffaf0;color:#1b1140;border-radius:24px;padding:22px;text-align:center;margin-top:16px}
+.txt{font-size:2.2rem;font-weight:700;line-height:1.5;min-height:3.4em;display:flex;align-items:center;justify-content:center}
+.en{direction:ltr;font-family:Andika,Arial}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+button{font:inherit;font-size:1.1rem;border:0;border-radius:14px;padding:14px 20px;cursor:pointer;font-weight:700}
+.rec{background:#ff5fa2;color:#fff;font-size:1.4rem;padding:18px 30px}.rec.on{background:#c43a78;animation:p 1s infinite}@keyframes p{50%{opacity:.6}}
+.ok{background:#3fbf6f;color:#fff}.light{background:#fff;border:2px solid #ddd}.warn{background:#ffc23d}
+.meta{color:#6b6480;margin-top:8px}.bar{height:10px;background:#eee;border-radius:9px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:#3fbf6f}
+.tips{background:#ffffff22;border-radius:16px;padding:14px;line-height:1.6;font-size:.95rem}
+select{font:inherit;padding:8px;border-radius:10px}
+</style></head><body>
+<h1>🎙️ הקלטת הקול של "אגם על הבמה"</h1>
+<div class="tips">מקליטים בחדר שקט, 20–30 ס"מ מהמיקרופון, בטון חם ומחויך, לא מהר. לוחצים <b>הקלט</b>, אומרים את המשפט, לוחצים <b>עצור</b>, מאזינים, ואם טוב — <b>שמור והבא</b>. אפשר להפסיק ולהמשיך אחר-כך (נשמר בדפדפן). בסוף: <b>ייצוא הכול</b> ושולחים לי את הקובץ.</div>
+<div class="row" style="margin-top:12px"><label>קבוצה: <select id="grp"></select></label><button class="light" id="exp">⬇️ ייצוא הכול</button><button class="light" id="rst" style="color:#c00">איפוס</button></div>
+<div class="card"><div class="meta" id="meta"></div><div class="txt" id="txt"></div><div class="meta" id="hint"></div>
+<div class="row"><button class="light" id="prev">◀ הקודם</button><button class="rec" id="rec">🎙️ הקלט</button><button class="light" id="play">▶️ השמע</button><button class="ok" id="save">✅ שמור והבא</button><button class="light" id="skip">דלג ▶</button></div>
+<div class="bar"><i id="bar" style="width:0"></i></div></div>
+<script src="../audio-manifest.js"></script><script src="../content.js"></script>
+<script>
+const strip=s=>s.replace(/[֑-ׇ]/g,"").replace(/[!?,.]/g,"").trim();
+const items=[];const add=(g,t,hint)=>{if(!t)return;const key="he:"+strip(t);if(items.some(x=>x.key===key))return;items.push({g,t,key,hint:hint||""})};
+Object.keys(PROMPTS).forEach(k=>add("הנחיות",PROMPTS[k]));
+PRAISE.forEach(t=>add("עידוד",t));ENCOURAGE.forEach(t=>add("עידוד",t));add("עידוד",SAY_HI);add("עידוד",SAY_LEVELUP);
+["וְ","אוֹ","וְעוֹד","פָּחוֹת","זֶה","זֶה עֶשֶׂר","וְעוֹד כַּמָּה","הֲכִי גָּדוֹל","הֲכִי קָטָן","הַשָּׁלָב הַזֶּה עוֹד נָעוּל. קֹדֶם מְסַיְּמִים אֶת הַשָּׁלָב שֶׁלְּפָנָיו","חַבְּרִי כָּל מִלָּה לַתְּמוּנָה שֶׁלָּהּ","מֻשְׁלָם! שְׁלוֹשָׁה כּוֹכָבִים!","כָּל הַכָּבוֹד! שְׁנֵי כּוֹכָבִים!","עָבַרְתְּ! כּוֹכָב אֶחָד!","וְקִבַּלְתְּ מַדְבֵּקָה חֲדָשָׁה!","כִּמְעַט! בּוֹאִי נְנַסֶּה שׁוּב"].forEach(t=>add("משפטי משחק",t));
+LET.forEach(l=>add("שמות אותיות",l.n,"שם האות "+l.l));Object.keys(FINALS).forEach(l=>add("שמות אותיות",LETNAME[l]+" סוֹפִית"));
+NUMNAME.forEach((n,i)=>add("מספרים",n,String(i)));SHAPES.forEach(s=>add("צורות",s.n));
+WORDS.forEach(w=>{if(!(window.AUDIO||{})[ "he:"+w.w])add("מילים חסרות",w.s,w.e+" "+w.w)});
+WORDS.forEach(w=>add("כל המילים (רשות)",w.s,w.e+" "+w.w));
+const groups=[...new Set(items.map(x=>x.g))];const sel=document.getElementById("grp");groups.forEach(g=>{const o=document.createElement("option");o.value=g;o.textContent=g+" ("+items.filter(x=>x.g===g).length+")";sel.appendChild(o)});
+let DB;const open=indexedDB.open("rec-agam",1);open.onupgradeneeded=()=>open.result.createObjectStore("clips");open.onsuccess=()=>{DB=open.result;render()};
+const tx=(mode)=>DB.transaction("clips",mode).objectStore("clips");
+const get=k=>new Promise(r=>{const q=tx("readonly").get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)});
+const put=(k,v)=>new Promise(r=>{const q=tx("readwrite").put(v,k);q.onsuccess=()=>r(true)});
+const allKeys=()=>new Promise(r=>{const q=tx("readonly").getAllKeys();q.onsuccess=()=>r(q.result)});
+let idx=+localStorage.getItem("rec-idx")||0,list=[],mr=null,chunks=[],blob=null,stream=null;
+async function render(){list=items.filter(x=>x.g===sel.value);if(idx>=list.length)idx=0;const it=list[idx];const done=await allKeys();const n=list.filter(x=>done.indexOf(x.key)>=0).length;
+ document.getElementById("meta").textContent=`${idx+1} / ${list.length} · הוקלטו ${n}`;document.getElementById("txt").textContent=it.t;document.getElementById("hint").textContent=(done.indexOf(it.key)>=0?"✅ יש הקלטה · ":"")+(it.hint||"");
+ document.getElementById("bar").style.width=(n/list.length*100)+"%";blob=await get(it.key)||null}
+sel.onchange=()=>{idx=0;render()};
+document.getElementById("rec").onclick=async()=>{const b=document.getElementById("rec");
+ if(mr&&mr.state==="recording"){mr.stop();b.textContent="🎙️ הקלט";b.classList.remove("on");return}
+ try{stream=stream||await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:true,autoGainControl:true}})}catch(e){alert("אין גישה למיקרופון: "+e.message);return}
+ const mime=["audio/webm;codecs=opus","audio/webm","audio/mp4"].find(m=>MediaRecorder.isTypeSupported(m))||"";mr=new MediaRecorder(stream,mime?{mimeType:mime}:{});chunks=[];
+ mr.ondataavailable=e=>chunks.push(e.data);mr.onstop=()=>{blob=new Blob(chunks,{type:mr.mimeType});document.getElementById("hint").textContent="הוקלט — האזן ואז שמור";};mr.start();b.textContent="⏹ עצור";b.classList.add("on")};
+document.getElementById("play").onclick=()=>{if(!blob)return;const a=new Audio(URL.createObjectURL(blob));a.play()};
+document.getElementById("save").onclick=async()=>{if(!blob){alert("קודם מקליטים");return}await put(list[idx].key,{t:list[idx].t,mime:blob.type,blob});idx=Math.min(list.length-1,idx+1);localStorage.setItem("rec-idx",idx);render()};
+document.getElementById("skip").onclick=()=>{idx=Math.min(list.length-1,idx+1);localStorage.setItem("rec-idx",idx);render()};
+document.getElementById("prev").onclick=()=>{idx=Math.max(0,idx-1);localStorage.setItem("rec-idx",idx);render()};
+document.getElementById("rst").onclick=()=>{if(confirm("למחוק את כל ההקלטות מהדפדפן?")){tx("readwrite").clear();localStorage.removeItem("rec-idx");idx=0;setTimeout(render,200)}};
+document.getElementById("exp").onclick=async()=>{const keys=await allKeys();const out=[];for(const k of keys){const v=await get(k);const b64=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(",")[1]);fr.readAsDataURL(v.blob)});out.push({key:k,t:v.t,mime:v.mime,b64})}
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({items:out})],{type:"application/json"}));a.download="recordings-agam.json";a.click();alert("נשמר קובץ recordings-agam.json ("+out.length+" הקלטות) בתיקיית ההורדות")};
+</script></body></html>
