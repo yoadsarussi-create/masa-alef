@@ -48,10 +48,14 @@ function unlock(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext
  if(audioReady||!P.paused)return;try{P.src=AUDIO["__silence"]||"";const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true;unlocked=true},()=>{})}catch(e){}
 }
 document.addEventListener("touchstart",unlock,{capture:true,passive:true});document.addEventListener("touchend",unlock,{capture:true,passive:true});document.addEventListener("pointerdown",unlock,{capture:true});document.addEventListener("click",unlock,{capture:true});
-let seqToken=0;
+let seqToken=0,lastAudioErr="",bufCache={};
+function playViaCtx(src){return new Promise(res=>{const a=ctx();if(!a){res(false);return}const go=buf=>{try{const n=a.createBufferSource();n.buffer=buf;n.connect(a.destination);n.onended=()=>res(true);n.start();setTimeout(()=>res(true),(buf.duration+.3)*1000)}catch(e){lastAudioErr="ctx-play:"+e.name;res(false)}};
+ if(bufCache[src]){go(bufCache[src]);return}
+ fetch(src).then(r=>r.arrayBuffer()).then(ab=>{a.decodeAudioData(ab,buf=>{bufCache[src]=buf;go(buf)},e=>{lastAudioErr="decode:"+((e&&e.name)||e);res(false)})}).catch(e=>{lastAudioErr="fetch:"+e.name;res(false)})})}
 function clipKey(it){return typeof it==="string"?"he:"+strip(it).replace(/[!?,.]/g,"").trim():"en:"+it.en.toLowerCase()}
 function playOne(it){return new Promise(res=>{const key=clipKey(it),src=AUDIO[key];let done=false;const fin=()=>{if(!done){done=true;res()}};
- if(src){try{P.pause();P.onended=fin;P.onerror=()=>{tts(it).then(fin)};P.src=src;P.currentTime=0;const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true},()=>{tts(it).then(fin)});setTimeout(fin,6000);return}catch(e){}}
+ if(src){const alt=()=>playViaCtx(src).then(ok=>{if(!ok)tts(it).then(fin);else fin()});
+  try{P.pause();P.onended=fin;P.onerror=()=>{lastAudioErr="media:"+(P.error&&P.error.code);alt()};P.src=src;const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true},e=>{lastAudioErr="play:"+e.name;alt()});setTimeout(fin,7000);return}catch(e){lastAudioErr="throw:"+e.name;alt();return}}
  tts(it).then(fin)})}
 function tts(it){if(!S.tts)return Promise.resolve();return new Promise(res=>{const text=typeof it==="string"?it:it.en;let started=false;
  try{if(!window.speechSynthesis)throw 0;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const he=typeof it==="string";
@@ -260,7 +264,7 @@ function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const c
  <div class="map">${Object.keys(SK).map(k=>{const s=SK[k];const st=stars(k);const m=mastery(k);const cls=hist(k).length<3&&lvOf(k)===1?"new":(m!==null&&m<.6?"weak":"");
   return`<button class="island ${cls}" data-sk="${k}"><span class="ic ${isEnIc(s.ic)?"en":""}">${s.ic}</span><span class="nm">${s.n}</span><span class="lvb">שלב ${lvOf(k)}/${s.max}</span><span class="stars">${starHtml(st)}</span></button>`}).join("")}</div>`
  :`<div class="saga" id="saga"><svg class="path" id="path" aria-hidden="true"></svg>${nodes}</div>`}
- <button class="back" id="par" style="align-self:center;background:#ffffff22;color:#fff;box-shadow:none;font-size:.95rem">👨‍👧 פינת הורים</button>`;
+ <button class="back" id="par" style="align-self:center;background:#ffffff22;color:#fff;box-shadow:none;font-size:.95rem">👨‍👧 פינת הורים · v${window.APP_VER}</button>`;
  app.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{const i=+b.dataset.lv;if(!lvOpen(i)){b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400);toast("השלב הזה עוד נעול 🔒 קודם מסיימים את השלב שלפניו",2200);speak(["הַשָּׁלָב הַזֶּה עוֹד נָעוּל. קֹדֶם מְסַיְּמִים אֶת הַשָּׁלָב שֶׁלְּפָנָיו"]);return}levelIntro(i)});
  app.querySelector("#smart").onclick=()=>start(null);
  app.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>start(b.dataset.sk));
@@ -419,6 +423,23 @@ function collection(){view="col";hush();app.innerHTML=`<div class="panel"><butto
  <p class="muted">הרצף הכי ארוך שלך: ${S.best} תשובות נכונות ברצף 🔥</p></div>`;
  app.querySelector("#b").onclick=home;scrollTo(0,0)}
 
+/* ---------- אבחון קול ---------- */
+function soundDiag(){view="diag";hush();const w=WORDS.filter(hasClip)[0];const src=w?AUDIO["he:"+w.w]:"";const standalone=!!(navigator.standalone||matchMedia("(display-mode: standalone)").matches);
+ const info=()=>`גרסה ${window.APP_VER} · קליפים ${Object.keys(AUDIO).length} · ${standalone?"מותקן במסך הבית":"בדפדפן"} · נגן משוחרר: ${audioReady?"כן":"לא"} · AudioContext: ${ac?ac.state:"אין"} · שגיאה אחרונה: ${lastAudioErr||"אין"}`;
+ app.innerHTML=`<div class="panel"><button class="back" id="b">→ להורים</button><h2>אבחון קול 🔧</h2><p>לוחצים על כל כפתור ומסמנים מה נשמע. הסטטוס מתעדכן אחרי כל ניסיון.</p>
+ <p class="muted" id="st">${info()}</p>
+ <button class="btn" id="t1">1️⃣ נגן &lt;audio&gt; — המילה "${w?w.w:""}"</button>
+ <button class="btn" id="t2">2️⃣ Web Audio (פענוח) — אותה מילה</button>
+ <button class="btn" id="t3">3️⃣ צליל סינתטי (ביפ)</button>
+ <button class="btn light" id="t4">4️⃣ רענון מלא של האפליקציה</button></div>`;
+ const upd=()=>{const el=document.getElementById("st");if(el)el.textContent=info()};
+ app.querySelector("#b").onclick=parents;
+ app.querySelector("#t1").onclick=()=>{lastAudioErr="";try{P.pause();P.src=src;const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true;toast("נגן: הצליח ✓",1500);upd()},e=>{lastAudioErr="play:"+e.name+" "+e.message;toast("נגן נכשל: "+e.name,3000);upd()})}catch(e){lastAudioErr="throw:"+e.name;upd()}};
+ app.querySelector("#t2").onclick=()=>{lastAudioErr="";playViaCtx(src).then(ok=>{toast(ok?"Web Audio: הצליח ✓":"Web Audio נכשל: "+lastAudioErr,3000);upd()})};
+ app.querySelector("#t3").onclick=()=>{try{ctx();note(PENTA[4],"bell",0,.6);toast("ביפ נשלח · AudioContext: "+(ac?ac.state:"אין"),2000)}catch(e){toast("ביפ נכשל: "+e.name,2000)}upd()};
+ app.querySelector("#t4").onclick=()=>{if("serviceWorker" in navigator)navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister()));if(window.caches)caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>location.reload(true));else location.reload(true)};
+ scrollTo(0,0)}
+
 /* ---------- parents (מאחורי שער) ---------- */
 let confirmReset=false;
 function parentGate(){view="gate";hush();const a=rnd(3,9),b=rnd(2,9);
@@ -444,13 +465,14 @@ function parents(){view="par";hush();const rows=Object.keys(SK).map(k=>{const s=
  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn light" id="snd">צלילי משחק: ${S.sound?"פועלים":"כבויים"}</button>
  <button class="btn light" id="tts">קול מלאכותי כשאין הקלטה: ${S.tts?"פועל":"כבוי"}</button>
  <button class="btn light" id="xfer">📲 העברת התקדמות למכשיר אחר</button>
+ <button class="btn light" id="diag">🔧 אבחון קול</button>
  <button class="btn ${confirmReset?"red":"light"}" id="rst">${confirmReset?"לחצו שוב כדי למחוק הכול":"איפוס ההתקדמות"}</button></div>
  <p class="muted">גרסה ${window.APP_VER||"dev"} · הקלטות: ${Object.keys(AUDIO).length} קליפים · שמות-אותיות מוקלטים ${clipCoverage()} · ההתקדמות נשמרת במכשיר הזה.</p></div>`;
  app.querySelector("#b").onclick=()=>{confirmReset=false;home()};
  app.querySelector("#svn").onclick=()=>{S.name=app.querySelector("#nm").value.trim().slice(0,20);save();toast("נשמר ✓",1500)};
  app.querySelector("#snd").onclick=()=>{S.sound=!S.sound;save();parents()};
  app.querySelector("#tts").onclick=()=>{S.tts=!S.tts;save();parents()};
- app.querySelector("#xfer").onclick=transfer;
+ app.querySelector("#xfer").onclick=transfer;app.querySelector("#diag").onclick=soundDiag;
  app.querySelector("#rst").onclick=()=>{if(!confirmReset){confirmReset=true;parents();return}const nm=S.name;S=fresh();S.name=nm;confirmReset=false;save();parents()};
  scrollTo(0,0)}
 function keySk(key){const p=key.split(":")[0];const map={let:"let",sound:"sound",syl:"rhyme",rhyme:"rhyme",build:"word",read:"word",nsyl:"nik",nik:"nik",seq:"num",between:"num",after:"num",before:"num",cmpn:"num",cmp:"num",hear:"num",count:"num",ten:"calc",sub:"calc",add:"calc",shape:"think",sides:"think",pat:"think",dir:"think",size:"think",odd:"think",wr:"write",wrn:"write",wrw:"write",wre:"write",dots:"num",phon:"abc",up:"abc",low:"abc",abc:"abc",enprod:"en",enread:"en",enword:"en",en:"en",sb:"sent",sh:"sent"};return map[p]||p}
