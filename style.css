@@ -369,3 +369,30 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .card.play .mcell .he-big{font-size:2.3rem;line-height:1.2}
 .card.play .mcell .num-big{font-size:2.1rem}
 @media (min-width:700px){.card.play .mcell .he-big{font-size:3.4rem}.card.play .mcell .num-big{font-size:3rem}}
+/* games3 */
+.maze{display:grid;gap:0;background:#fff;border:var(--ol) solid var(--ink);border-radius:14px;padding:4px;max-width:min(380px,calc(100vh - 400px));margin:0 auto;width:100%}
+.mz{aspect-ratio:1;background:#fff;border:0 solid var(--ink);border-radius:0;display:flex;align-items:center;justify-content:center;padding:0;font-size:1.5rem;position:relative}
+.mz.wn{border-top-width:4px}.mz.we{border-right-width:4px}.mz.ws{border-bottom-width:4px}.mz.ww{border-left-width:4px}
+.mz.trail{background:#ffe3ef}.mz img.pic{width:70%;height:70%}
+.mz .who{position:absolute;inset:8%;display:flex;align-items:center;justify-content:center;z-index:2}
+.maze.lm{gap:6px;background:transparent;border:0;padding:0}
+.lmz{border:3px solid var(--ink)!important;border-radius:12px;font-family:var(--glyph);font-weight:900;font-size:1.9rem;box-shadow:0 3px 0 var(--ink)}
+.lmz.trail{background:#dcfce7;border-color:var(--ok)!important}.lmz.start{background:var(--sun)}
+.train{display:flex;align-items:flex-end;justify-content:center;gap:4px;flex-wrap:nowrap;overflow:hidden}
+.train .loco{font-size:2.6rem}.train .loco img.pic{width:56px;height:56px}
+.car{width:52px;height:46px;border:var(--ol) solid var(--ink);border-radius:10px;background:var(--sun);font-weight:700;font-size:1.5rem;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 4px 0 var(--ink)}
+.train .car{width:44px;font-size:1.3rem}.train .car.empty{background:#fff;border-style:dashed;box-shadow:none}
+.train.go{animation:trainGo 1.2s ease-in .3s forwards}@keyframes trainGo{to{transform:translateX(120%)}}
+.cars{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}.cars .car{width:64px;height:58px;font-size:1.8rem}.cars .car:disabled{opacity:.25;box-shadow:none}
+.signrow{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.sgrp{display:flex;flex-wrap:wrap;gap:2px;max-width:130px;justify-content:center;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:6px;min-height:70px;align-content:center}
+.sgrp img.pic{width:26px;height:26px}
+.slotsign{font-size:2.4rem;font-weight:900;color:var(--pink);min-width:40px}
+.ordarrow{display:inline-block;font-size:1.6rem;vertical-align:middle}
+
+.answers.one .ans.wide{grid-column:1/-1;min-height:64px}
+/* תיקוני פריסה 0.9.0 */
+.lenbar{width:100%;height:46px;display:block}
+.answers.one .ans.wide{min-height:62px;padding:4px 8px}
+.row-opts .ans{min-width:0;padding:4px}
+.card.play .row-opts .ans img.pic{width:100%;max-width:72px;height:auto}

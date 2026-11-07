@@ -82,6 +82,8 @@ function setupTraceStrokes(q,wrap,onDone){const strokes=STROKES[q.glyph];const W
  const drawGuide=()=>{gx.clearRect(0,0,W,H);gx.lineCap="round";gx.lineJoin="round";
   paths.forEach((p,k)=>{gx.beginPath();p.forEach((pt,i)=>i?gx.lineTo(pt[0],pt[1]):gx.moveTo(pt[0],pt[1]));gx.lineWidth=W*.13;gx.strokeStyle=k<si?"#dcfce7":"#efe9ff";gx.stroke();
    if(k===si&&!done){gx.setLineDash([8,10]);gx.lineWidth=3;gx.strokeStyle="#b9a8ee";gx.stroke();gx.setLineDash([])}});
+  if(paths.length>1)paths.forEach((p,k)=>{if(k<si&&!done)return;const s0=p[0];gx.fillStyle=k===si?"#FFD93D":"#fff";gx.strokeStyle="#1E1B3A";gx.lineWidth=2.5;gx.beginPath();gx.arc(s0[0]-W*.06,s0[1]-W*.06,W*.045,0,Math.PI*2);gx.fill();gx.stroke();
+   gx.fillStyle="#1E1B3A";gx.font="bold "+Math.round(W*.055)+"px Fredoka,Arial";gx.textAlign="center";gx.textBaseline="middle";gx.fillText(String(k+1),s0[0]-W*.06,s0[1]-W*.06+1)});
   if(!done){const p=paths[si];const s=p[Math.min(pi,p.length-1)];const r=12+Math.sin(pulse)*3;gx.fillStyle="#22C55E";gx.beginPath();gx.arc(s[0],s[1],r,0,Math.PI*2);gx.fill();
    /* חץ-כיוון */const nx=p[Math.min(pi+4,p.length-1)];const ang=Math.atan2(nx[1]-s[1],nx[0]-s[0]);gx.save();gx.translate(s[0],s[1]);gx.rotate(ang);gx.fillStyle="#fff";gx.beginPath();gx.moveTo(4,-6);gx.lineTo(12,0);gx.lineTo(4,6);gx.closePath();gx.fill();gx.restore()}
   pulse+=.15;if(!done)raf=requestAnimationFrame(drawGuide)};
