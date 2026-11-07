@@ -108,18 +108,18 @@ function letterOpts(t,n,confuse){let pool=LETTERS.filter(x=>x!==t);let o=[];
 function dotsQ(sk,labels,sayLabel){const shape=pick(Object.keys(DOT_SHAPES).filter(k=>DOT_SHAPES[k].p.length>=labels.length));const lab=labels.slice(0,DOT_SHAPES[shape].p.length);
  return{sk:sk,key:"dots:"+shape,tag:"חבר את הנקודות",p:PROMPTS.dots,say:[PROMPTS.dots],kind:"dots",shape:shape,labels:lab,sayLabel:sayLabel,a:"done",after:[]}}
 const GEN={
- write(lv,focus){if(focus||lv===1||(lv>=3&&Math.random()<.3)){const t=focus||pick(LETTERS);return{sk:"write",key:"wr:"+t,tag:"כותבים אות",p:`${PROMPTS.trace} הָאוֹת <span class="he-word">${t}׳</span>`,say:[PROMPTS.trace,LETNAME[t]],kind:"trace",glyph:t,dir:"rtl",a:"done",after:[LETNAME[t]]}}
+ write(lv,focus){if(focus||lv===1||(lv>=3&&Math.random()<.3)){const t=focus||pick(LETTERS);return{sk:"write",key:"wr:"+t,tag:"כותבים אות",p:`${PROMPTS.trace} הָאוֹת <span class="he-word">${t}</span>`,say:[PROMPTS.trace,LETNAME[t]],kind:"trace",glyph:t,dir:"rtl",a:"done",after:[LETNAME[t]]}}
   if(lv===2){const n=rnd(0,9);return{sk:"write",key:"wrn:"+n,tag:"כותבים ספרה",p:`${PROMPTS.trace} <span class="num-big">${n}</span>`,say:[PROMPTS.trace,NUMNAME[n]],kind:"trace",glyph:String(n),font:"Fredoka",dir:"ltr",a:"done",after:[NUMNAME[n]]}}
   if(lv===3){const w=WORD_BY(pick(SPELL_L1));return{sk:"write",key:"wrw:"+w.w,tag:"כותבים מילה",p:`${PROMPTS.traceWord}${pic(w.e)}<span class="he-word">${w.s}</span>`,say:[PROMPTS.traceWord,w.s],kind:"trace",glyph:w.w,dir:"rtl",a:"done",after:[w.s]}}
   const L=pick("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));const g=Math.random()<.5?L:L.toLowerCase();return{sk:"write",key:"wre:"+g,tag:"כותבים באנגלית",p:`${PROMPTS.trace} <span class="en-big">${g}</span>`,say:[PROMPTS.trace,{en:L}],kind:"trace",glyph:g,font:"Andika",dir:"ltr",a:"done",after:[{en:L}]}},
  let(lv,focus){if(!focus&&lv>=3&&Math.random()<.22){const i=rnd(0,12);return dotsQ("let",LETTERS.slice(i,i+10),k=>LETNAME[LETTERS[i+k]])}
   const t=focus||pick(LETTERS);
   if(lv>=3&&Math.random()<(lv===4?.4:.5)){const base=pick(Object.keys(FINALS));const fins=Object.keys(FINALS).map(k=>FINALS[k]);
-   return{sk:"let",key:"let:fin:"+base,tag:"אות סופית",p:`${PROMPTS.letFinal} <span class="he-word">${base}׳</span>`,say:[PROMPTS.letFinal,LETNAME[base]],opts:sh(fins).map(x=>opt(x,bigHe(x),"he")),a:FINALS[base],after:[LETNAME[base]+" סוֹפִית"]}}
+   return{sk:"let",key:"let:fin:"+base,tag:"אות סופית",p:`${PROMPTS.letFinal} <span class="he-word">${base}</span>`,say:[PROMPTS.letFinal,LETNAME[base]],opts:sh(fins).map(x=>opt(x,bigHe(x),"he")),a:FINALS[base],after:[LETNAME[base]+" סוֹפִית"]}}
   if(lv===4&&Math.random()<.5){const i=rnd(1,20);const seq=[LETTERS[i-1],"_",LETTERS[i+1]];const o=sh([LETTERS[i]].concat(others(LETTERS,[LETTERS[i]],2)));
    return{sk:"let",key:"let:seq:"+LETTERS[i],tag:"סדר הא״ב",p:`${PROMPTS.letNext}<span class="he-seq">${seq.join(" ")}</span>`,say:[PROMPTS.letNext],opts:o.map(x=>opt(x,bigHe(x),"he")),a:LETTERS[i],after:[LETNAME[LETTERS[i-1]],LETNAME[LETTERS[i]],LETNAME[LETTERS[i+1]]]}}
   const lane=lv>=2&&Math.random()<.4;const n=lane?3:lv===1?3:4;const o=letterOpts(t,n,lv>=2);
-  return{sk:"let",key:"let:"+t,tag:lane?"תפסי את האות":"שמות האותיות",p:lane?`${PROMPTS.lane} הָאוֹת <span class="he-word">${t}׳</span>`:PROMPTS.letHear,say:[lane?PROMPTS.lane:PROMPTS.letHear,LETNAME[t]],kind:lane?"lane":"opts",opts:o.map(x=>opt(x,bigHe(x),"he")),a:t,after:[LETNAME[t]]}},
+  return{sk:"let",key:"let:"+t,tag:lane?"תפסי את האות":"שמות האותיות",p:lane?`${PROMPTS.lane} הָאוֹת <span class="he-word">${t}</span>`:PROMPTS.letHear,say:[lane?PROMPTS.lane:PROMPTS.letHear,LETNAME[t]],kind:lane?"lane":"opts",opts:o.map(x=>opt(x,bigHe(x),"he")),a:t,after:[LETNAME[t]]}},
  sound(lv,focus){if(focus?Math.random()<.5:Math.random()<.35){const t=focus||pick(LETTERS.filter(l=>wordsBy(w=>w.w[0]===l).length>=1));if(!wordsBy(x=>x.w[0]===t).length)return GEN.let(lv,focus);const w=pick(wordsBy(x=>x.w[0]===t));const n=lv>=3?4:3;
    const dis=others(wordsBy(x=>x.w[0]!==t&&(lv<2||!(CONFUSE_SOUND[t]||"").includes(x.w[0]))),[],n-1);const o=sh([w].concat(dis)).map(x=>Object.assign(opt(x.w,picHtml(x.e),"pic"),{say:x.s}));
    return{sk:"sound",key:"l2w:"+t,tag:"האות והצליל",p:`${PROMPTS.letterWord} ${bigHe(t)}`,say:[PROMPTS.letterWord,LETNAME[t]],playOpts:true,opts:o,a:w.w,after:[w.s,LETNAME[t]],info:`<span class="he-word">${w.s}</span>`}}
@@ -340,7 +340,7 @@ function introCard(item){view="play";const L=item.focus;const he=/[\u0590-\u05FF
  app.innerHTML=`<div class="hud"><button class="x" id="quit" aria-label="חזרה">✕</button><div class="dots"></div><span class="pill" id="hc">👥 ${S.coins}</span></div>
  <div class="card play"><div class="row-tag"><span class="tag">${item.reteach?"נלמד שוב ביחד 🤝":"אות חדשה ✨"}</span></div>
  <div class="pz"><button class="live ${he?"":"en"}" id="live">${L}${he?"":"<small>"+L.toLowerCase()+"</small>"}</button>
- <div class="prompt">${he?"הָאוֹת "+L+"׳":L}</div>
+ <div class="prompt">${he?"הָאוֹת "+L:L}</div>
  ${(w||ew)?`<button class="ans pic ex" id="ex">${picHtml((w||ew).e)}<span class="${he?"he-word":"en-word"}">${he?w.s:ew.w}</span></button>`:""}
  <p class="muted">נוגעים באות ושומעים אותה</p></div>
  <button class="next" id="nx">הבנתי, שואלים! ←</button></div>`;
