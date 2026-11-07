@@ -47,18 +47,25 @@ try{pickVoices();speechSynthesis.onvoiceschanged=pickVoices}catch(e){}
 const P=new Audio();P.preload="auto";try{P.setAttribute("playsinline","")}catch(e){}
 let unlocked=false;
 let audioReady=false;
+let p2ok=false;
 function unlock(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume()}catch(e){}
+ if(!p2ok){p2ok=true;try{P2.src=AUDIO["__silence"]||"";const q=P2.play();if(q&&q.catch)q.catch(()=>{p2ok=false})}catch(e){}}
  if(audioReady||!P.paused)return;try{P.src=AUDIO["__silence"]||"";const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true;unlocked=true},()=>{})}catch(e){}
 }
 document.addEventListener("touchstart",unlock,{capture:true,passive:true});document.addEventListener("touchend",unlock,{capture:true,passive:true});document.addEventListener("pointerdown",unlock,{capture:true});document.addEventListener("click",unlock,{capture:true});
 let seqToken=0,lastAudioErr="",bufCache={};
-function playViaCtx(src){return new Promise(res=>{const a=ctx();if(!a){res(false);return}const go=buf=>{try{const n=a.createBufferSource();n.buffer=buf;n.connect(a.destination);n.onended=()=>res(true);n.start();setTimeout(()=>res(true),(buf.duration+.3)*1000)}catch(e){lastAudioErr="ctx-play:"+e.name;res(false)}};
+let ctxSrc=null;
+function playViaCtx(src){return new Promise(res=>{const a=ctx();if(!a){res(false);return}const go=buf=>{try{const n=a.createBufferSource();ctxSrc=n;n.buffer=buf;n.connect(a.destination);n.onended=()=>res(true);n.start();setTimeout(()=>res(true),(buf.duration+.3)*1000)}catch(e){lastAudioErr="ctx-play:"+e.name;res(false)}};
  if(bufCache[src]){go(bufCache[src]);return}
  fetch(src).then(r=>r.arrayBuffer()).then(ab=>{a.decodeAudioData(ab,buf=>{bufCache[src]=buf;go(buf)},e=>{lastAudioErr="decode:"+((e&&e.name)||e);res(false)})}).catch(e=>{lastAudioErr="fetch:"+e.name;res(false)})})}
-function clipKey(it){return typeof it==="string"?"he:"+strip(it).replace(/[!?,.]/g,"").trim():"en:"+it.en.toLowerCase()}
-function playOne(it){return new Promise(res=>{const key=clipKey(it),src=AUDIO[key];let done=false;const fin=()=>{if(!done){done=true;res()}};
- if(src){const alt=()=>playViaCtx(src).then(ok=>{if(!ok)tts(it).then(fin);else fin()});
-  try{P.pause();P.onended=fin;P.onerror=()=>{lastAudioErr="media:"+(P.error&&P.error.code);alt()};P.src=src;const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true},e=>{lastAudioErr="play:"+e.name;alt()});setTimeout(fin,7000);return}catch(e){lastAudioErr="throw:"+e.name;alt();return}}
+function clipKey(it){return typeof it==="string"?"he:"+strip(it).replace(/[!?,.]/g,"").trim():it.sfx?"sfx:"+it.sfx:"en:"+it.en.toLowerCase()}
+const SFX={ok:"sfx/ok.m4a",wrong:"sfx/wrong.m4a",level:"sfx/level.m4a",win:"sfx/level.m4a",coin:"sfx/coin.m4a",tick:"sfx/tick.m4a"};
+/* מנגן פריט אחד בנגן היחיד P. אם הניגון נקטע בכוונה (hush/פריט חדש) — לא מנסים שוב (זה מה שגרם להד) */
+function playOne(it){return new Promise(res=>{const tok=seqToken;const key=clipKey(it);const src=it&&it.sfx?(S.sound?SFX[it.sfx]:null):AUDIO[key];let done=false;const fin=()=>{if(!done){done=true;res()}};
+ if(it&&it.sfx&&!src){fin();return}
+ if(src){const alt=()=>{if(tok!==seqToken||done){fin();return}playViaCtx(src).then(ok=>{ok?fin():(it.sfx?fin():tts(it).then(fin))})};
+  try{P.pause();P.onended=fin;P.onerror=()=>{if(P.getAttribute("src")!==src)return;lastAudioErr="media:"+(P.error&&P.error.code);alt()};P.src=src;
+   const pr=P.play();if(pr&&pr.then)pr.then(()=>{audioReady=true},e=>{lastAudioErr="play:"+e.name;if(e.name==="AbortError"||tok!==seqToken){fin();return}alt()});setTimeout(fin,7000);return}catch(e){lastAudioErr="throw:"+e.name;alt();return}}
  tts(it).then(fin)})}
 function tts(it){if(!S.tts)return Promise.resolve();return new Promise(res=>{const text=typeof it==="string"?it:it.en;let started=false;
  try{if(!window.speechSynthesis)throw 0;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const he=typeof it==="string";
@@ -68,10 +75,12 @@ function tts(it){if(!S.tts)return Promise.resolve();return new Promise(res=>{con
 async function speak(list,gap){const tok=++seqToken;if(!Array.isArray(list))list=[list];
  for(let i=0;i<list.length;i++){if(tok!==seqToken)return;const it=list[i];if(!it)continue;await playOne(it);if(tok!==seqToken)return;await new Promise(r=>setTimeout(r,gap==null?220:gap))}
  return tok===seqToken}
-function hush(){seqToken++;try{P.pause()}catch(e){}try{speechSynthesis.cancel()}catch(e){}}
+function hush(){seqToken++;try{P.pause()}catch(e){}try{if(ctxSrc){ctxSrc.stop();ctxSrc=null}}catch(e){}try{speechSynthesis.cancel()}catch(e){}}
+/* צליל-משחק בנגן נפרד (לא קוטע דיבור); נפתח בנגיעה הראשונה */
+const P2=new Audio();P2.preload="auto";
+function sfx(name){if(!S.sound||!SFX[name])return;try{P2.pause();P2.src=SFX[name];const pr=P2.play();if(pr&&pr.catch)pr.catch(()=>{})}catch(e){}}
 let ac=null;
-function tone(ok){if(!S.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();const notes=ok?[660,880,1175]:[330,262];
- notes.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=ok?"triangle":"sine";o.frequency.value=f;const t=ac.currentTime+i*.09;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(ok?.12:.05,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.25)})}catch(e){}}
+function tone(ok){sfx(ok?"ok":"wrong")}
 function tick(){if(!S.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=520;g.gain.setValueAtTime(.08,ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.08);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.09)}catch(e){}}
 
 /* ---------- confetti ---------- */
@@ -156,8 +165,8 @@ const GEN={
    return{sk:"num",key:(after?"after:":"before:")+k,tag:after?"אחרי":"לפני",p:`${pr} <span class="num-big">${k}</span>?`,say:[pr,NUMNAME[k]],opts:numOpts(a,3,Math.max(1,a-3),Math.min(20,a+3)),a:String(a),after:[NUMNAME[a]]}}
   if(lv>=2&&r<.75){if(lv>=3&&Math.random()<.5){let a=rnd(1,20),b=rnd(1,20);while(b===a)b=rnd(1,20);const big=Math.max(a,b);
     return{sk:"num",key:"cmpn:"+a+":"+b,tag:"גדול יותר",p:PROMPTS.compareNum,say:[PROMPTS.compareNum,NUMNAME[a],"אוֹ",NUMNAME[b]],opts:[a,b].map(x=>opt(x,String(x),"num")),a:String(big),after:[NUMNAME[big]]}}
-   let a=rnd(1,max),b=rnd(1,max);while(b===a)b=rnd(1,max);const e2=pick(COUNT_EMO.filter(x=>x!==e));const big=Math.max(a,b);
-   return{sk:"num",key:"cmp:"+a+":"+b,tag:"יותר",p:PROMPTS.compare,say:[PROMPTS.compare],opts:[[a,e],[b,e2]].map(x=>opt(x[0],grid(x[0],x[1]),"grp")),a:String(big),after:[NUMNAME[big]],wide:true}}
+   const ns=sh(Array.from({length:max},(_,i)=>i+1)).slice(0,3);const ems=sh(COUNT_EMO).slice(0,3);const big=Math.max.apply(null,ns);
+   return{sk:"num",key:"cmp:"+ns.slice().sort().join(":"),tag:"הכי הרבה",p:PROMPTS.compareMost,say:[PROMPTS.compareMost],opts:ns.map((n,k)=>opt(n,grid(n,ems[k]),"grp")),a:String(big),after:[NUMNAME[big]]}}
   if(r<.85){const a=rnd(1,max);const lane=lv>=2&&Math.random()<.4;return{sk:"num",key:"hear:"+a,tag:lane?"תפסי את המספר":"מספרים",p:lane?`${PROMPTS.lane} <span class="num-big">${a}</span>`:PROMPTS.numHear,say:[lane?PROMPTS.lane:PROMPTS.numHear,NUMNAME[a]],kind:lane?"lane":"opts",opts:numOpts(a,lane?3:lv===1?3:4,Math.max(1,a-4),Math.min(max,a+4)),a:String(a),after:[NUMNAME[a]]}}
   const a=rnd(1,max);return{sk:"num",key:"count:"+a,tag:"ספירה",p:`${PROMPTS.count}${grid(a,e)}`,say:[PROMPTS.count],opts:numOpts(a,lv===1?3:4,Math.max(1,a-3),Math.min(max,a+3)),a:String(a),after:[NUMNAME[a]]}},
  calc(lv){const e=pick(COUNT_EMO);const r=Math.random();const max=lv===1?5:lv===2?10:lv===3?10:20;
@@ -302,7 +311,7 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  const item=G.plan[G.i];const sk=item.sk;let lv=item.lv;const easy=G.easy;G.easy=false;if(easy)lv=Math.max(1,lv-1);
  if(item.focus&&!item.introDone){const st=subState(item.step,item.sub);const h=st.h;const last2=h.slice(-2).join("")==="00";const acc=h.length>=4?h.slice(-6).reduce((a,b)=>a+b,0)/Math.min(6,h.length):1;
   if(st.n===0||last2||acc<.5){item.introDone=true;item.reteach=st.n>0;introCard(item);return}}
- let q=G.retryQ||makeQ(sk,lv,item.focus);G.retryQ=null;if(!q){G.i++;G.i<G.plan.length?ask():finish();return}q.item=item;
+ let q=G.retryQ;if(!q){S.rk=S.rk||[];for(let k=0;k<10;k++){q=makeQ(sk,lv,item.focus);if(!q||S.rk.indexOf(q.key)<0)break}if(q&&!q._retry){S.rk.push(q.key);if(S.rk.length>8)S.rk.shift()}}G.retryQ=null;if(!q){G.i++;G.i<G.plan.length?ask():finish();return}q.item=item;
  if(easy&&q.kind!=="spell"&&q.kind!=="row"&&q.opts.length>2){q.opts=sh([q.opts.find(o=>o.v===q.a),q.opts.find(o=>o.v!==q.a)])}
  G.cur={q,done:false,t0:Date.now(),retry:q._retry||0};
  const dots=G.plan.map((_,k)=>`<i class="${k<G.res.length?(G.res[k]===1?"ok":G.res[k]?"half":"no"):k===G.i?"now":""}"></i>`).join("");
@@ -330,6 +339,7 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  if(q.kind==="trace"){const wrap=app.querySelector("#draw");const fn=(typeof STROKES!=="undefined"&&STROKES[q.glyph])?setupTraceStrokes:setupTrace;const t=fn(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
  if(q.kind==="dots"){setupDots(q,app.querySelector("#draw"),(ok,st)=>{finishQ(true,null,null,st)})}
  scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150);
+ if(q.say&&q.say[0]&&!AUDIO[clipKey(q.say[0])]){const area=app.querySelector(".answers,.row-opts,.lane-wrap,.tiles,.draw-wrap");if(area){const h=document.createElement("div");h.className="hand-hint";h.textContent="👆";area.style.position="relative";area.appendChild(h);setTimeout(()=>h.remove(),3600)}}
  clearTimeout(attractT);attractT=setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q&&!G.cur.done){const e=app.querySelector("#ear");if(e)e.classList.add("attract");speak(q.say)}},9000)}
 let attractT=null;
 async function playOptions(q){const tok=seqToken;const els=Array.prototype.slice.call(app.querySelectorAll(".ans"));
@@ -358,13 +368,13 @@ function bumpCoins(){const el=document.getElementById("hc");if(el){el.textConten
 function answer(b){if(G.cur.done)return;const ok=b.dataset.o===G.cur.q.a;finishQ(ok,b)}
 function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  /* סולם-רמזים: טעות ראשונה בשאלת-בחירה → אותה שאלה ב-2 אפשרויות */
- if(!ok&&!G.cur.retry&&(q.kind==="opts"||!q.kind||q.kind==="lane"||q.kind==="row")&&q.opts&&q.opts.length>2){G.cur.done=true;hush();if(b)b.classList.add("wrong");tone(false);G.hints++;
+ if(!ok&&!G.cur.retry&&(q.kind==="opts"||!q.kind||q.kind==="lane"||q.kind==="row")&&q.opts&&q.opts.length>2){G.cur.done=true;hush();if(b)b.classList.add("wrong");G.hints++;
   const q2=Object.assign({},q);q2.opts=sh([q.opts.find(o=>o.v===q.a),q.opts.find(o=>o.v!==q.a&&(!b||o.v!==b.dataset.o))||q.opts.find(o=>o.v!==q.a)]);if(q2.kind==="lane")q2.kind="opts";q2._retry=1;
-  speak([pick(ENCOURAGE)]).then(()=>{if(view==="play"&&G.cur.q===q){G.retryQ=q2;ask()}});return}
+  speak([{sfx:"wrong"},pick(ENCOURAGE)]).then(()=>{if(view==="play"&&G.cur.q===q){G.retryQ=q2;ask()}});return}
  /* טעות שנייה → ביצוע-מתקן: הנכון מהבהב והילדה לוחצת עליו */
  if(!ok&&G.cur.retry===1&&!G.cur.corrective&&q.opts){G.cur.corrective=true;if(b)b.classList.add("wrong");tone(false);
   app.querySelectorAll(".ans").forEach(x=>{if(x.dataset.o===q.a){x.classList.add("hintblink");x.disabled=false;x.onclick=()=>{x.classList.remove("hintblink");finishQ(false,null,null,null,true)}}else x.disabled=true});
-  speak(["לַחֲצִי עַל הַתְּשׁוּבָה הַנְּכוֹנָה"].concat(q.after||[]));return}
+  speak([{sfx:"wrong"},"לַחֲצִי עַל הַתְּשׁוּבָה הַנְּכוֹנָה"].concat(q.after||[]));return}
  G.cur.done=true;hush();const hinted=arguments[4]||G.cur.retry>0;
  if(q.kind==="lane"){const f=app.querySelector(".fall");if(f){f.classList.add("paused")}}
  app.querySelectorAll(".ans").forEach(x=>{x.disabled=true;if(x.dataset.o===q.a)x.classList.add("right")});
@@ -379,7 +389,7 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
   if(G.retried<2&&G.plan.length<CAP){G.retried++;G.plan.splice(Math.min(G.i+3,G.plan.length),0,Object.assign({},q.item))}
   if(G.wrongRow>=2){G.easy=true;G.wrongRow=0}}
  if(change==="step"){G.pendingUp=q.item.step;G.ups.push(q.item.step)}else if(change==="pass"){toast("✨ "+STEPS[q.item.step].n+": עוד חלק נסגר!",1800);jingle("level")}else if(change==="down"){G.easy=true}
- if(!ok)tone(false);save();bumpCoins();
+ save();bumpCoins();
  const praise=pick(PRAISE);const enc=pick(ENCOURAGE);
  const last=G.i>=G.plan.length-1&&!G.easy;
  const ansHtml=q.opts?(q.opts.find(o=>o.v===q.a)||{}).html||q.a:q.a;const starsTxt=st?` ${"⭐".repeat(st)}`:"";
@@ -390,7 +400,7 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;(G.i<G.plan.length||G.easy)?ask():finish()};
  const nx=document.getElementById("nx");const tAns=Date.now();
  nx.onclick=()=>{if(Date.now()-tAns<400)return;go()};
- const seq=ok?[praise].concat(q.after||[]):[enc].concat(q.after||[]);
+ const seq=ok?[{sfx:"ok"},praise].concat(q.after||[]):[{sfx:"wrong"},enc].concat(q.after||[]);
  const tFb=Date.now();speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);const minMs=ok?2200:3400;advT=setTimeout(go,Math.max(300,minMs-(Date.now()-tFb)))}});
  advT=setTimeout(go,ok?7000:10000);
  nx.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})}

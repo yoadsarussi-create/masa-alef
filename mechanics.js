@@ -16,7 +16,7 @@ function note(freq,inst,when,dur){if(!S.sound)return;const a=ctx();if(!a)return;
  osc.start(t);osc.stop(t+dur*1.7)}
 function cheer(){if(!S.sound)return;const a=ctx();if(!a)return;const t=a.currentTime;const buf=a.createBuffer(1,a.sampleRate*1.2,a.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
  const src=a.createBufferSource();src.buffer=buf;const f=a.createBiquadFilter();f.type="bandpass";f.frequency.value=1800;f.Q.value=.6;const g=a.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.15);g.gain.exponentialRampToValueAtTime(.0001,t+1.1);src.connect(f);f.connect(g);g.connect(a.destination);src.start(t)}
-function jingle(kind){if(!S.sound)return;const seq=kind==="win"?[0,2,4,7,9,7,9]:kind==="level"?[0,4,7,9,12]:[0,2,4];seq.forEach((n,i)=>note(PENTA[0]*Math.pow(2,n/12),"bell",i*.12,.5))}
+function jingle(kind){sfx(kind==="win"?"win":"level")}
 function comboNote(n){note(PENTA[Math.min(PENTA.length-1,n)],"marimba",0,.45)}
 function flyTo(fromEl,toEl,text){try{const a=fromEl.getBoundingClientRect(),b=toEl.getBoundingClientRect();const el=document.createElement("div");el.className="flyer";el.textContent=text;el.style.left=(a.left+a.width/2-20)+"px";el.style.top=(a.top+a.height/2-14)+"px";
  el.style.setProperty("--dx",(b.left+b.width/2-(a.left+a.width/2))+"px");el.style.setProperty("--dy",(b.top+b.height/2-(a.top+a.height/2))+"px");document.body.appendChild(el);setTimeout(()=>el.remove(),900)}catch(e){}}
