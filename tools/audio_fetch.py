@@ -63,7 +63,7 @@ def main():
                 if not os.path.exists(raw):
                     urllib.request.urlretrieve(urllib.request.Request(info["url"],headers=UA).full_url,raw) if False else open(raw,"wb").write(urllib.request.urlopen(urllib.request.Request(info["url"],headers=UA),timeout=60).read())
                 # normalize loudness, trim silence, mono 32kbps AAC
-                subprocess.run(["ffmpeg","-y","-loglevel","error","-i",raw,"-af","silenceremove=start_periods=1:start_threshold=-45dB:stop_periods=1:stop_threshold=-45dB,loudnorm=I=-16:TP=-1.5,apad=pad_dur=0.15","-ac","1","-ar","32000","-c:a","aac","-b:a","40k",os.path.join(ROOT,out)],check=True)
+                subprocess.run(["ffmpeg","-y","-loglevel","error","-i",raw,"-af","loudnorm=I=-16:TP=-1.5,silenceremove=start_periods=1:start_threshold=-55dB:start_silence=0.08:stop_periods=1:stop_threshold=-55dB:stop_silence=0.12,apad=pad_dur=0.12","-ac","1","-ar","32000","-c:a","aac","-b:a","40k",os.path.join(ROOT,out)],check=True)
                 man[key]=out;credits.append((key,t,info["user"],info["license"]))
                 json.dump(man,open(man_path,"w",encoding="utf-8"),ensure_ascii=False,indent=0)
             n+=1
