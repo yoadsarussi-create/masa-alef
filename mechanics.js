@@ -108,28 +108,30 @@ const AV_ITEMS=[
  {id:"pat:stars",cat:"דוגמה",n:"כוכבים ⭐",cost:50},{id:"pat:hearts",cat:"דוגמה",n:"לבבות ❤️",cost:50},{id:"pat:none",cat:"דוגמה",n:"חלק",cost:0},
  {id:"acc:mic",cat:"אביזרים",n:"מיקרופון 🎤",cost:0},{id:"acc:phones",cat:"אביזרים",n:"אוזניות 🎧",cost:40},{id:"acc:glasses",cat:"אביזרים",n:"משקפי-כוכב 🕶️",cost:70},{id:"acc:crown",cat:"אביזרים",n:"כתר 👑",cost:120},{id:"acc:guitar",cat:"אביזרים",n:"גיטרה 🎸",cost:150},{id:"acc:cape",cat:"אביזרים",n:"גלימה 🦸",cost:90},{id:"acc:wand",cat:"אביזרים",n:"שרביט ✨",cost:200}];
 function avDefaults(){S.av=S.av||{hair:"pony",hc:"#5a3b1e",dress:"#ff5fa2",pat:"none",acc:["mic"]};S.wardrobe=S.wardrobe||["hair:pony","hc:#5a3b1e","hc:#1b1b1b","dress:#ff5fa2","pat:none","acc:mic"];return S.av}
-function avatarSvg(av,cls){av=av||avDefaults();const hc=av.hc,skin="#f6d3b8";const d=av.dress==="rainbow"?"url(#rb)":av.dress;const has=x=>av.acc.indexOf(x)>=0;
- const hairBack={pony:`<path d="M30 40 Q18 60 26 92 Q34 96 40 90 Q30 70 36 46Z" fill="${hc}"/>`,curly:`<circle cx="30" cy="48" r="12" fill="${hc}"/><circle cx="70" cy="48" r="12" fill="${hc}"/><circle cx="26" cy="64" r="10" fill="${hc}"/><circle cx="74" cy="64" r="10" fill="${hc}"/>`,long:`<path d="M26 40 Q20 70 24 100 L76 100 Q80 70 74 40Z" fill="${hc}"/>`,bun:`<circle cx="50" cy="14" r="11" fill="${hc}"/>`}[av.hair]||"";
- const pat=av.pat==="stars"?`<text x="42" y="92" font-size="9">⭐</text><text x="56" y="104" font-size="9">⭐</text>`:av.pat==="hearts"?`<text x="42" y="92" font-size="9">❤️</text><text x="56" y="104" font-size="9">❤️</text>`:"";
+function avatarSvg(av,cls){av=av||avDefaults();const hc=av.hc,skin="#f6d3b8",ol="#1E1B3A";const d=av.dress==="rainbow"?"url(#rb)":av.dress;const has=x=>av.acc.indexOf(x)>=0;
+ const hairBack={pony:`<g class="av-hair"><path d="M30 40 Q18 60 26 92 Q34 96 40 90 Q30 70 36 46Z" fill="${hc}" stroke="${ol}" stroke-width="3"/></g>`,curly:`<circle cx="30" cy="48" r="12" fill="${hc}" stroke="${ol}" stroke-width="3"/><circle cx="70" cy="48" r="12" fill="${hc}" stroke="${ol}" stroke-width="3"/><circle cx="26" cy="64" r="10" fill="${hc}" stroke="${ol}" stroke-width="3"/><circle cx="74" cy="64" r="10" fill="${hc}" stroke="${ol}" stroke-width="3"/>`,long:`<path d="M26 40 Q20 70 24 100 L76 100 Q80 70 74 40Z" fill="${hc}" stroke="${ol}" stroke-width="3"/>`,bun:`<circle cx="50" cy="14" r="11" fill="${hc}" stroke="${ol}" stroke-width="3"/>`}[av.hair]||"";
+ const pat=av.pat==="stars"?`<text x="42" y="92" font-size="10">⭐</text><text x="56" y="104" font-size="10">⭐</text>`:av.pat==="hearts"?`<text x="42" y="92" font-size="10">❤️</text><text x="56" y="104" font-size="10">❤️</text>`:"";
  return`<svg class="avatar ${cls||""}" viewBox="0 0 100 130" aria-hidden="true"><defs><linearGradient id="rb" x1="0" x2="1"><stop offset="0" stop-color="#ff6f61"/><stop offset=".5" stop-color="#ffc23d"/><stop offset="1" stop-color="#2ee6d6"/></linearGradient></defs>
- ${has("cape")?`<path d="M30 70 L20 125 L80 125 L70 70Z" fill="#8e24aa" opacity=".9"/>`:""}
+ <g class="part">
+ ${has("cape")?`<path d="M30 70 L20 125 L80 125 L70 70Z" fill="#8e24aa" stroke="${ol}" stroke-width="3" opacity=".95"/>`:""}
  ${hairBack}
- <path d="M34 72 L26 118 L74 118 L66 72Z" fill="${d}"/>${pat}
- <rect x="38" y="116" width="8" height="10" rx="3" fill="${skin}"/><rect x="54" y="116" width="8" height="10" rx="3" fill="${skin}"/>
- <rect x="36" y="124" width="12" height="5" rx="2" fill="#1b1140"/><rect x="52" y="124" width="12" height="5" rx="2" fill="#1b1140"/>
- <path d="M34 76 L22 98" stroke="${skin}" stroke-width="7" stroke-linecap="round"/><path d="M66 76 L78 98" stroke="${skin}" stroke-width="7" stroke-linecap="round"/>
- <circle cx="50" cy="46" r="22" fill="${skin}"/>
- <path d="M28 44 Q30 22 50 22 Q70 22 72 44 Q62 34 50 36 Q38 34 28 44Z" fill="${hc}"/>
- <circle cx="42" cy="46" r="3" fill="#1b1140"/><circle cx="58" cy="46" r="3" fill="#1b1140"/><circle cx="43" cy="45" r="1" fill="#fff"/><circle cx="59" cy="45" r="1" fill="#fff"/>
- <circle cx="37" cy="53" r="3" fill="#ff8ac0" opacity=".6"/><circle cx="63" cy="53" r="3" fill="#ff8ac0" opacity=".6"/>
- <path d="M43 56 Q50 63 57 56" stroke="#c43a78" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+ <path d="M34 72 L26 118 L74 118 L66 72Z" fill="${d}" stroke="${ol}" stroke-width="4" stroke-linejoin="round"/>${pat}
+ <rect x="38" y="116" width="8" height="10" rx="3" fill="${skin}" stroke="${ol}" stroke-width="3"/><rect x="54" y="116" width="8" height="10" rx="3" fill="${skin}" stroke="${ol}" stroke-width="3"/>
+ <rect x="35" y="123" width="14" height="6" rx="3" fill="${ol}"/><rect x="51" y="123" width="14" height="6" rx="3" fill="${ol}"/>
+ <path d="M34 76 L22 98" stroke="${ol}" stroke-width="11" stroke-linecap="round"/><path d="M34 76 L22 98" stroke="${skin}" stroke-width="6" stroke-linecap="round"/>
+ <g class="av-armR"><path d="M66 76 L80 60" stroke="${ol}" stroke-width="11" stroke-linecap="round"/><path d="M66 76 L80 60" stroke="${skin}" stroke-width="6" stroke-linecap="round"/>
+ ${has("mic")?`<circle cx="85" cy="53" r="7" fill="#2ED8C3" stroke="${ol}" stroke-width="3"/><rect x="83" y="59" width="4" height="9" fill="${ol}"/>`:""}
+ ${has("wand")?`<line x1="84" y1="56" x2="94" y2="40" stroke="#FFD93D" stroke-width="4" stroke-linecap="round"/><text x="88" y="42" font-size="12">✨</text>`:""}</g>
+ <g class="av-head"><circle cx="50" cy="46" r="23" fill="${skin}" stroke="${ol}" stroke-width="4"/>
+ <path d="M27 44 Q30 20 50 20 Q70 20 73 44 Q62 32 50 35 Q38 32 27 44Z" fill="${hc}" stroke="${ol}" stroke-width="3"/>
+ <g class="av-eyes"><circle cx="42" cy="47" r="3.5" fill="${ol}"/><circle cx="58" cy="47" r="3.5" fill="${ol}"/><circle cx="43.5" cy="45.5" r="1.2" fill="#fff"/><circle cx="59.5" cy="45.5" r="1.2" fill="#fff"/></g>
+ <circle cx="36" cy="54" r="3.5" fill="#FF5C8A" opacity=".5"/><circle cx="64" cy="54" r="3.5" fill="#FF5C8A" opacity=".5"/>
+ <path class="av-mouth" d="M42 57 Q50 66 58 57" stroke="${ol}" stroke-width="3" fill="none" stroke-linecap="round"/>
  ${has("glasses")?`<text x="31" y="52" font-size="14">⭐</text><text x="52" y="52" font-size="14">⭐</text>`:""}
- ${has("phones")?`<path d="M28 44 Q28 26 50 26 Q72 26 72 44" stroke="#1b1140" stroke-width="4" fill="none"/><rect x="24" y="40" width="9" height="14" rx="4" fill="#ff5fa2"/><rect x="67" y="40" width="9" height="14" rx="4" fill="#ff5fa2"/>`:""}
- ${has("crown")?`<path d="M34 24 L40 10 L50 20 L60 10 L66 24Z" fill="#ffc23d" stroke="#c98a00" stroke-width="1.5"/>`:""}
- ${has("mic")?`<line x1="22" y1="98" x2="14" y2="80" stroke="#444" stroke-width="4" stroke-linecap="round"/><circle cx="12" cy="76" r="6" fill="#2ee6d6"/>`:""}
- ${has("guitar")?`<g transform="rotate(-25 60 95)"><ellipse cx="62" cy="100" rx="13" ry="10" fill="#c0392b"/><rect x="60" y="68" width="4" height="30" fill="#8d6e63"/><circle cx="62" cy="100" r="4" fill="#1b1140"/></g>`:""}
- ${has("wand")?`<line x1="78" y1="98" x2="90" y2="78" stroke="#ffc23d" stroke-width="3" stroke-linecap="round"/><text x="84" y="80" font-size="12">✨</text>`:""}
- </svg>`}
+ ${has("phones")?`<path d="M28 44 Q28 26 50 26 Q72 26 72 44" stroke="${ol}" stroke-width="4" fill="none"/><rect x="24" y="40" width="9" height="14" rx="4" fill="#FF5C8A" stroke="${ol}" stroke-width="2"/><rect x="67" y="40" width="9" height="14" rx="4" fill="#FF5C8A" stroke="${ol}" stroke-width="2"/>`:""}
+ ${has("crown")?`<path d="M34 24 L40 10 L50 20 L60 10 L66 24Z" fill="#FFD93D" stroke="${ol}" stroke-width="3" stroke-linejoin="round"/>`:""}</g>
+ ${has("guitar")?`<g transform="rotate(-25 60 95)"><ellipse cx="62" cy="100" rx="13" ry="10" fill="#c0392b" stroke="${ol}" stroke-width="3"/><rect x="60" y="68" width="4" height="30" fill="#8d6e63" stroke="${ol}" stroke-width="2"/><circle cx="62" cy="100" r="4" fill="${ol}"/></g>`:""}
+ </g></svg>`}
 function wardrobe(){view="ward";hush();const av=avDefaults();const cats=[...new Set(AV_ITEMS.map(x=>x.cat))];
  const eq=id=>{const [k,v]=id.split(":");if(k==="acc")return av.acc.indexOf(v)>=0;return av[k]===v};
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>הארון של ${KID()} 👗</h2>

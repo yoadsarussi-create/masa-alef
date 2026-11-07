@@ -16,7 +16,10 @@ const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"
 const strip=s=>s.replace(/[֑-ׇ]/g,"");
 const others=(pool,excl,n)=>sh(pool.filter(x=>excl.indexOf(x)<0)).slice(0,n);
 const opt=(v,html,cls)=>({v:String(v),html,cls:cls||""});
-const pic=e=>`<span class="emo">${e}</span>`;
+const PICS=window.PICS||{};
+const picHtml=e=>{if(!e)return"";if(PICS[e])return`<img class="pic" src="${PICS[e]}" alt="">`;const parts=[];let cur="";for(const ch of Array.from(e)){const cp=ch.codePointAt(0);if(cur&&(cp===0xFE0F||cp===0x200D||(cp>=0x1F3FB&&cp<=0x1F3FF)||(cur.slice(-1)==="\u200D"))){cur+=ch}else{if(cur)parts.push(cur);cur=ch}}if(cur)parts.push(cur);
+ if(parts.length<2)return e;return parts.map(p=>PICS[p]?`<img class="pic" src="${PICS[p]}" alt="">`:p).join("")};
+const pic=e=>`<span class="emo">${picHtml(e)}</span>`;
 
 /* ---------- mastery (per island, per level) ---------- */
 const lvOf=sk=>S.lv[sk]||1;
@@ -82,7 +85,7 @@ function loop(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx
 let toastT=null;function toast(html,ms){let el=document.getElementById("toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.innerHTML=html;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,ms||4000)}
 
 /* ---------- mascot ---------- */
-const TURTLE=`<svg viewBox="0 0 76 64" aria-hidden="true"><ellipse cx="38" cy="58" rx="26" ry="4" fill="#0002"/><ellipse cx="18" cy="50" rx="7" ry="5" fill="#3fbf6f"/><ellipse cx="54" cy="50" rx="7" ry="5" fill="#3fbf6f"/><ellipse cx="36" cy="40" rx="24" ry="17" fill="#2a8a4e"/><path d="M20 38 Q36 18 52 38" fill="#3fbf6f"/><circle cx="30" cy="34" r="4" fill="#ffc23d"/><circle cx="42" cy="33" r="3" fill="#ffc23d"/><circle cx="37" cy="42" r="3.5" fill="#ffc23d"/><circle cx="64" cy="32" r="10" fill="#3fbf6f"/><circle cx="67" cy="29" r="3" fill="#fff"/><circle cx="68" cy="29" r="1.6" fill="#13324a"/><path d="M62 36 Q66 39 70 35" stroke="#13324a" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="60" cy="34" r="2" fill="#ff6f61" opacity=".5"/></svg>`;
+const TURTLE=`<svg viewBox="0 0 76 64" aria-hidden="true"><ellipse cx="38" cy="59" rx="26" ry="3" fill="#0003"/><ellipse cx="18" cy="52" rx="7" ry="5" fill="#3fbf6f" stroke="#1E1B3A" stroke-width="3"/><ellipse cx="54" cy="52" rx="7" ry="5" fill="#3fbf6f" stroke="#1E1B3A" stroke-width="3"/><ellipse cx="36" cy="40" rx="24" ry="17" fill="#2a8a4e" stroke="#1E1B3A" stroke-width="3"/><path d="M20 38 Q36 18 52 38" fill="#8fe39f" stroke="#1E1B3A" stroke-width="3"/><circle cx="30" cy="34" r="4" fill="#FFD93D"/><circle cx="42" cy="33" r="3" fill="#FFD93D"/><circle cx="64" cy="32" r="10" fill="#8fe39f" stroke="#1E1B3A" stroke-width="3"/><circle cx="67" cy="29" r="3" fill="#1E1B3A"/><circle cx="68" cy="28" r="1" fill="#fff"/><path d="M62 36 Q66 39 70 35" stroke="#1E1B3A" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="30" r="9" fill="#FF9F43" stroke="#1E1B3A" stroke-width="3"/><line x1="12" y1="30" x2="26" y2="18" stroke="#1E1B3A" stroke-width="3" stroke-linecap="round"/></svg>`;
 const COLORS={red:"#e53935",blue:"#1e88e5",green:"#43a047",yellow:"#fdd835",orange:"#fb8c00",purple:"#8e24aa",black:"#333333",white:"#ffffff",brown:"#8d6e63",pink:"#ec407a"};
 function shapeSvg(k,fill){fill=fill||"#1aa6b7";const m={circle:`<circle cx="50" cy="50" r="40" fill="${fill}"/>`,triangle:`<polygon points="50,10 92,88 8,88" fill="${fill}"/>`,square:`<rect x="12" y="12" width="76" height="76" rx="6" fill="${fill}"/>`,
  rect:`<rect x="4" y="26" width="92" height="48" rx="6" fill="${fill}"/>`,star:`<polygon points="50,6 61,38 95,38 68,58 78,92 50,72 22,92 32,58 5,38 39,38" fill="${fill}"/>`,heart:`<path d="M50 88 L14 50 C2 36 14 12 34 16 C42 18 48 26 50 30 C52 26 58 18 66 16 C86 12 98 36 86 50 Z" fill="${fill}"/>`};
@@ -114,7 +117,7 @@ const GEN={
   const lane=lv>=2&&Math.random()<.4;const n=lane?3:lv===1?3:4;const o=letterOpts(t,n,lv>=2);
   return{sk:"let",key:"let:"+t,tag:lane?"תפסי את האות":"שמות האותיות",p:lane?`${PROMPTS.lane} <span class="he-word">${LETNAME[t]}</span>`:PROMPTS.letHear,say:[lane?PROMPTS.lane:PROMPTS.letHear,LETNAME[t]],kind:lane?"lane":"opts",opts:o.map(x=>opt(x,bigHe(x),"he")),a:t,after:[LETNAME[t]]}},
  sound(lv){if(Math.random()<.35){const t=pick(LETTERS.filter(l=>wordsBy(w=>w.w[0]===l).length>=1));const w=pick(wordsBy(x=>x.w[0]===t));const n=lv>=3?4:3;
-   const dis=others(wordsBy(x=>x.w[0]!==t&&(lv<2||!(CONFUSE_SOUND[t]||"").includes(x.w[0]))),[],n-1);const o=sh([w].concat(dis)).map(x=>Object.assign(opt(x.w,x.e,"pic"),{say:x.s}));
+   const dis=others(wordsBy(x=>x.w[0]!==t&&(lv<2||!(CONFUSE_SOUND[t]||"").includes(x.w[0]))),[],n-1);const o=sh([w].concat(dis)).map(x=>Object.assign(opt(x.w,picHtml(x.e),"pic"),{say:x.s}));
    return{sk:"sound",key:"l2w:"+t,tag:"האות והצליל",p:`${PROMPTS.letterWord} ${bigHe(t)}`,say:[PROMPTS.letterWord,LETNAME[t]],playOpts:true,opts:o,a:w.w,after:[w.s,LETNAME[t]],info:`<span class="he-word">${w.s}</span>`}}
   const last=lv===3||(lv===4&&Math.random()<.5);const pool=wordsBy(w=>last?true:w.syl<=3);const w=pick(pool);
   const t=last?w.w[w.w.length-1]:w.w[0];const base=FINAL_TO_BASE[t]||t;const n=lv===1?3:4;
@@ -125,14 +128,14 @@ const GEN={
    return{sk:"rhyme",key:"syl:"+w.w,tag:"הברות",p:`${PROMPTS.syl}${pic(w.e)}<span class="he-word">${w.s}</span>`,say:[PROMPTS.syl,w.s],opts:o,a:String(w.syl),after:[w.s]}}
   const pr=pick(RHYMES);const a=WORD_BY(pr[0]),b=WORD_BY(pr[1]);const n=lv>=3?4:3;
   const end=b.w.slice(-1);const dis=others(clearWords().filter(x=>x.w!==a.w&&x.w!==b.w&&x.w.slice(-1)!==end&&x.w.slice(-2)!==b.w.slice(-2)),[],n-1);
-  return{sk:"rhyme",key:"rhyme:"+a.w,tag:"חרוזים",p:`${PROMPTS.rhyme} <span class="he-word">${a.s}</span>?${pic(a.e)}`,say:[PROMPTS.rhyme,a.s],opts:sh([b].concat(dis)).map(x=>opt(x.w,x.e,"pic")),a:b.w,after:[a.s,b.s]}},
+  return{sk:"rhyme",key:"rhyme:"+a.w,tag:"חרוזים",p:`${PROMPTS.rhyme} <span class="he-word">${a.s}</span>?${pic(a.e)}`,say:[PROMPTS.rhyme,a.s],opts:sh([b].concat(dis)).map(x=>opt(x.w,picHtml(x.e),"pic")),a:b.w,after:[a.s,b.s]}},
  word(lv){const build=lv===2||lv===3||(lv===4&&Math.random()<.5);
   if(build){const list=lv===2?SPELL_L1.concat(SPELL_L2):lv===3?SPELL_L2.concat(SPELL_L3):SPELL_L3;const w=WORD_BY(pick(list));const letters=w.w.split("");
    const dn=lv===2?1:2;const dis=others(LETTERS.concat(Object.keys(FINAL_TO_BASE)),letters.map(x=>FINAL_TO_BASE[x]||x).concat(letters),dn);
    return{sk:"word",key:"build:"+w.w,tag:"בניית מילה",p:`${PROMPTS.wordBuild}${pic(w.e)}`,say:[PROMPTS.wordBuild,w.s],kind:"spell",tiles:sh(letters.concat(dis)),ans:letters,dir:"rtl",a:w.w,after:[w.s],info:`<span class="he-word">${w.s}</span>`}}
   const list=lv===1?SPELL_L1:SPELL_L2.concat(SPELL_L3);const w=WORD_BY(pick(list));const n=lv===1?3:4;
   const dis=others(clearWords().filter(x=>x.w!==w.w&&(lv===1||x.w[0]===w.w[0]||x.w.length===w.w.length)),[],n-1);
-  return{sk:"word",key:"read:"+w.w,tag:"קריאת מילה",p:`${PROMPTS.wordRead}<span class="he-word big">${w.s}</span>`,say:[PROMPTS.wordRead],opts:sh([w].concat(dis)).map(x=>opt(x.w,x.e,"pic")),a:w.w,after:[w.s]}},
+  return{sk:"word",key:"read:"+w.w,tag:"קריאת מילה",p:`${PROMPTS.wordRead}<span class="he-word big">${w.s}</span>`,say:[PROMPTS.wordRead],opts:sh([w].concat(dis)).map(x=>opt(x.w,picHtml(x.e),"pic")),a:w.w,after:[w.s]}},
  nik(lv){if(lv===3||(lv===4&&Math.random()<.5)){const it=pick(SYL1);const w=WORD_BY(it[0]);
    return{sk:"nik",key:"nsyl:"+w.w,tag:"הברה פותחת",p:`${PROMPTS.nikSyl} <span class="he-word">${w.s}</span>?${pic(w.e)}`,say:[PROMPTS.nikSyl,w.s],opts:sh([it[1]].concat(it[2])).map(x=>opt(x,bigHe(x),"he")),a:it[1],after:[w.s]}}
   const pool=NIK.filter(x=>lv===1?x.w.length===2:lv===2?x.w.length===3:x.w.length>=4);const it=pick(pool);const w=WORD_BY(it.w);
@@ -140,7 +143,7 @@ const GEN={
  num(lv){const max=lv===1?5:lv===2?10:20;const r=Math.random();const e=pick(COUNT_EMO);
   if(lv<=2&&r<.2){const n=lv===1?7:10;return dotsQ("num",Array.from({length:n},(_,i)=>String(i+1)),k=>NUMNAME[k+1])}
   const numOpts=(a,n,lo,hi)=>sh([a].concat(others(Array.from({length:hi-lo+1},(_,i)=>lo+i),[a],n-1))).map(x=>opt(x,String(x),"num"));
-  const grid=(n,em)=>`<div class="count ${n>10?"tens":""}">${Array.from({length:n},()=>`<span>${em}</span>`).join("")}</div>`;
+  const grid=(n,em)=>`<div class="count ${n>10?"tens":""}">${Array.from({length:n},()=>`<span>${picHtml(em)}</span>`).join("")}</div>`;
   if(lv===4&&r<.35){const step=pick([1,1,2,10]);const start=step===10?10:step===2?pick([2,4]):rnd(1,15);const seq=[0,1,2,3].map(i=>start+i*step).filter(x=>x<=20);if(seq.length<4)return GEN.num(3);const hole=rnd(1,3);const a=seq[hole];
    return{sk:"num",key:"seq:"+step+":"+start,tag:"סדרה",p:`${PROMPTS.numSeq}<span class="num-seq" dir="ltr">${seq.map((x,i)=>i===hole?"_":x).join(" , ")}</span>`,say:[PROMPTS.numSeq],opts:numOpts(a,3,Math.max(1,a-3),Math.min(20,a+3)),a:String(a)}}
   if(lv>=2&&r<.55){const n=lv>=4?pick([1,2,3]):lv===3?pick([1,2]):1;const k=rnd(2,max-1);
@@ -155,7 +158,7 @@ const GEN={
   const a=rnd(1,max);return{sk:"num",key:"count:"+a,tag:"ספירה",p:`${PROMPTS.count}${grid(a,e)}`,say:[PROMPTS.count],opts:numOpts(a,lv===1?3:4,Math.max(1,a-3),Math.min(max,a+3)),a:String(a),after:[NUMNAME[a]]}},
  calc(lv){const e=pick(COUNT_EMO);const r=Math.random();const max=lv===1?5:lv===2?10:lv===3?10:20;
   const numOpts=(a,n,lo,hi)=>sh([a].concat(others(Array.from({length:hi-lo+1},(_,i)=>lo+i),[a],n-1))).map(x=>opt(x,String(x),"num"));
-  const grp=(n,fade)=>`<span class="grp${fade?" fade":""}">${Array.from({length:n},()=>e).join("")}</span>`;
+  const grp=(n,fade)=>`<span class="grp${fade?" fade":""}">${Array.from({length:n},()=>picHtml(e)).join("")}</span>`;
   if(lv===3&&r<.3){const a=rnd(1,9);const ans=10-a;
    return{sk:"calc",key:"ten:"+a,tag:"השלמה ל-10",p:`${PROMPTS.ten}<span class="eq" dir="ltr">${a} + ? = 10</span>`,say:[PROMPTS.ten,NUMNAME[a],"וְעוֹד כַּמָּה"],opts:numOpts(ans,4,1,9),a:String(ans),after:[NUMNAME[a],"וְעוֹד",NUMNAME[ans],"זֶה עֶשֶׂר"]}}
   const sub=lv>=2&&Math.random()<.45;const digitsOnly=lv>=3;
@@ -169,17 +172,17 @@ const GEN={
    const sp=pick(SHAPES.filter(x=>x.sides));return{sk:"think",key:"sides:"+sp.k,tag:"צלעות",p:`${PROMPTS.sides}<div class="shape-big">${shapeSvg(sp.k,"#ff6f61")}</div>`,say:[PROMPTS.sides],opts:[3,4,5].map(x=>opt(x,String(x),"num")),a:String(sp.sides),after:[sp.n]}}
   if(lv>=2&&r<(lv===2?.4:.35)){const kinds=lv===2?["ABAB"]:["ABAB","ABC","AAB"];const k=pick(kinds);const em=sh(COUNT_EMO).slice(0,3);const pat=k==="ABAB"?[0,1]:k==="ABC"?[0,1,2]:[0,0,1];
    const len=lv===2?5:6;const seq=Array.from({length:len+1},(_,i)=>em[pat[i%pat.length]]);const a=seq[len];
-   return{sk:"think",key:"pat:"+k,tag:"מה בא אחר כך?",p:`${PROMPTS.pattern}<div class="pattern" dir="ltr">${seq.slice(0,len).map(x=>`<span>${x}</span>`).join("")}<span class="q">?</span></div>`,say:[PROMPTS.pattern],opts:sh(em).map(x=>opt(x,x,"pic")),a:a}}
+   return{sk:"think",key:"pat:"+k,tag:"מה בא אחר כך?",p:`${PROMPTS.pattern}<div class="pattern" dir="ltr">${seq.slice(0,len).map(x=>`<span>${picHtml(x)}</span>`).join("")}<span class="q">?</span></div>`,say:[PROMPTS.pattern],opts:sh(em).map(x=>opt(x,picHtml(x),"pic")),a:a}}
   if(lv>=2&&r<(lv===2?.75:.7)){const n=lv===2?3:4;const ws=sh(clearWords()).slice(0,n);let idx,pr,sayx=[];
    if(lv===2){const dir=Math.random()<.5?"R":"L";let x=dir==="R"?rnd(0,n-2):rnd(1,n-1);idx=dir==="R"?x+1:x-1;pr=dir==="R"?PROMPTS.dirRight:PROMPTS.dirLeft;sayx=[pr,ws[x].s];
-    return{sk:"think",key:"dir:"+dir,tag:"ימין ושמאל",p:`${pr} <span class="he-word">${ws[x].s}</span>`,say:sayx,kind:"row",opts:ws.map((w,i)=>opt(i,w.e,"pic")),a:String(idx),after:[ws[idx].s]}}
+    return{sk:"think",key:"dir:"+dir,tag:"ימין ושמאל",p:`${pr} <span class="he-word">${ws[x].s}</span>`,say:sayx,kind:"row",opts:ws.map((w,i)=>opt(i,picHtml(w.e),"pic")),a:String(idx),after:[ws[idx].s]}}
    const kind=pick(["mid","firstR","firstL","secondR"]);if(kind==="mid"&&n%2===0)return GEN.think(2);
    idx=kind==="mid"?Math.floor(n/2):kind==="firstR"?n-1:kind==="firstL"?0:n-2;pr=kind==="mid"?PROMPTS.dirMid:kind==="firstR"?PROMPTS.dirFirstR:kind==="firstL"?PROMPTS.dirFirstL:PROMPTS.dirSecondR;
-   return{sk:"think",key:"dir:"+kind,tag:"ימין ושמאל",p:pr,say:[pr],kind:"row",opts:ws.map((w,i)=>opt(i,w.e,"pic")),a:String(idx),after:[ws[idx].s]}}
+   return{sk:"think",key:"dir:"+kind,tag:"ימין ושמאל",p:pr,say:[pr],kind:"row",opts:ws.map((w,i)=>opt(i,picHtml(w.e),"pic")),a:String(idx),after:[ws[idx].s]}}
   if(r<.5||lv===1&&r<.6){const big=Math.random()<.5;const w=pick(clearWords());const sizes=sh([1,1.7,2.6]);const a=sizes.indexOf(big?2.6:1);
-   return{sk:"think",key:"size:"+(big?"B":"S"),tag:"גדול וקטן",p:`${big?PROMPTS.sizeBig:PROMPTS.sizeSmall}`,say:[big?PROMPTS.sizeBig:PROMPTS.sizeSmall],kind:"row",opts:sizes.map((s,i)=>opt(i,`<span style="font-size:${s}em">${w.e}</span>`,"pic")),a:String(a),after:[big?"הֲכִי גָּדוֹל":"הֲכִי קָטָן"]}}
+   return{sk:"think",key:"size:"+(big?"B":"S"),tag:"גדול וקטן",p:`${big?PROMPTS.sizeBig:PROMPTS.sizeSmall}`,say:[big?PROMPTS.sizeBig:PROMPTS.sizeSmall],kind:"row",opts:sizes.map((s,i)=>opt(i,`<span style="font-size:${s}em">${picHtml(w.e)}</span>`,"pic")),a:String(a),after:[big?"הֲכִי גָּדוֹל":"הֲכִי קָטָן"]}}
   const cats=sh(["animal","food","vehicle","home","clothes","nature","body"]);const A=sh(wordsBy(w=>w.c===cats[0])).slice(0,3),B=pick(wordsBy(w=>w.c===cats[1]));
-  return{sk:"think",key:"odd:"+cats[1],tag:"מה לא שייך?",p:PROMPTS.odd,say:[PROMPTS.odd],opts:sh(A.concat([B])).map(x=>opt(x.w,x.e,"pic")),a:B.w,after:[B.s]}},
+  return{sk:"think",key:"odd:"+cats[1],tag:"מה לא שייך?",p:PROMPTS.odd,say:[PROMPTS.odd],opts:sh(A.concat([B])).map(x=>opt(x.w,picHtml(x.e),"pic")),a:B.w,after:[B.s]}},
  abc(lv,focus){const U="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const L=focus||pick(U),low=L.toLowerCase();const r=Math.random();
   const conf=n=>{const c=(EN_CONFUSE[low]||"").split("").filter(Boolean);const o=sh(c).slice(0,Math.min(2,n-1));return sh([low].concat(o,others(U.map(x=>x.toLowerCase()),o.concat([low]),n-1-o.length)))};
   if(lv===4&&r<.5){const keys=Object.keys(PHONICS);const k=pick(keys);const w=EN_BY(PHONICS[k]);const o=sh([k].concat(others(keys,[k],3)));
@@ -195,14 +198,14 @@ const GEN={
   const r=Math.random();
   if(lv===4||lv===3&&r<.5){const prod=lv===4&&r<.6;
    if(prod)return{sk:"en",key:"enprod:"+w.w,tag:"אנגלית",p:`${PROMPTS.enWord} <span class="he-word">${w.h}</span>?`,say:[PROMPTS.enWord,WORD_BY(w.h)?WORD_BY(w.h).s:w.h],opts:o.map(x=>opt(x.w,`<span class="en-word">${x.w}</span>`,"en")),a:w.w,after:[{en:w.w}],info:`${w.e} <span class="en-word">${w.w}</span> · ${w.h}`};
-   return{sk:"en",key:"enread:"+w.w,tag:"קריאה באנגלית",p:`${PROMPTS.enRead}<span class="en-word big">${w.w}</span>`,say:[PROMPTS.enRead,{en:w.w}],opts:o.map(x=>opt(x.w,x.e,"pic")),a:w.w,after:[{en:w.w},w.h],info:`<span class="en-word">${w.w}</span> · ${w.h}`}}
+   return{sk:"en",key:"enread:"+w.w,tag:"קריאה באנגלית",p:`${PROMPTS.enRead}<span class="en-word big">${w.w}</span>`,say:[PROMPTS.enRead,{en:w.w}],opts:o.map(x=>opt(x.w,picHtml(x.e),"pic")),a:w.w,after:[{en:w.w},w.h],info:`<span class="en-word">${w.w}</span> · ${w.h}`}}
   if(lv===3)return{sk:"en",key:"enword:"+w.w,tag:"אנגלית",p:`${PROMPTS.enWord} <span class="he-word">${w.h}</span>?${pic(w.e)}`,say:[PROMPTS.enWord,WORD_BY(w.h)?WORD_BY(w.h).s:w.h],opts:o.map(x=>opt(x.w,`<span class="en-word">${x.w}</span>`,"en")),a:w.w,after:[{en:w.w}],info:`<span class="en-word">${w.w}</span> · ${w.h}`};
-  return{sk:"en",key:"en:"+w.w,tag:"אנגלית",p:PROMPTS.enHear,say:[PROMPTS.enHear,{en:w.w}],opts:o.map(x=>opt(x.w,x.e,"pic")),a:w.w,after:[{en:w.w},w.h],info:`<span class="en-word">${w.w}</span> · ${w.h}`}},
+  return{sk:"en",key:"en:"+w.w,tag:"אנגלית",p:PROMPTS.enHear,say:[PROMPTS.enHear,{en:w.w}],opts:o.map(x=>opt(x.w,picHtml(x.e),"pic")),a:w.w,after:[{en:w.w},w.h],info:`<span class="en-word">${w.w}</span> · ${w.h}`}},
  sent(lv){const build=lv===3||(lv===4&&Math.random()<.5);const tl=build?(lv===3?2:4):lv;const T=pick(SENT.filter(s=>s.lvl===Math.min(tl,4)));
   const poolW=T.pool==="colorable"?EN.filter(x=>COLORABLE.indexOf(x.w)>=0):EN.filter(x=>x.c===T.pool&&x.w!=="orange");const w=pick(poolW);
   const col=T.t.indexOf("{c}")>=0?pick(EN.filter(x=>x.c==="color"&&x.w!=="white")):null;const sz=T.t.indexOf("{sz}")>=0?pick(SIZES):null;
   const text=T.t.replace("{x}",w.w).replace("{c}",col?col.w:"").replace("{sz}",sz?sz[0]:"");
-  const render=(ww,cc,ss)=>`<span class="scene ${ss?ss[0]:""}" style="${cc?"background:"+COLORS[cc.w]+"33;border-color:"+COLORS[cc.w]:""}"><span class="emo">${ww.e}</span>${cc?`<i class="dot" style="background:${COLORS[cc.w]}"></i>`:""}</span>`;
+  const render=(ww,cc,ss)=>`<span class="scene ${ss?ss[0]:""}" style="${cc?"background:"+COLORS[cc.w]+"33;border-color:"+COLORS[cc.w]:""}"><span class="emo">${picHtml(ww.e)}</span>${cc?`<i class="dot" style="background:${COLORS[cc.w]}"></i>`:""}</span>`;
   if(build){const words=text.split(" ");const dis=lv===4?sh(["big","red","cat","is","the","my"].filter(x=>words.indexOf(x)<0)).slice(0,1):[];
    return{sk:"sent",key:"sb:"+T.t,tag:"בניית משפט",p:`${PROMPTS.sentBuild}<div class="scene-wrap">${render(w,col,sz)}</div>`,say:[PROMPTS.sentBuild,{en:text}],kind:"spell",tiles:sh(words.concat(dis)),ans:words,dir:"ltr",a:text,after:[{en:text}],info:`<span class="en-word">${text}</span>`}}
   const n=lv>=2?3:3;let o;
@@ -318,7 +321,9 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  if(q.kind==="lane"){const f=app.querySelector(".fall");let loops=0;f.addEventListener("animationend",()=>{if(G.cur.done)return;loops++;if(loops===1){f.style.animation="none";void f.offsetWidth;f.style.animation="";speak(q.say)}else{f.classList.add("paused");f.style.transform="translateY(200px)";f.style.animation="none"}})}
  if(q.kind==="trace"){const wrap=app.querySelector("#draw");const t=setupTrace(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
  if(q.kind==="dots"){setupDots(q,app.querySelector("#draw"),(ok,st)=>{finishQ(true,null,null,st)})}
- scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150)}
+ scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150);
+ clearTimeout(attractT);attractT=setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q&&!G.cur.done){const e=app.querySelector("#ear");if(e)e.classList.add("attract");speak(q.say)}},9000)}
+let attractT=null;
 async function playOptions(q){const tok=seqToken;const els=Array.prototype.slice.call(app.querySelectorAll(".ans"));
  for(let i=0;i<els.length;i++){if(tok!==seqToken||!G.cur||G.cur.q!==q||G.cur.done)return;const o=q.opts.find(x=>x.v===els[i].dataset.o);els[i].classList.add("hl");await playOne(o&&o.say?o.say:"");els[i].classList.remove("hl");await new Promise(r=>setTimeout(r,150))}}
 function setupSpell(q){const slots=Array.prototype.slice.call(app.querySelectorAll(".slot")),tiles=Array.prototype.slice.call(app.querySelectorAll(".tile"));const fill=[];
@@ -355,9 +360,10 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  const praise=pick(PRAISE);const enc=pick(ENCOURAGE);
  const last=G.i>=G.plan.length-1&&!G.easy;
  const ansHtml=q.opts?(q.opts.find(o=>o.v===q.a)||{}).html||q.a:q.a;const starsTxt=st?` ${"⭐".repeat(st)}`:"";
+ if(ok){const f=document.createElement("div");f.className="flash";document.body.appendChild(f);setTimeout(()=>f.remove(),250)}
  document.getElementById("fb").innerHTML=ok
-  ?`<div class="feedback good">${Math.random()<.5?avatarSvg(avDefaults(),"small"):TURTLE.replace('viewBox','width="54" height="46" viewBox')}<div><b>${PRAISE_SHOW[praise]||praise}${starsTxt} +${gain} 👥</b>${G.combo>=3?"רצף של "+G.combo+"! בונוס!":""}${q.info?"<br>"+q.info:""}</div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`
-  :`<div class="feedback bad"><div><b>כמעט! התשובה: <span class="ans-mini">${ansHtml}</span></b>${q.info?"<br>"+q.info:""}<br><span class="muted">+2 👥 על הניסיון</span></div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`;
+  ?`<div class="feedback good">${Math.random()<.5?avatarSvg(avDefaults(),"small cheer"):TURTLE.replace('viewBox','width="54" height="46" viewBox')}<div><b>${PRAISE_SHOW[praise]||praise}${starsTxt} +${gain} 👥</b>${G.combo>=3?"רצף של "+G.combo+"! בונוס!":""}${q.info?"<br>"+q.info:""}</div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`
+  :`<div class="feedback bad">${avatarSvg(avDefaults(),"small sad")}<div><b>כמעט! התשובה: <span class="ans-mini">${ansHtml}</span></b>${q.info?"<br>"+q.info:""}<br><span class="muted">+2 👥 על הניסיון</span></div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`;
  const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;(G.i<G.plan.length||G.easy)?ask():finish()};
  const nx=document.getElementById("nx");const tAns=Date.now();
  nx.onclick=()=>{if(Date.now()-tAns<400)return;go()};
@@ -365,15 +371,15 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);advT=setTimeout(go,ok?500:1600)}});
  advT=setTimeout(go,ok?6000:9000);
  nx.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})}
-function levelUp(step){view="up";confetti(50);jingle("win");cheer();const nxt=Object.keys(STEPS).filter(k=>STEPS[k].deps.indexOf(step)>=0&&stepOpen(k));
- app.innerHTML=`<div class="card end"><div class="sticker-new">🏆</div><h2>סיימת את "${STEPS[step].n}"!</h2>
+function levelUp(step){view="up";const f=document.createElement("div");f.className="flash";document.body.appendChild(f);setTimeout(()=>f.remove(),250);jingle("win");setTimeout(()=>{confetti(50);cheer()},500);const nxt=Object.keys(STEPS).filter(k=>STEPS[k].deps.indexOf(step)>=0&&stepOpen(k));
+ app.innerHTML=`<div class="card end"><div class="sticker-new">🏆</div><div class="dancers" style="margin-top:4px"><div class="dance">${avatarSvg(avDefaults(),"big cheer")}</div></div><h2>סיימת את "${STEPS[step].n}"!</h2>
  <p style="margin:0;font-size:1.15rem">${nxt.length?"נפתח: "+nxt.map(k=>STEPS[k].n).join(" · "):"כל הכבוד! ממשיכים הלאה"} 💪</p>
  <button class="big" id="go">יאללה, ממשיכים!</button></div>`;
  speak([SAY_LEVELUP]);app.querySelector("#go").onclick=()=>ask();scrollTo(0,0)}
 function bonus(){view="bonus";hush();const pool=sh(wordsBy(w=>w.w.length<=4)).slice(0,4);const L=sh(pool),Rr=sh(pool);let sel=null,done=0;
  app.innerHTML=`<div class="hud"><span class="pill" id="hc">👥 ${S.coins}</span></div>
  <div class="card"><span class="tag">שלב בונוס ⭐</span><div class="prompt">חברי כל מילה לתמונה שלה!</div>
- <div class="match"><div class="col">${L.map(w=>`<button class="mt he-word" data-w="${w.w}">${w.s}</button>`).join("")}</div><div class="col">${Rr.map(w=>`<button class="mt pic" data-p="${w.w}">${w.e}</button>`).join("")}</div></div>
+ <div class="match"><div class="col">${L.map(w=>`<button class="mt he-word" data-w="${w.w}">${w.s}</button>`).join("")}</div><div class="col">${Rr.map(w=>`<button class="mt pic" data-p="${w.w}">${picHtml(w.e)}</button>`).join("")}</div></div>
  <button class="back" id="skip" style="align-self:center">דלגי על הבונוס</button></div>`;
  speak(["חַבְּרִי כָּל מִלָּה לַתְּמוּנָה שֶׁלָּהּ"]);
  const end=()=>{G.bonus=true;finish()};app.querySelector("#skip").onclick=end;
@@ -525,24 +531,24 @@ const GEN2={
   const k=rnd(20,98);const after=Math.random()<.5;const a=after?k+1:k-1;return{sk:"num",key:(after?"after100:":"before100:")+k,tag:after?"אחרי":"לפני",p:`${after?PROMPTS.numAfter:PROMPTS.numBefore} <span class="num-big">${k}</span>?`,say:[after?PROMPTS.numAfter:PROMPTS.numBefore].concat(sayNum(k)),opts:numOpts2(a,4,Math.max(1,a-5),Math.min(100,a+5)),a:String(a),after:sayNum(a)}},
  word(lv){if(lv<5||Math.random()<.2)return null;const r=Math.random();
   if(lv===5||r<.4){const sub=pick(HE_SUBJ),vb=pick(HE_VERB);const pool=wordsBy(w=>w.c===vb.c);const ob=pick(pool);const text=`${sub.s} ${sub.g==="m"?vb.m:vb.f} ${ob.s}`;
-   const dis=others(pool.filter(x=>x.w!==ob.w),[],2);const mk=(o)=>`<span class="scene"><span class="emo">${sub.e}${vb.e}${o.e}</span></span>`;
+   const dis=others(pool.filter(x=>x.w!==ob.w),[],2);const mk=(o)=>`<span class="scene"><span class="emo">${picHtml(sub.e)}${picHtml(vb.e)}${picHtml(o.e)}</span></span>`;
    return{sk:"word",key:"sent:"+ob.w,tag:"קריאת משפט",p:`${PROMPTS.sentHe}<span class="he-word big" style="font-size:2rem">${text}</span>`,say:[PROMPTS.sentHe],opts:sh([ob].concat(dis)).map(o=>opt(o.w,mk(o),"pic")),a:ob.w,after:[ob.s]}}
   if(r<.7){const it=pick(OPPOSITES);const flip=Math.random()<.5;const q=flip?it[1]:it[0],a=flip?it[0]:it[1],qe=flip?it[3]:it[2],ae=flip?it[2]:it[3];const dis=sh(OPPOSITES.filter(x=>x!==it)).slice(0,2).map(x=>[x[Math.random()<.5?0:1]]);
-   const o=sh([[a,ae]].concat(dis.map(d=>[d[0],""]))).map(x=>opt(x[0],`<span class="he-word">${x[0]}</span>${x[1]?`<span class="emo" style="font-size:2rem">${x[1]}</span>`:""}`,"he"));
-   return{sk:"word",key:"opp:"+strip(q),tag:"הפכים",p:`${PROMPTS.opp} <span class="he-word">${q}</span>?<span class="emo">${qe}</span>`,say:[PROMPTS.opp,q],opts:o.map(x=>{x.html=x.html.replace(/<span class="emo"[^>]*>[^<]*<\/span>/,"");return x}),a:a,after:[q,"—",a]}}
-  const it=pick(PLURALS);const dis=sh(PLURALS.filter(x=>x!==it)).slice(0,2);return{sk:"word",key:"pl:"+strip(it[0]),tag:"יחיד ורבים",p:`${PROMPTS.plural} <span class="he-word">${it[0]}</span>?<span class="emo">${it[3]}</span>`,say:[PROMPTS.plural,it[0]],opts:sh([it].concat(dis)).map(x=>opt(x[1],`<span class="he-word">${x[1]}</span>`,"he")),a:it[1],after:[it[1]]}},
+   const o=sh([[a,ae]].concat(dis.map(d=>[d[0],""]))).map(x=>opt(x[0],`<span class="he-word">${x[0]}</span>${x[1]?`<span class="emo" style="font-size:2rem">${picHtml(x[1])}</span>`:""}`,"he"));
+   return{sk:"word",key:"opp:"+strip(q),tag:"הפכים",p:`${PROMPTS.opp} <span class="he-word">${q}</span>?<span class="emo">${picHtml(qe)}</span>`,say:[PROMPTS.opp,q],opts:o.map(x=>{x.html=x.html.replace(/<span class="emo"[^>]*>[^<]*<\/span>/,"");return x}),a:a,after:[q,"—",a]}}
+  const it=pick(PLURALS);const dis=sh(PLURALS.filter(x=>x!==it)).slice(0,2);return{sk:"word",key:"pl:"+strip(it[0]),tag:"יחיד ורבים",p:`${PROMPTS.plural} <span class="he-word">${it[0]}</span>?<span class="emo">${picHtml(it[3])}</span>`,say:[PROMPTS.plural,it[0]],opts:sh([it].concat(dis)).map(x=>opt(x[1],`<span class="he-word">${x[1]}</span>`,"he")),a:it[1],after:[it[1]]}},
  en(lv){if(lv<5||Math.random()<.2)return null;const r=Math.random();
   if(lv===5||r<.5){const w=pick(EN_CVC);const i=rnd(0,2);const miss=w[i];const shown=w.slice(0,i)+"_"+w.slice(i+1);const o=sh([miss].concat(others("abcdefghijklmnopqrstuvwxyz".split(""),[miss],3)));
-   return{sk:"en",key:"enmiss:"+w,tag:"אות חסרה",p:`${PROMPTS.enMissing}<span class="emo">${EN_CVC_PIC[w]}</span><span class="en-word big">${shown}</span>`,say:[PROMPTS.enMissing,{en:w}],opts:o.map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:miss,after:[{en:w}],info:`<span class="en-word">${w}</span>`}}
+   return{sk:"en",key:"enmiss:"+w,tag:"אות חסרה",p:`${PROMPTS.enMissing}<span class="emo">${picHtml(EN_CVC_PIC[w])}</span><span class="en-word big">${shown}</span>`,say:[PROMPTS.enMissing,{en:w}],opts:o.map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:miss,after:[{en:w}],info:`<span class="en-word">${w}</span>`}}
   if(r<.8){const it=pick(EN_OPP);const flip=Math.random()<.5;const q=flip?it[1]:it[0],a=flip?it[0]:it[1],qe=flip?it[3]:it[2];const dis=sh(EN_OPP.filter(x=>x!==it)).slice(0,2).map(x=>x[Math.random()<.5?0:1]);
-   return{sk:"en",key:"enopp:"+q,tag:"הפכים באנגלית",p:`${PROMPTS.enOpp} <span class="en-word">${q}</span>?<span class="emo">${qe}</span>`,say:[PROMPTS.enOpp,{en:q}],opts:sh([a].concat(dis)).map(x=>opt(x,`<span class="en-word">${x}</span>`,"en")),a:a,after:[{en:q},{en:a}]}}
+   return{sk:"en",key:"enopp:"+q,tag:"הפכים באנגלית",p:`${PROMPTS.enOpp} <span class="en-word">${q}</span>?<span class="emo">${picHtml(qe)}</span>`,say:[PROMPTS.enOpp,{en:q}],opts:sh([a].concat(dis)).map(x=>opt(x,`<span class="en-word">${x}</span>`,"en")),a:a,after:[{en:q},{en:a}]}}
   const w=pick(EN.filter(x=>x.c==="animal"||x.c==="thing"&&x.w!=="bus"));const pl=w.w+"s";const dis=others(EN.filter(x=>(x.c==="animal"||x.c==="thing")&&x.w!==w.w),[],2).map(x=>x.w+"s");
-  return{sk:"en",key:"enpl:"+w.w,tag:"רבים באנגלית",p:`${PROMPTS.enPlural} <span class="en-word">${w.w}</span>?<span class="emo">${w.e}${w.e}</span>`,say:[PROMPTS.enPlural,{en:w.w}],opts:sh([pl].concat(dis)).map(x=>opt(x,`<span class="en-word">${x}</span>`,"en")),a:pl,after:[{en:pl}]}},
+  return{sk:"en",key:"enpl:"+w.w,tag:"רבים באנגלית",p:`${PROMPTS.enPlural} <span class="en-word">${w.w}</span>?<span class="emo">${picHtml(w.e)}${picHtml(w.e)}</span>`,say:[PROMPTS.enPlural,{en:w.w}],opts:sh([pl].concat(dis)).map(x=>opt(x,`<span class="en-word">${x}</span>`,"en")),a:pl,after:[{en:pl}]}},
  think(lv){if(lv<5||Math.random()<.25)return null;const h=rnd(1,12);const m=lv===5?0:pick([0,30]);const fmt=(hh,mm)=>`${hh}:${mm?"30":"00"}`;const say=m?["הַשָּׁעָה"].concat(sayNum(h),["וָחֵצִי"]):["הַשָּׁעָה"].concat(sayNum(h));
   const alts=[[h,m],[h%12+1,m],[h===1?12:h-1,m],[h,m?0:30]];const o=sh(alts.filter((x,i,a)=>a.findIndex(y=>y[0]===x[0]&&y[1]===x[1])===i)).map(x=>opt(fmt(x[0],x[1]),`<span class="num-big">${fmt(x[0],x[1])}</span>`,"num"));
   return{sk:"think",key:"clock:"+fmt(h,m),tag:"שעון",p:`${PROMPTS.clock}<div class="shape-big">${clockSvg(h,m)}</div>`,say:[PROMPTS.clock],opts:o,a:fmt(h,m),after:say}},
  nik(lv){if(lv<5||Math.random()<.3)return null;const sub=pick(HE_SUBJ),vb=pick(HE_VERB);const pool=wordsBy(w=>w.c===vb.c);const ob=pick(pool);const text=`${sub.s} ${sub.g==="m"?vb.m:vb.f} ${ob.s}`;const dis=others(pool.filter(x=>x.w!==ob.w),[],2);
-  return{sk:"nik",key:"nsent:"+ob.w,tag:"קריאה מנוקדת",p:`${PROMPTS.nikPhrase}<span class="he-word big" style="font-size:2rem">${text}</span>`,say:[PROMPTS.nikPhrase],opts:sh([ob].concat(dis)).map(o=>opt(o.w,`<span class="emo">${sub.e}${vb.e}${o.e}</span>`,"pic")),a:ob.w,after:[ob.s]}},
+  return{sk:"nik",key:"nsent:"+ob.w,tag:"קריאה מנוקדת",p:`${PROMPTS.nikPhrase}<span class="he-word big" style="font-size:2rem">${text}</span>`,say:[PROMPTS.nikPhrase],opts:sh([ob].concat(dis)).map(o=>opt(o.w,`<span class="emo">${picHtml(sub.e)}${picHtml(vb.e)}${picHtml(o.e)}</span>`,"pic")),a:ob.w,after:[ob.s]}},
  abc(lv){if(lv<5||Math.random()<.4)return null;const U="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const i=rnd(0,24);const a=U[i+1];
   return{sk:"abc",key:"abcafter:"+U[i],tag:"סדר האלפבית",p:`${PROMPTS.abcAfter} <span class="en-big">${U[i]}</span>?`,say:[PROMPTS.abcAfter,{en:U[i]}],opts:sh([a].concat(others(U,[a,U[i]],3))).map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:a,after:[{en:U[i]},{en:a}]}}
 };

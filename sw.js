@@ -1,5 +1,5 @@
 /* service worker — אופליין מלא אחרי הטעינה הראשונה; גרסה חדשה מתעדכנת ברקע */
-const VER="v0.4.0";
+const VER="v0.5.0";
 const CORE=["./","index.html","style.css","content.js","mechanics.js","engine2.js","app.js","pics-manifest.js","audio-manifest.js","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-180.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(VER).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VER).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
