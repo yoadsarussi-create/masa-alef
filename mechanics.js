@@ -87,6 +87,7 @@ function studio(){view="studio";hush();S.inst=S.inst||"piano";S.owned=S.owned||[
  <div class="inst">${INSTR.map(it=>`<button data-i="${it.k}" aria-pressed="${S.inst===it.k}" class="${S.owned.indexOf(it.k)<0?"locked":""}">${it.n}${S.owned.indexOf(it.k)<0?` · 👥${it.cost}`:""}</button>`).join("")}</div>
  <div class="pads">${labels.map((l,i)=>`<button class="pad" data-n="${i}" style="background:${cols[i]}">${l}</button>`).join("")}</div>
  <div class="draw-tools"><button class="btn light" id="lab">${S.padLabels==="num"?"אותיות על הפדים":"מספרים על הפדים"}</button><button class="btn" id="song">🎵 נגני מנגינה</button></div>
+ <div class="draw-tools"><button class="btn" id="singhe">🎤 שיר האלף-בית</button><button class="btn" id="singen">🎤 ABC song</button></div>
  <h3>לוח האותיות — נוגעים ושומעים</h3>
  <div class="abc-board">${LETTERS.map(l=>`<button data-l="${l}">${l}</button>`).join("")}</div>
  <p class="muted">מעריצים: 👥 ${S.coins}</p></div>`;
@@ -94,6 +95,85 @@ function studio(){view="studio";hush();S.inst=S.inst||"piano";S.owned=S.owned||[
  app.querySelectorAll(".pad").forEach(b=>{const h=e=>{e.preventDefault();note(PENTA[+b.dataset.n],S.inst,0,.6);b.classList.add("hit");setTimeout(()=>b.classList.remove("hit"),150)};b.addEventListener("touchstart",h,{passive:false});b.addEventListener("mousedown",e=>{if(!("ontouchstart" in window))h(e)})});
  app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const it=INSTR.find(x=>x.k===b.dataset.i);if(S.owned.indexOf(it.k)<0){if(S.coins<it.cost){toast(`צריך עוד ${it.cost-S.coins} מעריצים 👥 — משחקים ואוספים!`,2500);return}S.coins-=it.cost;S.owned.push(it.k);confetti(60);jingle("level")}S.inst=it.k;save();studio()});
  app.querySelector("#lab").onclick=()=>{S.padLabels=S.padLabels==="num"?"let":"num";save();studio()};
+ app.querySelector("#singhe").onclick=()=>singAlong("he");app.querySelector("#singen").onclick=()=>singAlong("en");
  app.querySelector("#song").onclick=()=>{const m=[0,0,4,4,5,5,4,3,3,2,2,1,1,0];m.forEach((n,i)=>{note(PENTA[0]*Math.pow(2,[0,2,4,5,7,9,11][n]/12),S.inst,i*.32,.3);setTimeout(()=>{const p=app.querySelectorAll(".pad")[Math.min(7,n)];if(p){p.classList.add("hit");setTimeout(()=>p.classList.remove("hit"),150)}},i*320)})};
  app.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{b.classList.remove("hit");void b.offsetWidth;b.classList.add("hit");note(PENTA[LETTERS.indexOf(b.dataset.l)%PENTA.length],"marimba",0,.4);speak([LETNAME[b.dataset.l]])});
+ scrollTo(0,0)}
+
+/* ---------- אווטאר-זמרת + ארון ---------- */
+const AV_ITEMS=[
+ {id:"hair:pony",cat:"שיער",n:"קוקו",cost:0},{id:"hair:curly",cat:"שיער",n:"מתולתל",cost:30},{id:"hair:long",cat:"שיער",n:"ארוך",cost:30},{id:"hair:bun",cat:"שיער",n:"קוקו-גבוה",cost:40},
+ {id:"hc:#5a3b1e",cat:"צבע שיער",n:"חום",cost:0,sw:"#5a3b1e"},{id:"hc:#1b1b1b",cat:"צבע שיער",n:"שחור",cost:0,sw:"#1b1b1b"},{id:"hc:#e9c46a",cat:"צבע שיער",n:"בלונד",cost:20,sw:"#e9c46a"},{id:"hc:#c0392b",cat:"צבע שיער",n:"ג'ינג'י",cost:20,sw:"#c0392b"},{id:"hc:#ff5fa2",cat:"צבע שיער",n:"ורוד",cost:80,sw:"#ff5fa2"},{id:"hc:#2ee6d6",cat:"צבע שיער",n:"טורקיז",cost:80,sw:"#2ee6d6"},
+ {id:"dress:#ff5fa2",cat:"שמלה",n:"ורוד",cost:0,sw:"#ff5fa2"},{id:"dress:#8e24aa",cat:"שמלה",n:"סגול",cost:20,sw:"#8e24aa"},{id:"dress:#1aa6b7",cat:"שמלה",n:"טורקיז",cost:20,sw:"#1aa6b7"},{id:"dress:#ffc23d",cat:"שמלה",n:"זהב",cost:60,sw:"#ffc23d"},{id:"dress:rainbow",cat:"שמלה",n:"קשת 🌈",cost:120},
+ {id:"pat:stars",cat:"דוגמה",n:"כוכבים ⭐",cost:50},{id:"pat:hearts",cat:"דוגמה",n:"לבבות ❤️",cost:50},{id:"pat:none",cat:"דוגמה",n:"חלק",cost:0},
+ {id:"acc:mic",cat:"אביזרים",n:"מיקרופון 🎤",cost:0},{id:"acc:phones",cat:"אביזרים",n:"אוזניות 🎧",cost:40},{id:"acc:glasses",cat:"אביזרים",n:"משקפי-כוכב 🕶️",cost:70},{id:"acc:crown",cat:"אביזרים",n:"כתר 👑",cost:120},{id:"acc:guitar",cat:"אביזרים",n:"גיטרה 🎸",cost:150},{id:"acc:cape",cat:"אביזרים",n:"גלימה 🦸",cost:90},{id:"acc:wand",cat:"אביזרים",n:"שרביט ✨",cost:200}];
+function avDefaults(){S.av=S.av||{hair:"pony",hc:"#5a3b1e",dress:"#ff5fa2",pat:"none",acc:["mic"]};S.wardrobe=S.wardrobe||["hair:pony","hc:#5a3b1e","hc:#1b1b1b","dress:#ff5fa2","pat:none","acc:mic"];return S.av}
+function avatarSvg(av,cls){av=av||avDefaults();const hc=av.hc,skin="#f6d3b8";const d=av.dress==="rainbow"?"url(#rb)":av.dress;const has=x=>av.acc.indexOf(x)>=0;
+ const hairBack={pony:`<path d="M30 40 Q18 60 26 92 Q34 96 40 90 Q30 70 36 46Z" fill="${hc}"/>`,curly:`<circle cx="30" cy="48" r="12" fill="${hc}"/><circle cx="70" cy="48" r="12" fill="${hc}"/><circle cx="26" cy="64" r="10" fill="${hc}"/><circle cx="74" cy="64" r="10" fill="${hc}"/>`,long:`<path d="M26 40 Q20 70 24 100 L76 100 Q80 70 74 40Z" fill="${hc}"/>`,bun:`<circle cx="50" cy="14" r="11" fill="${hc}"/>`}[av.hair]||"";
+ const pat=av.pat==="stars"?`<text x="42" y="92" font-size="9">⭐</text><text x="56" y="104" font-size="9">⭐</text>`:av.pat==="hearts"?`<text x="42" y="92" font-size="9">❤️</text><text x="56" y="104" font-size="9">❤️</text>`:"";
+ return`<svg class="avatar ${cls||""}" viewBox="0 0 100 130" aria-hidden="true"><defs><linearGradient id="rb" x1="0" x2="1"><stop offset="0" stop-color="#ff6f61"/><stop offset=".5" stop-color="#ffc23d"/><stop offset="1" stop-color="#2ee6d6"/></linearGradient></defs>
+ ${has("cape")?`<path d="M30 70 L20 125 L80 125 L70 70Z" fill="#8e24aa" opacity=".9"/>`:""}
+ ${hairBack}
+ <path d="M34 72 L26 118 L74 118 L66 72Z" fill="${d}"/>${pat}
+ <rect x="38" y="116" width="8" height="10" rx="3" fill="${skin}"/><rect x="54" y="116" width="8" height="10" rx="3" fill="${skin}"/>
+ <rect x="36" y="124" width="12" height="5" rx="2" fill="#1b1140"/><rect x="52" y="124" width="12" height="5" rx="2" fill="#1b1140"/>
+ <path d="M34 76 L22 98" stroke="${skin}" stroke-width="7" stroke-linecap="round"/><path d="M66 76 L78 98" stroke="${skin}" stroke-width="7" stroke-linecap="round"/>
+ <circle cx="50" cy="46" r="22" fill="${skin}"/>
+ <path d="M28 44 Q30 22 50 22 Q70 22 72 44 Q62 34 50 36 Q38 34 28 44Z" fill="${hc}"/>
+ <circle cx="42" cy="46" r="3" fill="#1b1140"/><circle cx="58" cy="46" r="3" fill="#1b1140"/><circle cx="43" cy="45" r="1" fill="#fff"/><circle cx="59" cy="45" r="1" fill="#fff"/>
+ <circle cx="37" cy="53" r="3" fill="#ff8ac0" opacity=".6"/><circle cx="63" cy="53" r="3" fill="#ff8ac0" opacity=".6"/>
+ <path d="M43 56 Q50 63 57 56" stroke="#c43a78" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+ ${has("glasses")?`<text x="31" y="52" font-size="14">⭐</text><text x="52" y="52" font-size="14">⭐</text>`:""}
+ ${has("phones")?`<path d="M28 44 Q28 26 50 26 Q72 26 72 44" stroke="#1b1140" stroke-width="4" fill="none"/><rect x="24" y="40" width="9" height="14" rx="4" fill="#ff5fa2"/><rect x="67" y="40" width="9" height="14" rx="4" fill="#ff5fa2"/>`:""}
+ ${has("crown")?`<path d="M34 24 L40 10 L50 20 L60 10 L66 24Z" fill="#ffc23d" stroke="#c98a00" stroke-width="1.5"/>`:""}
+ ${has("mic")?`<line x1="22" y1="98" x2="14" y2="80" stroke="#444" stroke-width="4" stroke-linecap="round"/><circle cx="12" cy="76" r="6" fill="#2ee6d6"/>`:""}
+ ${has("guitar")?`<g transform="rotate(-25 60 95)"><ellipse cx="62" cy="100" rx="13" ry="10" fill="#c0392b"/><rect x="60" y="68" width="4" height="30" fill="#8d6e63"/><circle cx="62" cy="100" r="4" fill="#1b1140"/></g>`:""}
+ ${has("wand")?`<line x1="78" y1="98" x2="90" y2="78" stroke="#ffc23d" stroke-width="3" stroke-linecap="round"/><text x="84" y="80" font-size="12">✨</text>`:""}
+ </svg>`}
+function wardrobe(){view="ward";hush();const av=avDefaults();const cats=[...new Set(AV_ITEMS.map(x=>x.cat))];
+ const eq=id=>{const [k,v]=id.split(":");if(k==="acc")return av.acc.indexOf(v)>=0;return av[k]===v};
+ app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>הארון של ${KID()} 👗</h2>
+ <div class="av-preview">${avatarSvg(av,"big dance")}</div>
+ <p class="muted" style="text-align:center">מעריצים: 👥 ${S.coins}</p>
+ ${cats.map(c=>`<h3>${c}</h3><div class="inst">${AV_ITEMS.filter(x=>x.cat===c).map(it=>{const own=S.wardrobe.indexOf(it.id)>=0;return`<button data-id="${it.id}" aria-pressed="${eq(it.id)}" class="${own?"":"locked"}">${it.sw?`<i class="sw" style="background:${it.sw}"></i>`:""}${it.n}${own?"":` · 👥${it.cost}`}</button>`}).join("")}</div>`).join("")}</div>`;
+ app.querySelector("#b").onclick=home;
+ app.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{const id=b.dataset.id;const it=AV_ITEMS.find(x=>x.id===id);const [k,v]=id.split(":");
+  if(S.wardrobe.indexOf(id)<0){if(S.coins<it.cost){toast(`צריך עוד ${it.cost-S.coins} מעריצים 👥 — משחקים ואוספים!`,2500);tone(false);return}S.coins-=it.cost;S.wardrobe.push(id);confetti(50);jingle("level")}
+  if(k==="acc"){const i=av.acc.indexOf(v);if(i>=0)av.acc.splice(i,1);else av.acc.push(v)}else av[k]=v;
+  save();note(PENTA[5],"bell",0,.4);wardrobe()});
+ scrollTo(0,0)}
+
+/* ---------- הפסקת-ריקוד ---------- */
+let beatTimer=null;
+function beat(bpm,secs){const a=ctx();if(!a||!S.sound)return;const step=60/bpm/2;let i=0;const n=Math.floor(secs/step);clearInterval(beatTimer);
+ const kick=t=>{const o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(40,t+.12);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.3)};
+ const hat=t=>{const b=a.createBuffer(1,a.sampleRate*.05,a.sampleRate);const d=b.getChannelData(0);for(let k=0;k<d.length;k++)d[k]=(Math.random()*2-1)*(1-k/d.length);const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter();f.type="highpass";f.frequency.value=6000;const g=a.createGain();g.gain.value=.15;s.connect(f);f.connect(g);g.connect(a.destination);s.start(t)};
+ const bass=[0,0,7,7,5,5,3,3];
+ beatTimer=setInterval(()=>{if(i>=n||view!=="dance"){clearInterval(beatTimer);return}const t=a.currentTime+.05;if(i%2===0)kick(t);hat(t);if(i%4===0)note(PENTA[0]/2*Math.pow(2,bass[(i/4)%8]/12),"synth",.05,.3);i++},step*1000)}
+function danceBreak(){view="dance";hush();let claps=0;const t0=Date.now();
+ app.innerHTML=`<div class="card end dance-card"><span class="tag">הפסקת ריקוד 🎶</span><h2>רוקדים! ${KID()} והלהקה</h2>
+ <div class="dancers"><div class="dance">${avatarSvg(null,"big")}</div><div class="dance" style="animation-delay:.25s">${TURTLE.replace("viewBox",'width="110" height="92" viewBox')}</div></div>
+ <button class="big pink" id="clap">👏 מחיאת כף!</button><p class="muted" id="cnt">מוחאים כפיים בקצב</p>
+ <button class="next" id="go" style="width:100%;opacity:.4" disabled>ממשיכים! ←</button></div>`;
+ beat(104,14);
+ app.querySelector("#clap").onclick=e=>{claps++;cheer();note(PENTA[claps%PENTA.length],"marimba",0,.3);const el=document.createElement("div");el.className="flyer";el.textContent=pick(["🎵","🎶","⭐","💖"]);el.style.left=(e.clientX||200)+"px";el.style.top=(e.clientY||300)+"px";el.style.setProperty("--dx",(Math.random()*160-80)+"px");el.style.setProperty("--dy","-180px");document.body.appendChild(el);setTimeout(()=>el.remove(),900);app.querySelector("#cnt").textContent=claps+" מחיאות כפיים 👏";if(claps===10){S.coins+=5;save();toast("+5 מעריצים על הריקוד! 👥",1500)}};
+ setTimeout(()=>{const g=app.querySelector("#go");if(g){g.disabled=false;g.style.opacity=1}},6000);
+ app.querySelector("#go").onclick=()=>{clearInterval(beatTimer);G.bonus=true;finish()};scrollTo(0,0)}
+
+/* ---------- שרים את האלף-בית / ABC ---------- */
+const TWINKLE=[0,0,7,7,9,9,7, 5,5,4,4,2,2,0, 7,7,5,5,4,4,2, 7,7,5,5,4,4,2];
+function singAlong(lang){view="sing";hush();const letters=lang==="he"?LETTERS:"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+ const plan=lang==="he"?[[0,.5],[0,.5],[7,.5],[7,.5],[9,.5],[9,.5],[7,1],[5,.5],[5,.5],[4,.5],[4,.5],[2,.5],[2,.5],[0,1],[7,.5],[7,.5],[5,.5],[5,1],[7,.5],[7,.5],[5,.5],[5,1]]
+  :[[0,.5],[0,.5],[7,.5],[7,.5],[9,.5],[9,.5],[7,1],[5,.5],[5,.5],[4,.5],[4,.5],[2,.25],[2,.25],[2,.25],[2,.25],[0,1],[7,.5],[7,.5],[5,1],[5,.5],[4,.5],[4,1],[7,.5],[7,1],[5,.5],[5,.5]];
+ app.innerHTML=`<div class="card end"><span class="tag">${lang==="he"?"שיר האלף-בית":"ABC song"} 🎤</span><h2>שרים ביחד!</h2>
+ <div class="sing-big ${lang==="en"?"en":""}" id="sbig">🎤</div>
+ <div class="sing-row ${lang==="en"?"en":""}" id="srow">${letters.map((l,i)=>`<span data-i="${i}">${l}</span>`).join("")}</div>
+ <button class="big" id="start">▶️ להתחיל</button><button class="back" id="b" style="align-self:center">→ לאולפן</button></div>`;
+ app.querySelector("#b").onclick=studio;
+ app.querySelector("#start").onclick=()=>{const a=ctx();let t=0;const bt=.55;app.querySelector("#start").disabled=true;
+  letters.forEach((l,i)=>{const p=plan[i]||[0,.5];const when=t;note(PENTA[0]*Math.pow(2,p[0]/12),"bell",when+.05,p[1]*bt*1.4);
+   setTimeout(()=>{if(view!=="sing")return;const big=document.getElementById("sbig");big.textContent=l;big.classList.remove("pop");void big.offsetWidth;big.classList.add("pop");document.querySelectorAll("#srow span").forEach(s=>s.classList.toggle("on",+s.dataset.i<=i));
+    if(lang==="he"&&AUDIO["he:"+strip(LETNAME[l])])playOne(LETNAME[l]);else if(lang==="en"&&AUDIO["en:"+l.toLowerCase()])playOne({en:l})},when*1000);
+   t+=p[1]*bt});
+  setTimeout(()=>{if(view!=="sing")return;confetti(50);jingle("win");document.getElementById("sbig").textContent="🌟";app.querySelector("#start").disabled=false;S.coins+=5;save();toast("שרת יפה! +5 מעריצים 👥",2000)},t*1000+300)};
  scrollTo(0,0)}

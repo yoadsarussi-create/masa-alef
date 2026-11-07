@@ -245,17 +245,18 @@ function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const c
   </div>`}).reverse().join("");
  app.innerHTML=`
  <div class="top"><h1>🎤 ${KID()} על הבמה</h1><button class="pill" id="sndtest" aria-label="בדיקת קול">🔊</button><span class="pill">⭐ ${totalStars}</span><span class="pill" aria-label="מעריצים">👥 ${S.coins}</span></div>
- <div class="buddy"><div class="bounce">${TURTLE}</div><div class="bubble">${buddyLine(cur)}</div></div>
- <div class="row3">
+ <div class="buddy"><div class="bounce">${avatarSvg(avDefaults())}</div><div class="bubble">${buddyLine(cur)}</div><div class="bounce" style="animation-delay:.4s">${TURTLE}</div></div>
+ <div class="row4">
   <button class="small" id="smart"><span>🎯</span><span>אימון חכם</span></button>
   <button class="small" id="stu"><span>🎧</span><span>האולפן</span></button>
+  <button class="small" id="ward"><span>👗</span><span>הארון</span></button>
   <button class="small" id="col"><span>🎁</span><span>מדבקות</span></button>
  </div>
  <div class="seg" role="tablist" aria-label="תצוגה">
   <button role="tab" data-v="saga" aria-selected="${S.mapView!=="islands"}">🗺️ מפת שלבים</button>
-  <button role="tab" data-v="islands" aria-selected="${S.mapView==="islands"}">🏝️ האיים</button>
+  <button role="tab" data-v="islands" aria-selected="${S.mapView==="islands"}">🎪 הבמות</button>
  </div>
- ${S.mapView==="islands"?`<div class="map-title">לוחצים על אי כדי לשחק רק בו</div>
+ ${S.mapView==="islands"?`<div class="map-title">לוחצים על במה כדי לשחק רק בה</div>
  <div class="map">${Object.keys(SK).map(k=>{const s=SK[k];const st=stars(k);const m=mastery(k);const cls=hist(k).length<3&&lvOf(k)===1?"new":(m!==null&&m<.6?"weak":"");
   return`<button class="island ${cls}" data-sk="${k}"><span class="ic ${isEnIc(s.ic)?"en":""}">${s.ic}</span><span class="nm">${s.n}</span><span class="lvb">שלב ${lvOf(k)}/${s.max}</span><span class="stars">${starHtml(st)}</span></button>`}).join("")}</div>`
  :`<div class="saga" id="saga"><svg class="path" id="path" aria-hidden="true"></svg>${nodes}</div>`}
@@ -264,7 +265,7 @@ function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const c
  app.querySelector("#smart").onclick=()=>start(null);
  app.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>start(b.dataset.sk));
  app.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{S.mapView=b.dataset.v;save();home()});
- app.querySelector("#col").onclick=collection;app.querySelector("#par").onclick=parentGate;app.querySelector("#stu").onclick=studio;
+ app.querySelector("#col").onclick=collection;app.querySelector("#par").onclick=parentGate;app.querySelector("#stu").onclick=studio;app.querySelector("#ward").onclick=wardrobe;
  app.querySelector("#sndtest").onclick=()=>{const w=WORDS.filter(hasClip);const x=w.length?pick(w):null;if(!x){toast("אין עדיין הקלטות במכשיר הזה",2000);return}toast(`🔊 ${x.e} ${x.s}`,1800);speak([x.s])};
  installHint();
  if(S.mapView==="islands"){scrollTo(0,0);return}
@@ -284,7 +285,7 @@ function levelIntro(i){const L=LEVELS[i];const st=lvStars(i);view="intro";hush()
   <span class="tag">${L.boss?"שלב בוס":"שלב"} ${i+1}</span>
   <div class="lv-big ${L.boss?"boss":""}"><span class="${isEnIc(ic)?"en":""}">${ic}</span></div>
   <h2>${L.t}</h2>
-  <p style="margin:0;font-size:1.15rem">${L.boss?`${L.n} משימות מכל האיים`:`${SK[L.sk].n} · רמה ${lvOf(L.sk)} · 8 משימות`}</p>
+  <p style="margin:0;font-size:1.15rem">${L.boss?`${L.n} משימות מכל הבמות`:`${SK[L.sk].n} · רמה ${lvOf(L.sk)} · 8 משימות`}</p>
   <div class="bigstars" style="font-size:2.2rem">${[0,1,2].map(k=>`<span style="color:${k<st?"var(--sun)":"#d9e3e7"}">★</span>`).join("")}</div>
   <button class="big" id="play">${st?"לשחק שוב":"יאללה!"}</button>
   <button class="back" id="home" style="align-self:center">→ למפה</button></div>`;
@@ -357,7 +358,7 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;G.cur.done=true;const q=G.c
  const last=G.i>=G.list.length-1&&!G.easy;
  const ansHtml=q.opts?(q.opts.find(o=>o.v===q.a)||{}).html||q.a:q.a;const starsTxt=st?` ${"⭐".repeat(st)}`:"";
  document.getElementById("fb").innerHTML=ok
-  ?`<div class="feedback good">${TURTLE.replace('viewBox','width="54" height="46" viewBox')}<div><b>${PRAISE_SHOW[praise]||praise}${starsTxt} +${gain} 👥</b>${G.combo>=3?"רצף של "+G.combo+"! בונוס!":""}${q.info?"<br>"+q.info:""}</div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`
+  ?`<div class="feedback good">${Math.random()<.5?avatarSvg(avDefaults(),"small"):TURTLE.replace('viewBox','width="54" height="46" viewBox')}<div><b>${PRAISE_SHOW[praise]||praise}${starsTxt} +${gain} 👥</b>${G.combo>=3?"רצף של "+G.combo+"! בונוס!":""}${q.info?"<br>"+q.info:""}</div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`
   :`<div class="feedback bad"><div><b>כמעט! התשובה: <span class="ans-mini">${ansHtml}</span></b>${q.info?"<br>"+q.info:""}<br><span class="muted">+2 👥 על הניסיון</span></div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`;
  const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;(G.i<G.list.length||G.easy)?ask():finish()};
  const nx=document.getElementById("nx");const tAns=Date.now();
@@ -385,7 +386,7 @@ function bonus(){view="bonus";hush();const pool=sh(wordsBy(w=>w.w.length<=4)).sl
   if(b.dataset.p===sel){[lw,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done")});done++;S.coins+=5;S.xp+=5;G.gain+=5;bumpCoins();tone(true);confetti(20);sel=null;
    if(done===4){save();setTimeout(end,900)}}
   else{tone(false);b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400)}})}
-function finish(){if(!G.bonus){bonus();return}view="end";hush();const right=G.res.reduce((a,b)=>a+b,0),tot=G.res.length,pct=tot?right/tot:0;
+function finish(){if(!G.bonus){if(S.sessions.length%2===1)danceBreak();else bonus();return}view="end";hush();const right=G.res.reduce((a,b)=>a+b,0),tot=G.res.length,pct=tot?right/tot:0;
  const st=pct>=.85?3:pct>=.6?2:pct>=.5?1:0;const lv=G.lv;let firstClear=false;
  if(lv!=null){firstClear=!lvStars(lv)&&st>0;if(st>lvStars(lv))S.levels[lv]=st;if(firstClear){S.coins+=20;G.gain+=20}}
  S.sessions.push({d:Date.now(),r:right,t:tot,f:typeof G.focus==="string"?G.focus:""});
@@ -432,9 +433,9 @@ function parents(){view="par";hush();const rows=Object.keys(SK).map(k=>{const s=
  const days=new Set(S.sessions.map(s=>new Date(s.d).toDateString())).size;
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>פינת הורים</h2>
  <p>${S.sessions.length} הרפתקאות ב-${days} ימים · ${S.q} משימות נענו. הרמה בכל אי עולה אוטומטית אחרי 8 מתוך 10 נכונות, ויורדת אחרי רצף של טעויות.</p>
- <div class="tbl"><table><tr><th>אי</th><th>רמה</th><th>מצב</th><th>הצלחה</th><th>משימות</th></tr>${rows}</table></div>
+ <div class="tbl"><table><tr><th>במה</th><th>רמה</th><th>מצב</th><th>הצלחה</th><th>משימות</th></tr>${rows}</table></div>
  ${hard?`<h3>פריטים שהיו קשים</h3><div class="chips" style="justify-content:flex-start">${hard}</div>`:""}
- <h3>מה יש בכל אי</h3>
+ <h3>מה יש בכל במה</h3>
  <ul class="skl">${Object.keys(SK).map(k=>`<li><b>${SK[k].n}</b> — ${SK[k].d}</li>`).join("")}</ul>
  <h3>התקנה על המכשיר 📲</h3>
  <p>ב-Safari: לוחצים על כפתור השיתוף ⬆️ ואז ״הוסף למסך הבית״. האפליקציה תיפתח במסך מלא ותעבוד גם בלי אינטרנט אחרי הפעם הראשונה.</p>
@@ -482,3 +483,51 @@ function importFromHash(){try{const h=decodeURIComponent((location.hash||"").sli
 /* ---------- boot ---------- */
 if(!importFromHash())home();
 if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
+
+/* ---------- רמות 5–6 (כיתות ב–ג) — עוטף את המחוללים הקיימים ---------- */
+function numOpts2(a,n,lo,hi){return sh([a].concat(others(Array.from({length:hi-lo+1},(_,i)=>lo+i),[a],n-1))).map(x=>opt(x,String(x),"num"))}
+function sayNum(n){if(n<=20)return [NUMNAME[n]];const t=Math.floor(n/10),u=n%10;if(n===100)return [TENS_NAME[10]];return u?[TENS_NAME[t],"וְ",NUMNAME[u]]:[TENS_NAME[t]]}
+function clockSvg(h,m){const ha=(h%12)*30+m*.5,ma=m*6;const hand=(a,len,w,c)=>{const r=a*Math.PI/180;return`<line x1="50" y1="50" x2="${50+len*Math.sin(r)}" y2="${50-len*Math.cos(r)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`};
+ return`<svg class="clock" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#fff" stroke="#3b1d8f" stroke-width="4"/>${[...Array(12)].map((_,i)=>{const r=i*30*Math.PI/180;return`<text x="${50+36*Math.sin(r)}" y="${50-36*Math.cos(r)+4}" font-size="11" font-weight="700" text-anchor="middle" fill="#1b1140">${i===0?12:i}</text>`}).join("")}${hand(ha,22,6,"#1b1140")}${hand(ma,32,4,"#ff5fa2")}<circle cx="50" cy="50" r="3.5" fill="#1b1140"/></svg>`}
+const GEN2={
+ calc(lv){if(lv<5||Math.random()<.2)return null;const r=Math.random();
+  if(lv===5){if(r<.5){const sub=Math.random()<.5;let a,b,ans;if(sub){a=rnd(5,20);b=rnd(1,a-1);ans=a-b}else{a=rnd(2,18);b=rnd(1,20-a);ans=a+b}
+    return{sk:"calc",key:(sub?"sub:":"add:")+a+":"+b,tag:"עד 20",p:`${sub?PROMPTS.sub:PROMPTS.add}<span class="eq" dir="ltr">${a} ${sub?"−":"+"} ${b} = ?</span>`,say:[sub?PROMPTS.sub:PROMPTS.add].concat(sayNum(a),[sub?"פָּחוֹת":"וְעוֹד"],sayNum(b)),opts:numOpts2(ans,4,Math.max(0,ans-4),Math.min(20,ans+4)),a:String(ans),after:sayNum(ans)}}
+   const a=rnd(1,9),ans=rnd(1,10-a);return{sk:"calc",key:"miss:"+a+":"+ans,tag:"נעלם",p:`${PROMPTS.missing}<span class="eq" dir="ltr">${a} + ? = ${a+ans}</span>`,say:[PROMPTS.missing].concat(sayNum(a),["וְעוֹד כַּמָּה זֶה"],sayNum(a+ans)),opts:numOpts2(ans,4,1,10),a:String(ans),after:sayNum(ans)}}
+  if(r<.45){const t=pick([2,5,10,3,4]);const b=rnd(1,10);const ans=t*b;return{sk:"calc",key:"mul:"+t+":"+b,tag:"כפל",p:`${PROMPTS.mult}<span class="eq" dir="ltr">${t} × ${b} = ?</span><div class="calc-pic">${Array.from({length:b},()=>`<span class="grp">${"🔵".repeat(t)}</span>`).join("")}</div>`,say:[PROMPTS.mult].concat(sayNum(t),["כָּפוּל"],sayNum(b)),opts:numOpts2(ans,4,Math.max(0,ans-t*2),Math.min(100,ans+t*2)).filter(o=>+o.v>=0),a:String(ans),after:sayNum(ans)}}
+  const sub=Math.random()<.4;let a,b,ans;if(sub){a=rnd(20,99);b=Math.random()<.5?rnd(1,9):rnd(1,Math.floor(a/10))*10;ans=a-b}else{a=rnd(10,80);b=Math.random()<.5?rnd(1,9):rnd(1,Math.floor((99-a)/10))*10;ans=a+b}
+  if(ans<0||ans>100)return GEN2.calc(6);
+  return{sk:"calc",key:(sub?"sub100:":"add100:")+a+":"+b,tag:"עד 100",p:`${sub?PROMPTS.sub:PROMPTS.add}<span class="eq" dir="ltr">${a} ${sub?"−":"+"} ${b} = ?</span>`,say:[sub?PROMPTS.sub:PROMPTS.add].concat(sayNum(a),[sub?"פָּחוֹת":"וְעוֹד"],sayNum(b)),opts:numOpts2(ans,4,Math.max(0,ans-10),Math.min(100,ans+10)),a:String(ans),after:sayNum(ans)}},
+ num(lv){if(lv<5||Math.random()<.2)return null;const r=Math.random();
+  if(lv===5){if(r<.4){const n=rnd(11,99);const t=Math.floor(n/10),u=n%10;const mk=(a,b)=>`${a} עשרות ו-${b} אחדות`;const o=sh([[t,u],[u,t],[t,u+1>9?u-1:u+1],[t-1<1?t+1:t-1,u]].filter((x,i,arr)=>arr.findIndex(y=>y[0]===x[0]&&y[1]===x[1])===i).slice(0,4).map(x=>opt(x.join(":"),mk(x[0],x[1]),"")));
+    return{sk:"num",key:"tens:"+n,tag:"עשרות ואחדות",p:`${PROMPTS.tens}<span class="num-big">${n}</span>`,say:[PROMPTS.tens].concat(sayNum(n)),opts:o,a:t+":"+u,after:sayNum(n)}}
+   if(r<.7){let a=rnd(10,99),b=rnd(10,99);while(b===a)b=rnd(10,99);const big=Math.max(a,b);return{sk:"num",key:"cmp100:"+a+":"+b,tag:"גדול יותר",p:PROMPTS.compareNum,say:[PROMPTS.compareNum].concat(sayNum(a),["אוֹ"],sayNum(b)),opts:[a,b].map(x=>opt(x,String(x),"num")),a:String(big),after:sayNum(big)}}
+   const step=pick([5,10,2]);const start=step===10?10:step===5?pick([5,10,15]):rnd(10,40);const seq=[0,1,2,3,4].map(i=>start+i*step);const hole=rnd(1,4);const a=seq[hole];
+   return{sk:"num",key:"skip:"+step+":"+start,tag:"קפיצות",p:`${PROMPTS.skip}<span class="num-seq" dir="ltr">${seq.map((x,i)=>i===hole?"_":x).join(" , ")}</span>`,say:[PROMPTS.skip],opts:numOpts2(a,4,Math.max(1,a-step*2),Math.min(100,a+step*2)),a:String(a),after:sayNum(a)}}
+  if(r<.35){const n=rnd(1,30);const even=n%2===0;return{sk:"num",key:"eo:"+n,tag:"זוגי / אי-זוגי",p:`${PROMPTS.evenOdd}<span class="num-big">${n}</span><div class="count">${Array.from({length:n},(_,i)=>`<span>${i%2?"🟣":"🟡"}</span>`).join("")}</div>`,say:[PROMPTS.evenOdd].concat(sayNum(n)),opts:[opt("even","זוגי","" ),opt("odd","אי-זוגי","")],a:even?"even":"odd",after:[even?"זוּגִי":"אִי־זוּגִי"]}}
+  if(r<.7){const small=Math.random()<.5;const arr=sh(Array.from({length:90},(_,i)=>i+10)).slice(0,3);const a=small?Math.min.apply(null,arr):Math.max.apply(null,arr);return{sk:"num",key:(small?"min:":"max:")+arr.join("-"),tag:small?"הכי קטן":"הכי גדול",p:small?PROMPTS.smallest:PROMPTS.biggest,say:[small?PROMPTS.smallest:PROMPTS.biggest],opts:arr.map(x=>opt(x,String(x),"num")),a:String(a),after:sayNum(a)}}
+  const k=rnd(20,98);const after=Math.random()<.5;const a=after?k+1:k-1;return{sk:"num",key:(after?"after100:":"before100:")+k,tag:after?"אחרי":"לפני",p:`${after?PROMPTS.numAfter:PROMPTS.numBefore} <span class="num-big">${k}</span>?`,say:[after?PROMPTS.numAfter:PROMPTS.numBefore].concat(sayNum(k)),opts:numOpts2(a,4,Math.max(1,a-5),Math.min(100,a+5)),a:String(a),after:sayNum(a)}},
+ word(lv){if(lv<5||Math.random()<.2)return null;const r=Math.random();
+  if(lv===5||r<.4){const sub=pick(HE_SUBJ),vb=pick(HE_VERB);const pool=wordsBy(w=>w.c===vb.c);const ob=pick(pool);const text=`${sub.s} ${sub.g==="m"?vb.m:vb.f} ${ob.s}`;
+   const dis=others(pool.filter(x=>x.w!==ob.w),[],2);const mk=(o)=>`<span class="scene"><span class="emo">${sub.e}${vb.e}${o.e}</span></span>`;
+   return{sk:"word",key:"sent:"+ob.w,tag:"קריאת משפט",p:`${PROMPTS.sentHe}<span class="he-word big" style="font-size:2rem">${text}</span>`,say:[PROMPTS.sentHe],opts:sh([ob].concat(dis)).map(o=>opt(o.w,mk(o),"pic")),a:ob.w,after:[ob.s]}}
+  if(r<.7){const it=pick(OPPOSITES);const flip=Math.random()<.5;const q=flip?it[1]:it[0],a=flip?it[0]:it[1],qe=flip?it[3]:it[2],ae=flip?it[2]:it[3];const dis=sh(OPPOSITES.filter(x=>x!==it)).slice(0,2).map(x=>[x[Math.random()<.5?0:1]]);
+   const o=sh([[a,ae]].concat(dis.map(d=>[d[0],""]))).map(x=>opt(x[0],`<span class="he-word">${x[0]}</span>${x[1]?`<span class="emo" style="font-size:2rem">${x[1]}</span>`:""}`,"he"));
+   return{sk:"word",key:"opp:"+strip(q),tag:"הפכים",p:`${PROMPTS.opp} <span class="he-word">${q}</span>?<span class="emo">${qe}</span>`,say:[PROMPTS.opp,q],opts:o.map(x=>{x.html=x.html.replace(/<span class="emo"[^>]*>[^<]*<\/span>/,"");return x}),a:a,after:[q,"—",a]}}
+  const it=pick(PLURALS);const dis=sh(PLURALS.filter(x=>x!==it)).slice(0,2);return{sk:"word",key:"pl:"+strip(it[0]),tag:"יחיד ורבים",p:`${PROMPTS.plural} <span class="he-word">${it[0]}</span>?<span class="emo">${it[3]}</span>`,say:[PROMPTS.plural,it[0]],opts:sh([it].concat(dis)).map(x=>opt(x[1],`<span class="he-word">${x[1]}</span>`,"he")),a:it[1],after:[it[1]]}},
+ en(lv){if(lv<5||Math.random()<.2)return null;const r=Math.random();
+  if(lv===5||r<.5){const w=pick(EN_CVC);const i=rnd(0,2);const miss=w[i];const shown=w.slice(0,i)+"_"+w.slice(i+1);const o=sh([miss].concat(others("abcdefghijklmnopqrstuvwxyz".split(""),[miss],3)));
+   return{sk:"en",key:"enmiss:"+w,tag:"אות חסרה",p:`${PROMPTS.enMissing}<span class="emo">${EN_CVC_PIC[w]}</span><span class="en-word big">${shown}</span>`,say:[PROMPTS.enMissing,{en:w}],opts:o.map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:miss,after:[{en:w}],info:`<span class="en-word">${w}</span>`}}
+  if(r<.8){const it=pick(EN_OPP);const flip=Math.random()<.5;const q=flip?it[1]:it[0],a=flip?it[0]:it[1],qe=flip?it[3]:it[2];const dis=sh(EN_OPP.filter(x=>x!==it)).slice(0,2).map(x=>x[Math.random()<.5?0:1]);
+   return{sk:"en",key:"enopp:"+q,tag:"הפכים באנגלית",p:`${PROMPTS.enOpp} <span class="en-word">${q}</span>?<span class="emo">${qe}</span>`,say:[PROMPTS.enOpp,{en:q}],opts:sh([a].concat(dis)).map(x=>opt(x,`<span class="en-word">${x}</span>`,"en")),a:a,after:[{en:q},{en:a}]}}
+  const w=pick(EN.filter(x=>x.c==="animal"||x.c==="thing"&&x.w!=="bus"));const pl=w.w+"s";const dis=others(EN.filter(x=>(x.c==="animal"||x.c==="thing")&&x.w!==w.w),[],2).map(x=>x.w+"s");
+  return{sk:"en",key:"enpl:"+w.w,tag:"רבים באנגלית",p:`${PROMPTS.enPlural} <span class="en-word">${w.w}</span>?<span class="emo">${w.e}${w.e}</span>`,say:[PROMPTS.enPlural,{en:w.w}],opts:sh([pl].concat(dis)).map(x=>opt(x,`<span class="en-word">${x}</span>`,"en")),a:pl,after:[{en:pl}]}},
+ think(lv){if(lv<5||Math.random()<.25)return null;const h=rnd(1,12);const m=lv===5?0:pick([0,30]);const fmt=(hh,mm)=>`${hh}:${mm?"30":"00"}`;const say=m?["הַשָּׁעָה"].concat(sayNum(h),["וָחֵצִי"]):["הַשָּׁעָה"].concat(sayNum(h));
+  const alts=[[h,m],[h%12+1,m],[h===1?12:h-1,m],[h,m?0:30]];const o=sh(alts.filter((x,i,a)=>a.findIndex(y=>y[0]===x[0]&&y[1]===x[1])===i)).map(x=>opt(fmt(x[0],x[1]),`<span class="num-big">${fmt(x[0],x[1])}</span>`,"num"));
+  return{sk:"think",key:"clock:"+fmt(h,m),tag:"שעון",p:`${PROMPTS.clock}<div class="shape-big">${clockSvg(h,m)}</div>`,say:[PROMPTS.clock],opts:o,a:fmt(h,m),after:say}},
+ nik(lv){if(lv<5||Math.random()<.3)return null;const sub=pick(HE_SUBJ),vb=pick(HE_VERB);const pool=wordsBy(w=>w.c===vb.c);const ob=pick(pool);const text=`${sub.s} ${sub.g==="m"?vb.m:vb.f} ${ob.s}`;const dis=others(pool.filter(x=>x.w!==ob.w),[],2);
+  return{sk:"nik",key:"nsent:"+ob.w,tag:"קריאה מנוקדת",p:`${PROMPTS.nikPhrase}<span class="he-word big" style="font-size:2rem">${text}</span>`,say:[PROMPTS.nikPhrase],opts:sh([ob].concat(dis)).map(o=>opt(o.w,`<span class="emo">${sub.e}${vb.e}${o.e}</span>`,"pic")),a:ob.w,after:[ob.s]}},
+ abc(lv){if(lv<5||Math.random()<.4)return null;const U="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const i=rnd(0,24);const a=U[i+1];
+  return{sk:"abc",key:"abcafter:"+U[i],tag:"סדר האלפבית",p:`${PROMPTS.abcAfter} <span class="en-big">${U[i]}</span>?`,say:[PROMPTS.abcAfter,{en:U[i]}],opts:sh([a].concat(others(U,[a,U[i]],3))).map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:a,after:[{en:U[i]},{en:a}]}}
+};
+Object.keys(GEN2).forEach(k=>{const orig=GEN[k];GEN[k]=lv=>GEN2[k](lv)||orig(Math.min(lv,4))});
