@@ -396,3 +396,12 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .answers.one .ans.wide{min-height:62px;padding:4px 8px}
 .row-opts .ans{min-width:0;padding:4px}
 .card.play .row-opts .ans img.pic{width:100%;max-width:72px;height:auto}
+/* games4 — מחיאות להברות */
+.clapw{display:flex;flex-direction:column;gap:14px;align-items:center;width:100%}
+.clap-pic{background:#fff;border:var(--ol) solid var(--ink);border-radius:22px;padding:10px 22px 4px;display:flex;flex-direction:column;align-items:center;box-shadow:0 5px 0 var(--ink);color:var(--ink)}
+.clap-pic img.pic{width:110px;height:110px}.clap-pic .he-word{font-size:2.4rem;line-height:1.5}
+.beads{display:flex;gap:10px;min-height:48px;justify-content:center;align-items:center;flex-wrap:wrap}
+.bead{width:42px;height:42px;border-radius:50%;border:var(--ol) solid var(--ink);box-shadow:0 3px 0 var(--ink);display:inline-block}
+.bead.good{box-shadow:0 0 0 5px var(--ok)}.bead.demo{animation:popin .3s var(--spring)}
+.row-btns .clapbtn{flex:2;padding:8px}.clapbtn img.pic{width:70px;height:70px}
+.clapbtn.bump{animation:bump .18s}@keyframes bump{50%{transform:scale(.88)}}

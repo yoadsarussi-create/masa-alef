@@ -137,7 +137,7 @@ const GEN={
   let o=letterOpts(base,n,lv>=2);if(FINAL_TO_BASE[t])o=o.map(x=>x===base?t:x);
   const pr=last?PROMPTS.soundLast:PROMPTS.soundFirst;
   return{sk:"sound",key:"sound:"+(last?"L:":"F:")+w.w,tag:last?"צליל סוגר":"צליל פותח",p:`${pr}${pic(w.e)}`,say:[pr,w.s],opts:o.map(x=>opt(x,bigHe(x),"he")),a:t,after:[w.s,LETNAME[base]],info:`<span class="he-word">${w.s}</span>`}},
- rhyme(lv){if(lv>=2&&Math.random()<(lv===2?.55:.4)){const w=pick(wordsBy(x=>x.syl<=(lv===2?3:4)));const o=[1,2,3,4].slice(0,lv===2?3:4).map(k=>opt(k,`${k} <span class="clap">${"👏".repeat(k)}</span>`,"num"));
+ rhyme(lv){if(lv>=2&&Math.random()<(lv===2?.55:.4)){const w=pick(wordsBy(x=>!x.amb&&x.syl<=(lv===2?3:4)));const o=[1,2,3,4].slice(0,lv===2?3:4).map(k=>opt(k,`${k} <span class="clap">${"👏".repeat(k)}</span>`,"num"));
    return{sk:"rhyme",key:"syl:"+w.w,tag:"הברות",p:`${PROMPTS.syl}${pic(w.e)}<span class="he-word">${w.s}</span>`,say:[PROMPTS.syl,w.s],opts:o,a:String(w.syl),after:[w.s]}}
   const pr=pick(RHYMES);const a=WORD_BY(pr[0]),b=WORD_BY(pr[1]);const n=lv>=3?4:3;
   const end=b.w.slice(-1);const dis=others(clearWords().filter(x=>x.w!==a.w&&x.w!==b.w&&x.w.slice(-1)!==end&&x.w.slice(-2)!==b.w.slice(-2)),[],n-1);
@@ -510,7 +510,7 @@ function parents(){view="par";hush();const L=parentLists();const days=new Set(S.
  app.querySelector("#xfer").onclick=transfer;app.querySelector("#diag").onclick=soundDiag;
  app.querySelector("#rst").onclick=()=>{if(!confirmReset){confirmReset=true;parents();return}const nm=S.name;S=fresh();S.name=nm;confirmReset=false;save();parents()};
  scrollTo(0,0)}
-function keySk(key){const p=key.split(":")[0];const map={let:"let",sound:"sound",syl:"rhyme",rhyme:"rhyme",build:"word",read:"word",nsyl:"nik",nik:"nik",seq:"num",between:"num",after:"num",before:"num",cmpn:"num",cmp:"num",hear:"num",count:"num",ten:"calc",sub:"calc",add:"calc",shape:"think",sides:"think",pat:"think",dir:"think",size:"think",odd:"think",wr:"write",wrn:"write",wrw:"write",wre:"write",dots:"num",phon:"abc",up:"abc",low:"abc",abc:"abc",enprod:"en",enread:"en",enword:"en",en:"en",sb:"sent",sh:"sent"};return map[p]||p}
+function keySk(key){const p=key.split(":")[0];const map={let:"let",sound:"sound",syl:"rhyme",clap:"rhyme",rhyme:"rhyme",build:"word",read:"word",nsyl:"nik",nik:"nik",seq:"num",between:"num",after:"num",before:"num",cmpn:"num",cmp:"num",hear:"num",count:"num",ten:"calc",sub:"calc",add:"calc",shape:"think",sides:"think",pat:"think",dir:"think",size:"think",odd:"think",wr:"write",wrn:"write",wrw:"write",wre:"write",dots:"num",phon:"abc",up:"abc",low:"abc",abc:"abc",enprod:"en",enread:"en",enword:"en",en:"en",sb:"sent",sh:"sent"};return map[p]||p}
 
 /* ---------- transfer between devices (no sign-in) ---------- */
 const b64u=u=>{let s="";for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")};

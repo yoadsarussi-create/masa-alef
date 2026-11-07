@@ -1,6 +1,6 @@
 /* service worker — אופליין מלא אחרי הטעינה הראשונה; גרסה חדשה מתעדכנת ברקע */
-const VER="v0.9.1";
-const CORE=["./","index.html","style.css","content.js","mechanics.js","strokes.js","engine2.js","app.js","games2.js","games3.js","pics-manifest.js","audio-manifest.js","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-180.png","sfx/ok.m4a","sfx/wrong.m4a","sfx/level.m4a","sfx/coin.m4a","sfx/tick.m4a"];
+const VER="v0.9.2";
+const CORE=["./","index.html","style.css","content.js","mechanics.js","strokes.js","engine2.js","app.js","games2.js","games3.js","games4.js","pics-manifest.js","audio-manifest.js","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-180.png","sfx/ok.m4a","sfx/clap.m4a","sfx/wrong.m4a","sfx/level.m4a","sfx/coin.m4a","sfx/tick.m4a"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(VER).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VER).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const u=new URL(e.request.url);if(e.request.method!=="GET")return;
