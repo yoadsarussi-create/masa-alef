@@ -105,8 +105,8 @@ const GEN={
   if(lv===2){const n=rnd(0,9);return{sk:"write",key:"wrn:"+n,tag:"כותבים ספרה",p:`${PROMPTS.trace} <span class="num-big">${n}</span>`,say:[PROMPTS.trace,NUMNAME[n]],kind:"trace",glyph:String(n),font:"Fredoka",dir:"ltr",a:"done",after:[NUMNAME[n]]}}
   if(lv===3){const w=WORD_BY(pick(SPELL_L1));return{sk:"write",key:"wrw:"+w.w,tag:"כותבים מילה",p:`${PROMPTS.traceWord}${pic(w.e)}<span class="he-word">${w.s}</span>`,say:[PROMPTS.traceWord,w.s],kind:"trace",glyph:w.w,dir:"rtl",a:"done",after:[w.s]}}
   const L=pick("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));const g=Math.random()<.5?L:L.toLowerCase();return{sk:"write",key:"wre:"+g,tag:"כותבים באנגלית",p:`${PROMPTS.trace} <span class="en-big">${g}</span>`,say:[PROMPTS.trace,{en:L}],kind:"trace",glyph:g,font:"Andika",dir:"ltr",a:"done",after:[{en:L}]}},
- let(lv){if(lv>=3&&Math.random()<.22){const i=rnd(0,12);return dotsQ("let",LETTERS.slice(i,i+10),k=>LETNAME[LETTERS[i+k]])}
-  const t=pick(LETTERS);
+ let(lv,focus){if(!focus&&lv>=3&&Math.random()<.22){const i=rnd(0,12);return dotsQ("let",LETTERS.slice(i,i+10),k=>LETNAME[LETTERS[i+k]])}
+  const t=focus||pick(LETTERS);
   if(lv>=3&&Math.random()<(lv===4?.4:.5)){const base=pick(Object.keys(FINALS));const fins=Object.keys(FINALS).map(k=>FINALS[k]);
    return{sk:"let",key:"let:fin:"+base,tag:"אות סופית",p:`${PROMPTS.letFinal}${bigHe(base)}`,say:[PROMPTS.letFinal,LETNAME[base]],opts:sh(fins).map(x=>opt(x,bigHe(x),"he")),a:FINALS[base],after:[LETNAME[base]+" סוֹפִית"]}}
   if(lv===4&&Math.random()<.5){const i=rnd(1,20);const seq=[LETTERS[i-1],"_",LETTERS[i+1]];const o=sh([LETTERS[i]].concat(others(LETTERS,[LETTERS[i]],2)));
@@ -180,7 +180,7 @@ const GEN={
    return{sk:"think",key:"size:"+(big?"B":"S"),tag:"גדול וקטן",p:`${big?PROMPTS.sizeBig:PROMPTS.sizeSmall}`,say:[big?PROMPTS.sizeBig:PROMPTS.sizeSmall],kind:"row",opts:sizes.map((s,i)=>opt(i,`<span style="font-size:${s}em">${w.e}</span>`,"pic")),a:String(a),after:[big?"הֲכִי גָּדוֹל":"הֲכִי קָטָן"]}}
   const cats=sh(["animal","food","vehicle","home","clothes","nature","body"]);const A=sh(wordsBy(w=>w.c===cats[0])).slice(0,3),B=pick(wordsBy(w=>w.c===cats[1]));
   return{sk:"think",key:"odd:"+cats[1],tag:"מה לא שייך?",p:PROMPTS.odd,say:[PROMPTS.odd],opts:sh(A.concat([B])).map(x=>opt(x.w,x.e,"pic")),a:B.w,after:[B.s]}},
- abc(lv){const U="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const L=pick(U),low=L.toLowerCase();const r=Math.random();
+ abc(lv,focus){const U="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const L=focus||pick(U),low=L.toLowerCase();const r=Math.random();
   const conf=n=>{const c=(EN_CONFUSE[low]||"").split("").filter(Boolean);const o=sh(c).slice(0,Math.min(2,n-1));return sh([low].concat(o,others(U.map(x=>x.toLowerCase()),o.concat([low]),n-1-o.length)))};
   if(lv===4&&r<.5){const keys=Object.keys(PHONICS);const k=pick(keys);const w=EN_BY(PHONICS[k]);const o=sh([k].concat(others(keys,[k],3)));
    return{sk:"abc",key:"phon:"+k,tag:"פוניקס",p:`${PROMPTS.abcPhon}${pic(w.e)}<span class="en-word">${w.w}</span>`,say:[PROMPTS.abcPhon,{en:w.w}],opts:o.map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:k,after:[{en:k},{en:w.w}]}}
@@ -211,7 +211,7 @@ const GEN={
   const dis=others(poolW.filter(x=>x.e!==w.e),[],n-1);o=sh([w].concat(dis)).map(x=>opt(x.w,render(x,col,sz),"pic"));return fin(w.w);
   function fin(a){return{sk:"sent",key:"sh:"+T.t,tag:"משפט",p:`${PROMPTS.sentHear}<span class="en-word sent">${text}</span>`,say:[PROMPTS.sentHear,{en:text}],opts:o,a:a,after:[{en:text}],info:`<span class="en-word">${text}</span>`}}}
 };
-function makeQ(sk,lv){let q=null;for(let i=0;i<6&&!q;i++){try{q=GEN[sk](lv)}catch(e){q=null;console.error(sk,lv,e)}}return q}
+function makeQ(sk,lv,focus){let q=null;for(let i=0;i<6&&!q;i++){try{q=GEN[sk](lv,focus)}catch(e){q=null;console.error(sk,lv,e)}}return q}
 
 /* ---------- views ---------- */
 const app=document.getElementById("app");let view="home";
@@ -237,46 +237,28 @@ function onboarding(){view="onb";app.innerHTML=`<div class="card end">
 function buddyLine(cur){const L=LEVELS[cur];if(!S.q)return`היי ${KID()}! אני טיקי הצב 🐢 בואי נצא למסע עד כיתה א!`;
  if(Object.keys(S.levels).length===LEVELS.length)return`עברת את כל השלבים! 🏆 אפשר לשחק שוב, להשיג 3 כוכבים בכל שלב, או לעשות אימון חכם.`;
  const w=weakest();return`הבא בתור: <b>שלב ${cur+1} · ${L.t}</b>${w?`<br><span class="muted">באימון החכם נחזק את ${SK[w].n}</span>`:""}`}
-function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const cur=curLevel();const totalStars=Object.keys(S.levels).reduce((a,k)=>a+S.levels[k],0);
- const deco=["🌴","🐚","🏝️","🐠","⛵","🦀","🐙","🌺"];
- const nodes=LEVELS.map((L,i)=>{const st=lvStars(i),open=lvOpen(i),isCur=i===cur;const ic=lvIcon(L);
-  return`<div class="lv-row ${L.boss?"has-boss":""}" style="--x:${[50,74,50,26][i%4]}%">
-   <span class="deco" style="${i%4===1?"right":"left"}:6%">${deco[i%deco.length]}</span>
-   <button class="node ${L.boss?"boss":""} ${open?"":"locked"} ${st?"done":""} ${isCur?"cur":""}" data-lv="${i}" aria-label="שלב ${i+1}: ${L.t}">
-    ${isCur?`<span class="me">${TURTLE}</span>`:""}
-    <span class="num">${open?i+1:"🔒"}</span>
-    ${open?`<span class="lic ${isEnIc(ic)?"en":""}">${ic}</span>`:""}
-   </button>
-   <span class="lname">${L.t}</span>
-   ${st?`<span class="lstars">${starHtml(st)}</span>`:""}
-  </div>`}).reverse().join("");
+function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const totalStars=Object.keys(S.levels).reduce((a,k)=>a+S.levels[k],0);
+ const hallsHtml=HALLS.map((h,hi)=>{const open=hallOpen(hi);const prog=hallProgress(h);const fans=Math.round(prog*50);
+  const steps=h.steps.map(st=>{const o=open&&stepOpen(st);const p=stepProgress(st);const done=stepPassed(st);const d=STEPS[st].d;
+   return`<button class="stg ${d} ${o?"":"locked"} ${done?"done":""}" data-step="${st}" aria-label="${STEPS[st].n}"><span class="stg-ic">${o?(done?"🏆":{he:"א",ma:"1",en:"A"}[d]):"🔒"}</span><span class="stg-n">${STEPS[st].n}</span><span class="stg-bar"><i style="width:${Math.round(p*100)}%"></i></span></button>`}).join("");
+  return`<section class="hall ${open?"":"locked"}"><div class="hall-head"><span class="hall-e">${h.e}</span><b>${h.n}</b><span class="meter"><i style="width:${Math.round(prog*100)}%"></i></span><span class="fans">👥 ${fans}/50</span></div>${open?`<div class="stages">${steps}</div>`:`<p class="muted" style="color:#fff9;margin:6px 0 0">נפתח כשהאולם הקודם מתמלא</p>`}</section>`}).join("");
  app.innerHTML=`
  <div class="top"><h1>🎤 ${KID()} על הבמה</h1><button class="pill" id="sndtest" aria-label="בדיקת קול">🔊</button><span class="pill">⭐ ${totalStars}</span><span class="pill" aria-label="מעריצים">👥 ${S.coins}</span></div>
- <div class="buddy"><div class="bounce">${avatarSvg(avDefaults())}</div><div class="bubble">${buddyLine(cur)}</div><div class="bounce" style="animation-delay:.4s">${TURTLE}</div></div>
+ <div class="buddy"><div class="bounce">${avatarSvg(avDefaults())}</div><div class="bubble">${S.q?`הבא בתור: <b>הופעה</b> — המשחק בוחר לבד מה לתרגל. או בוחרים במה באולם.`:`היי ${KID()}! אני טיקי הצב 🐢 בואי נצא למסע עד כיתה א!`}</div><div class="bounce" style="animation-delay:.4s">${TURTLE}</div></div>
+ <button class="big pink" id="smart">🎤 הופעה! (8 משימות)</button>
  <div class="row4">
-  <button class="small" id="smart"><span>🎯</span><span>אימון חכם</span></button>
   <button class="small" id="stu"><span>🎧</span><span>האולפן</span></button>
   <button class="small" id="ward"><span>👗</span><span>הארון</span></button>
   <button class="small" id="col"><span>🎁</span><span>מדבקות</span></button>
+  <button class="small" id="par"><span>👨‍👧</span><span>הורים</span></button>
  </div>
- <div class="seg" role="tablist" aria-label="תצוגה">
-  <button role="tab" data-v="saga" aria-selected="${S.mapView!=="islands"}">🗺️ מפת שלבים</button>
-  <button role="tab" data-v="islands" aria-selected="${S.mapView==="islands"}">🎪 הבמות</button>
- </div>
- ${S.mapView==="islands"?`<div class="map-title">לוחצים על במה כדי לשחק רק בה</div>
- <div class="map">${Object.keys(SK).map(k=>{const s=SK[k];const st=stars(k);const m=mastery(k);const cls=hist(k).length<3&&lvOf(k)===1?"new":(m!==null&&m<.6?"weak":"");
-  return`<button class="island ${cls}" data-sk="${k}"><span class="ic ${isEnIc(s.ic)?"en":""}">${s.ic}</span><span class="nm">${s.n}</span><span class="lvb">שלב ${lvOf(k)}/${s.max}</span><span class="stars">${starHtml(st)}</span></button>`}).join("")}</div>`
- :`<div class="saga" id="saga"><svg class="path" id="path" aria-hidden="true"></svg>${nodes}</div>`}
- <button class="back" id="par" style="align-self:center;background:#ffffff22;color:#fff;box-shadow:none;font-size:.95rem">👨‍👧 פינת הורים · v${window.APP_VER}</button>`;
- app.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{const i=+b.dataset.lv;if(!lvOpen(i)){b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400);toast("השלב הזה עוד נעול 🔒 קודם מסיימים את השלב שלפניו",2200);speak(["הַשָּׁלָב הַזֶּה עוֹד נָעוּל. קֹדֶם מְסַיְּמִים אֶת הַשָּׁלָב שֶׁלְּפָנָיו"]);return}levelIntro(i)});
+ <div class="halls">${hallsHtml}</div>
+ <p class="muted" style="color:#fff8;text-align:center">v${window.APP_VER}</p>`;
+ app.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const st=b.dataset.step;if(!stepOpen(st)||b.classList.contains("locked")){b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400);const deps=STEPS[st].deps.filter(d=>!stepPassed(d)).map(d=>STEPS[d].n);toast("עוד נעול 🔒 קודם: "+deps.join(" · "),2600);return}levelIntro(st)});
  app.querySelector("#smart").onclick=()=>start(null);
- app.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>start(b.dataset.sk));
- app.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{S.mapView=b.dataset.v;save();home()});
  app.querySelector("#col").onclick=collection;app.querySelector("#par").onclick=parentGate;app.querySelector("#stu").onclick=studio;app.querySelector("#ward").onclick=wardrobe;
  app.querySelector("#sndtest").onclick=()=>{const w=WORDS.filter(hasClip);const x=w.length?pick(w):null;if(!x){toast("אין עדיין הקלטות במכשיר הזה",2000);return}toast(`🔊 ${x.e} ${x.s}`,1800);speak([x.s])};
- installHint();
- if(S.mapView==="islands"){scrollTo(0,0);return}
- drawPath();const c=app.querySelector(".node.cur");if(c)c.scrollIntoView({block:"center"});else scrollTo(0,0)}
+ installHint();scrollTo(0,0)}
 function drawPath(){const saga=document.getElementById("saga"),svg=document.getElementById("path");if(!saga||!svg)return;
  const r0=saga.getBoundingClientRect();const pts=Array.prototype.map.call(saga.querySelectorAll(".node"),n=>{const r=n.getBoundingClientRect();return[r.left-r0.left+r.width/2,r.top-r0.top+r.height/2,n.classList.contains("done")]});
  svg.setAttribute("viewBox",`0 0 ${r0.width} ${r0.height}`);let d="",dd="";
@@ -286,18 +268,16 @@ function installHint(){const standalone=navigator.standalone||matchMedia("(displ
  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
  if(!ios||S.q<5)return;S.hint++;save();toast("📲 להורים: כדי להתקין כאפליקציה — לוחצים על שיתוף ⬆️ ואז ״הוסף למסך הבית״",7000)}
 
-function levelIntro(i){const L=LEVELS[i];const st=lvStars(i);view="intro";hush();
- const skills=L.boss?(L.boss==="all"?Object.keys(SK):L.boss):[L.sk];const ic=lvIcon(L);
+function levelIntro(step){const T=STEPS[step];const st=S.levels[step]||0;view="intro";hush();const p=stepProgress(step);const ic={he:"א",ma:"123",en:"ABC"}[T.d];
  app.innerHTML=`<div class="card end">
-  <span class="tag">${L.boss?"שלב בוס":"שלב"} ${i+1}</span>
-  <div class="lv-big ${L.boss?"boss":""}"><span class="${isEnIc(ic)?"en":""}">${ic}</span></div>
-  <h2>${L.t}</h2>
-  <p style="margin:0;font-size:1.15rem">${L.boss?`${L.n} משימות מכל הבמות`:`${SK[L.sk].n} · רמה ${lvOf(L.sk)} · 8 משימות`}</p>
+  <span class="tag">${DOMAIN_NAME[T.d]}</span>
+  <div class="lv-big"><span class="${T.d==="en"?"en":""}">${ic}</span></div>
+  <h2>${T.n}</h2>
+  <p style="margin:0;font-size:1.15rem">${Math.round(p*100)}% מהשלב כבר שלך · 8 משימות</p>
   <div class="bigstars" style="font-size:2.2rem">${[0,1,2].map(k=>`<span style="color:${k<st?"var(--sun)":"#d9e3e7"}">★</span>`).join("")}</div>
-  <button class="big" id="play">${st?"לשחק שוב":"יאללה!"}</button>
+  <button class="big" id="play">${st?"עוד הופעה כאן":"יאללה!"}</button>
   <button class="back" id="home" style="align-self:center">→ למפה</button></div>`;
- app.querySelector("#play").onclick=()=>start(L.boss?(L.boss==="all"?null:L.boss):L.sk,i);
- app.querySelector("#home").onclick=home;scrollTo(0,0)}
+ speak([T.n]);app.querySelector("#play").onclick=()=>start(step);app.querySelector("#home").onclick=home;scrollTo(0,0)}
 
 /* ---------- game loop ---------- */
 let G=null,advT=null,quitArm=false;
@@ -307,20 +287,20 @@ function planSkills(focus,n){if(typeof focus==="string")return Array.from({lengt
  const w=keys.map(k=>{const m=mastery(k);const u=hist(k).length<3?1.2:0;return{k,s:(m===null?.5:1-m)*2+u+Math.random()*.6}}).sort((a,b)=>b.s-a.s);
  const out=[];let i=0;while(out.length<n){out.push(w[i%w.length].k);i++;if(i%w.length===0)w.sort((a,b)=>b.s+Math.random()*.8-(a.s+Math.random()*.8))}
  const res=[];let rest=out.slice();while(rest.length){const prev=res[res.length-1];let k=rest.findIndex(x=>!prev||x!==prev);if(k<0)k=0;res.push(rest.splice(k,1)[0])}return res}
-function start(focus,lv){const n=lv!=null&&LEVELS[lv].n?LEVELS[lv].n:ROUND;G={focus,lv:lv==null?null:lv,list:planSkills(focus,n),i:0,res:[],combo:0,gain:0,retried:0,wrongRow:0,easy:false,ups:[],pendingUp:null};ask()}
+function start(step){const plan=buildSession(step||null,ROUND);G={step:step||null,plan,list:plan.map(x=>x.sk),i:0,res:[],combo:0,gain:0,retried:0,wrongRow:0,easy:false,ups:[],pendingUp:null,encore:false,hints:0};ask()}
 function ask(){view="play";quitArm=false;clearTimeout(advT);
  if(G.pendingUp){const sk=G.pendingUp;G.pendingUp=null;levelUp(sk);return}
- const sk=G.list[G.i];let lv=lvOf(sk);const easy=G.easy;G.easy=false;if(easy)lv=Math.max(1,lv-1);
- const q=makeQ(sk,lv);if(!q){G.i++;G.i<G.list.length?ask():finish();return}
+ const item=G.plan[G.i];const sk=item.sk;let lv=item.lv;const easy=G.easy;G.easy=false;if(easy)lv=Math.max(1,lv-1);
+ let q=G.retryQ||makeQ(sk,lv,item.focus);G.retryQ=null;if(!q){G.i++;G.i<G.plan.length?ask():finish();return}q.item=item;
  if(easy&&q.kind!=="spell"&&q.kind!=="row"&&q.opts.length>2){q.opts=sh([q.opts.find(o=>o.v===q.a),q.opts.find(o=>o.v!==q.a)])}
- G.cur={q,done:false,t0:Date.now()};
+ G.cur={q,done:false,t0:Date.now(),retry:q._retry||0};
  const dots=G.list.map((_,k)=>`<i class="${k<G.res.length?(G.res[k]?"ok":"no"):k===G.i?"now":""}"></i>`).join("");
  const optHtml=o=>`<button class="ans ${o.cls}" data-o="${esc(o.v)}">${o.html}</button>`;
  app.innerHTML=`
  <div class="hud"><button class="x" id="quit" aria-label="חזרה למפה">✕</button><div class="dots">${dots}</div><span class="pill" id="hc">👥 ${S.coins}</span></div>
  <div class="card">
-  <div class="row-tag"><span class="tag">${SK[sk].n} · ${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
-  ${easy?`<div class="feedback good" style="padding:8px 12px">זה בסדר! גם טיקי טועה לפעמים. הנה אחת קלה 💪</div>`:""}
+  <div class="row-tag"><span class="tag">${STEPS[item.step].n} · ${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
+  ${easy?`<div class="feedback good" style="padding:8px 12px">זה בסדר! גם טיקי טועה לפעמים. הנה אחת קלה 💪</div>`:G.cur.retry?`<div class="feedback good" style="padding:8px 12px">עוד ניסיון — הקשיבי שוב 👂</div>`:""}
   <div class="prompt">${q.p}</div>
   <button class="ear" id="ear">🔊 עוד פעם</button>
   ${q.kind==="spell"?`<div class="slots" dir="${q.dir}">${q.ans.map((_,k)=>`<button class="slot ${q.dir==="ltr"?"wordslot":""}" data-k="${k}" aria-label="מקום ${k+1}"></button>`).join("")}</div>
@@ -349,36 +329,45 @@ function setupSpell(q){const slots=Array.prototype.slice.call(app.querySelectorA
  slots.forEach((sl,k)=>sl.onclick=()=>{if(G.cur.done||fill[k]==null)return;fill[k]=null;render()});render()}
 function bumpCoins(){const el=document.getElementById("hc");if(el){el.textContent="👥 "+S.coins;el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop")}}
 function answer(b){if(G.cur.done)return;const ok=b.dataset.o===G.cur.q.a;finishQ(ok,b)}
-function finishQ(ok,b,typed,st){if(G.cur.done)return;G.cur.done=true;const q=G.cur.q;hush();
+function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
+ /* סולם-רמזים: טעות ראשונה בשאלת-בחירה → אותה שאלה ב-2 אפשרויות */
+ if(!ok&&!G.cur.retry&&(q.kind==="opts"||!q.kind||q.kind==="lane"||q.kind==="row")&&q.opts&&q.opts.length>2){G.cur.done=true;hush();if(b)b.classList.add("wrong");tone(false);G.hints++;
+  const q2=Object.assign({},q);q2.opts=sh([q.opts.find(o=>o.v===q.a),q.opts.find(o=>o.v!==q.a&&(!b||o.v!==b.dataset.o))||q.opts.find(o=>o.v!==q.a)]);if(q2.kind==="lane")q2.kind="opts";q2._retry=1;
+  speak([pick(ENCOURAGE)]).then(()=>{if(view==="play"&&G.cur.q===q){G.retryQ=q2;ask()}});return}
+ /* טעות שנייה → ביצוע-מתקן: הנכון מהבהב והילדה לוחצת עליו */
+ if(!ok&&G.cur.retry===1&&!G.cur.corrective&&q.opts){G.cur.corrective=true;if(b)b.classList.add("wrong");tone(false);
+  app.querySelectorAll(".ans").forEach(x=>{if(x.dataset.o===q.a){x.classList.add("hintblink");x.disabled=false;x.onclick=()=>{x.classList.remove("hintblink");finishQ(false,null,null,null,true)}}else x.disabled=true});
+  speak(["לַחֲצִי עַל הַתְּשׁוּבָה הַנְּכוֹנָה"].concat(q.after||[]));return}
+ G.cur.done=true;hush();const hinted=arguments[4]||G.cur.retry>0;
  if(q.kind==="lane"){const f=app.querySelector(".fall");if(f){f.classList.add("paused")}}
  app.querySelectorAll(".ans").forEach(x=>{x.disabled=true;if(x.dataset.o===q.a)x.classList.add("right")});
  if(b&&!ok)b.classList.add("wrong");
  if(q.kind==="spell"){const sl=app.querySelector(".slots");sl.classList.add(ok?"right":"wrong");app.querySelectorAll(".tile").forEach(t=>t.disabled=true);
   if(!ok)sl.insertAdjacentHTML("afterend",`<div class="slots fix" dir="${q.dir}">${q.ans.map((c,k)=>`<span class="slot on ${q.dir==="ltr"?"wordslot":""} ${typed&&typed[k]!==c?"bad":""}">${c}</span>`).join("")}</div>`)}
- const change=record(q.sk,q.key,ok);G.res.push(ok?1:0);
+ const rt=Date.now()-G.cur.t0;const change=e2record(q.item.step,q.item.sub,ok,rt,hinted);record(q.sk,q.key,ok);G.res.push(ok?1:0);
  let gain=0;
  if(ok){G.combo++;G.wrongRow=0;gain=10+(G.combo>=3?5:0);S.xp+=gain;S.coins+=gain;G.gain+=gain;S.best=Math.max(S.best,G.combo);confetti(G.combo>=3?50:26);comboNote(G.combo-1);if(G.combo>=3)cheer();const hc=document.getElementById("hc");if(hc)flyTo(b||app.querySelector(".card"),hc,"👥+"+gain)}
  else{G.combo=0;G.wrongRow++;S.xp+=2;S.coins+=2;G.gain+=2;
-  if(G.retried<2&&G.list.length<CAP){G.retried++;G.list.splice(Math.min(G.i+3,G.list.length),0,q.sk)}
+  if(G.retried<2&&G.plan.length<CAP){G.retried++;G.plan.splice(Math.min(G.i+3,G.plan.length),0,Object.assign({},q.item))}
   if(G.wrongRow>=2){G.easy=true;G.wrongRow=0}}
- if(change==="up"){G.pendingUp=q.sk;G.ups.push(q.sk)}
+ if(change==="step"){G.pendingUp=q.item.step;G.ups.push(q.item.step)}else if(change==="pass"){toast("✨ "+STEPS[q.item.step].n+": עוד חלק נסגר!",1800);jingle("level")}else if(change==="down"){G.easy=true}
  if(!ok)tone(false);save();bumpCoins();
  const praise=pick(PRAISE);const enc=pick(ENCOURAGE);
- const last=G.i>=G.list.length-1&&!G.easy;
+ const last=G.i>=G.plan.length-1&&!G.easy;
  const ansHtml=q.opts?(q.opts.find(o=>o.v===q.a)||{}).html||q.a:q.a;const starsTxt=st?` ${"⭐".repeat(st)}`:"";
  document.getElementById("fb").innerHTML=ok
   ?`<div class="feedback good">${Math.random()<.5?avatarSvg(avDefaults(),"small"):TURTLE.replace('viewBox','width="54" height="46" viewBox')}<div><b>${PRAISE_SHOW[praise]||praise}${starsTxt} +${gain} 👥</b>${G.combo>=3?"רצף של "+G.combo+"! בונוס!":""}${q.info?"<br>"+q.info:""}</div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`
   :`<div class="feedback bad"><div><b>כמעט! התשובה: <span class="ans-mini">${ansHtml}</span></b>${q.info?"<br>"+q.info:""}<br><span class="muted">+2 👥 על הניסיון</span></div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`;
- const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;(G.i<G.list.length||G.easy)?ask():finish()};
+ const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;(G.i<G.plan.length||G.easy)?ask():finish()};
  const nx=document.getElementById("nx");const tAns=Date.now();
  nx.onclick=()=>{if(Date.now()-tAns<400)return;go()};
  const seq=ok?[praise].concat(q.after||[]):[enc].concat(q.after||[]);
  speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);advT=setTimeout(go,ok?500:1600)}});
  advT=setTimeout(go,ok?6000:9000);
  nx.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})}
-function levelUp(sk){view="up";const lv=lvOf(sk);confetti(120);
- app.innerHTML=`<div class="card end"><div class="sticker-new">🎉</div><h2>עלית לרמה ${lv} ב${SK[sk].n}!</h2>
- <p style="margin:0;font-size:1.15rem">${SK[sk].d}</p><p style="margin:0">מעכשיו יש משימות חדשות וקשות יותר 💪</p>
+function levelUp(step){view="up";confetti(50);jingle("win");cheer();const nxt=Object.keys(STEPS).filter(k=>STEPS[k].deps.indexOf(step)>=0&&stepOpen(k));
+ app.innerHTML=`<div class="card end"><div class="sticker-new">🏆</div><h2>סיימת את "${STEPS[step].n}"!</h2>
+ <p style="margin:0;font-size:1.15rem">${nxt.length?"נפתח: "+nxt.map(k=>STEPS[k].n).join(" · "):"כל הכבוד! ממשיכים הלאה"} 💪</p>
  <button class="big" id="go">יאללה, ממשיכים!</button></div>`;
  speak([SAY_LEVELUP]);app.querySelector("#go").onclick=()=>ask();scrollTo(0,0)}
 function bonus(){view="bonus";hush();const pool=sh(wordsBy(w=>w.w.length<=4)).slice(0,4);const L=sh(pool),Rr=sh(pool);let sel=null,done=0;
@@ -395,31 +384,32 @@ function bonus(){view="bonus";hush();const pool=sh(wordsBy(w=>w.w.length<=4)).sl
   if(b.dataset.p===sel){[lw,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done")});done++;S.coins+=5;S.xp+=5;G.gain+=5;bumpCoins();tone(true);confetti(20);sel=null;
    if(done===4){save();setTimeout(end,900)}}
   else{tone(false);b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400)}})}
-function finish(){if(!G.bonus){if(S.sessions.length%2===1)danceBreak();else bonus();return}view="end";hush();const right=G.res.reduce((a,b)=>a+b,0),tot=G.res.length,pct=tot?right/tot:0;
- const st=pct>=.85?3:pct>=.6?2:pct>=.5?1:0;const lv=G.lv;let firstClear=false;
- if(lv!=null){firstClear=!lvStars(lv)&&st>0;if(st>lvStars(lv))S.levels[lv]=st;if(firstClear){S.coins+=20;G.gain+=20}}
- S.sessions.push({d:Date.now(),r:right,t:tot,f:typeof G.focus==="string"?G.focus:""});
+function finish(){
+ if(!G.encore){G.encore=true;const okItems=G.plan.filter((it,k)=>G.res[k]===1&&it.role==="focus");if(okItems.length){const it=Object.assign({},pick(okItems),{role:"encore"});G.plan.push(it);toast("🎤 הדרן! עוד פעם אחת, אתן יודעות אותה",1800);ask();return}}
+ if(!G.bonus){if(S.sessions.length%2===1)danceBreak();else bonus();return}view="end";hush();const right=G.res.reduce((a,b)=>a+b,0),tot=G.res.length,pct=tot?right/tot:0;
+ const st=pct>=.85?3:pct>=.6?2:Math.max(1,pct>=.5?1:0);const lv=G.step;let firstClear=false;
+ if(lv!=null){firstClear=!S.levels[lv]&&st>0;if(st>(S.levels[lv]||0))S.levels[lv]=st;if(firstClear){S.coins+=20;G.gain+=20}}
+ S.sessions.push({d:Date.now(),r:right,t:tot,f:G.step||"",h:G.hints});
  let newSticker=null;const earned=Math.min(STICKERS.length,S.sessions.length);
  while(S.stickers.length<earned){newSticker=STICKERS[S.stickers.length];S.stickers.push(newSticker)}
  save();
- const by={};G.list.forEach((sk,k)=>{if(k>=G.res.length)return;(by[sk]=by[sk]||[]).push(G.res[k])});
- const good=Object.keys(by).filter(k=>by[k].every(x=>x)),work=Object.keys(by).filter(k=>by[k].some(x=>!x));
+ const by={};G.plan.forEach((it,k)=>{if(k>=G.res.length)return;(by[it.step]=by[it.step]||[]).push(G.res[k])});
+ const good=Object.keys(by).filter(k=>by[k].every(x=>x)),work=Object.keys(by).filter(k=>by[k].some(x=>!x));const NM=k=>STEPS[k].n;
  app.innerHTML=`<div class="card end">
   <div class="bigstars">${[0,1,2].map(i=>`<span style="color:${i<st?"var(--sun)":"#d9e3e7"}">★</span>`).join("")}</div>
-  ${lv!=null?`<span class="tag">שלב ${lv+1} · ${LEVELS[lv].t}</span>`:""}
-  <h2>${st===0?"כמעט! ננסה שוב 💪":lv===LEVELS.length-1&&firstClear?"עברת את המסע כולו! 🏆":firstClear?"שלב "+(lv+1)+" עבר! 🎉":st===3?"מושלם!":st===2?"כל הכבוד, "+KID()+"!":"עברת!"}</h2>
+  ${lv?`<span class="tag">${STEPS[lv].n}</span>`:`<span class="tag">הופעה</span>`}
+  <h2>${st===3?"מושלם! הקהל משתגע!":st===2?"כל הכבוד, "+KID()+"!":"עברת! הקהל מריע 👏"}</h2>
   ${firstClear?`<p style="margin:0">+20 👥 בונוס על הופעה חדשה</p>`:""}
   <p style="font-size:1.2rem;margin:0">${right} נכונות מתוך ${tot} · ${G.gain} מעריצים חדשים 👥</p>
-  ${G.ups.length?`<p style="margin:0">🎉 עלית רמה ב: ${G.ups.map(k=>SK[k].n).join(", ")}</p>`:""}
+  ${G.ups.length?`<p style="margin:0">🏆 סיימת: ${G.ups.map(k=>STEPS[k].n).join(", ")}</p>`:""}
   ${newSticker?`<div class="sticker-new">${newSticker}</div><p style="margin:0">קיבלת מדבקה חדשה לאוסף!</p>`:""}
-  ${good.length?`<div><p class="muted" style="margin:0 0 6px">הצלחת בגדול:</p><div class="chips">${good.map(k=>`<span class="chip g">${SK[k].n}</span>`).join("")}</div></div>`:""}
-  ${work.length?`<div><p class="muted" style="margin:0 0 6px">טיקי יחזק איתך בפעם הבאה:</p><div class="chips">${work.map(k=>`<span class="chip r">${SK[k].n}</span>`).join("")}</div></div>`:""}
-  ${lv!=null&&st>0&&lv<LEVELS.length-1?`<button class="big" id="next" style="margin-top:6px">לשלב ${lv+2} ←</button>`:""}
-  <button class="${lv!=null&&st>0&&lv<LEVELS.length-1?"back":"big"}" id="again" style="${lv!=null&&st>0?"align-self:center":"margin-top:6px"}">${st===0?"לנסות שוב":lv!=null?"לשחק שוב בשלב":"עוד אימון!"}</button>
+  ${good.length?`<div><p class="muted" style="margin:0 0 6px">הצלחת בגדול:</p><div class="chips">${good.map(k=>`<span class="chip g">${NM(k)}</span>`).join("")}</div></div>`:""}
+  ${work.length?`<div><p class="muted" style="margin:0 0 6px">טיקי יחזק איתך בפעם הבאה:</p><div class="chips">${work.map(k=>`<span class="chip r">${NM(k)}</span>`).join("")}</div></div>`:""}
+  <button class="big" id="again" style="margin-top:6px">עוד הופעה! 🎤</button>
   <button class="back" id="home" style="align-self:center">→ למפה</button></div>`;
  if(st>0){confetti(st===3||firstClear?50:40);jingle("win");cheer();speak([st===3?"מֻשְׁלָם! שְׁלוֹשָׁה כּוֹכָבִים!":st===2?"כָּל הַכָּבוֹד! שְׁנֵי כּוֹכָבִים!":"עָבַרְתְּ! כּוֹכָב אֶחָד!"].concat(newSticker?["וְקִבַּלְתְּ מַדְבֵּקָה חֲדָשָׁה!"]:[]))}
  else speak(["כִּמְעַט! בּוֹאִי נְנַסֶּה שׁוּב"]);
- app.querySelector("#again").onclick=()=>lv!=null?levelIntro(lv):start(G.focus);const nx=app.querySelector("#next");if(nx)nx.onclick=()=>levelIntro(lv+1);app.querySelector("#home").onclick=home;scrollTo(0,0)}
+ app.querySelector("#again").onclick=()=>start(null);app.querySelector("#home").onclick=home;scrollTo(0,0)}
 
 /* ---------- stickers ---------- */
 function collection(){view="col";hush();app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>המדבקות של ${KID()}</h2>
@@ -450,21 +440,20 @@ let confirmReset=false;
 function parentGate(){view="gate";hush();const a=rnd(3,9),b=rnd(2,9);
  app.innerHTML=`<div class="card end"><span class="tag">להורים</span><h2>כמה זה ${a} × ${b}?</h2><input type="text" id="g" inputmode="numeric" pattern="[0-9]*" style="font-size:1.6rem;text-align:center;max-width:160px" aria-label="תשובה"><button class="big" id="ok">כניסה</button><button class="back" id="h" style="align-self:center">→ למפה</button></div>`;
  const chk=()=>{if(+app.querySelector("#g").value===a*b)parents();else{toast("לא נכון 🙂",1200)}};app.querySelector("#ok").onclick=chk;app.querySelector("#g").onkeydown=e=>{if(e.key==="Enter")chk()};app.querySelector("#h").onclick=home;app.querySelector("#g").focus()}
-function parents(){view="par";hush();const rows=Object.keys(SK).map(k=>{const s=SK[k];const h=hist(k),m=mastery(k);
-  const items=Object.keys(S.items).filter(x=>x.indexOf(k+":")===0||x.indexOf(k)===0);
-  let c=0,w=0;Object.keys(S.items).forEach(key=>{if(keySk(key)===k){c+=S.items[key].c;w+=S.items[key].w}});
-  const lab=m===null?["#c3ced3","עוד לא תרגלה"]:m<.6?["var(--coral)","לחזק"]:m<.85?["var(--sun)","כמעט שם"]:["var(--leaf)","שולטת"];
-  return`<tr><td>${s.n}</td><td style="font-variant-numeric:tabular-nums">${lvOf(k)}/${s.max}</td><td><span class="lvl-dot" style="background:${lab[0]}"></span>${lab[1]}</td><td style="font-variant-numeric:tabular-nums">${c+w?Math.round(c/(c+w)*100)+"%":"–"}</td><td style="font-variant-numeric:tabular-nums">${c+w}</td></tr>`}).join("");
- const hard=Object.keys(S.items).filter(k=>S.items[k].w>0).sort((a,b)=>S.items[b].w-S.items[a].w).slice(0,10).map(k=>`<span class="chip r">${esc(k.split(":").slice(1).join(" "))}</span>`).join("");
- const days=new Set(S.sessions.map(s=>new Date(s.d).toDateString())).size;
+function parents(){view="par";hush();const L=parentLists();const days=new Set(S.sessions.map(s=>new Date(s.d).toDateString())).size;
+ const rows=Object.keys(STEPS).map(k=>{const T=STEPS[k];const p=stepProgress(k);const open=stepOpen(k);const subs=subKeys(k);let n=0,c=0,hint=0,rts=[];subs.forEach(sb=>{const st=subState(k,sb);n+=st.n;c+=st.h.reduce((a,b)=>a+b,0)+(st.box?0:0);hint+=st.nh;rts=rts.concat(st.rt)});rts.sort((a,b)=>a-b);const med=rts.length?Math.round(rts[Math.floor(rts.length/2)]/100)/10:0;
+  const lab=stepPassed(k)?["var(--leaf)","עברה"]:!open?["#c3ced3","נעול"]:p>0?["var(--sun)","בתהליך"]:n?["var(--coral)","לומדת"]:["#c3ced3","טרם"];
+  return`<tr><td>${DOMAIN_NAME[T.d]}</td><td>${T.n}</td><td><span class="lvl-dot" style="background:${lab[0]}"></span>${lab[1]}</td><td style="font-variant-numeric:tabular-nums">${Math.round(p*100)}%</td><td style="font-variant-numeric:tabular-nums">${n}</td><td style="font-variant-numeric:tabular-nums">${med?med+" ש'":"–"}</td></tr>`}).join("");
+ const lst=(arr,cls)=>arr.length?`<div class="chips" style="justify-content:flex-start">${arr.slice(0,24).map(x=>`<span class="chip ${cls}">${x}</span>`).join("")}${arr.length>24?`<span class="muted">+${arr.length-24}</span>`:""}</div>`:`<p class="muted">עדיין אין.</p>`;
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>פינת הורים</h2>
- <p>${S.sessions.length} הרפתקאות ב-${days} ימים · ${S.q} משימות נענו. הרמה בכל אי עולה אוטומטית אחרי 8 מתוך 10 נכונות, ויורדת אחרי רצף של טעויות.</p>
- <div class="tbl"><table><tr><th>במה</th><th>רמה</th><th>מצב</th><th>הצלחה</th><th>משימות</th></tr>${rows}</table></div>
- ${hard?`<h3>פריטים שהיו קשים</h3><div class="chips" style="justify-content:flex-start">${hard}</div>`:""}
- <h3>מה יש בכל במה</h3>
- <ul class="skl">${Object.keys(SK).map(k=>`<li><b>${SK[k].n}</b> — ${SK[k].d}</li>`).join("")}</ul>
+ <p>${S.sessions.length} הופעות ב-${days} ימים · ${S.q} משימות. שלב נסגר כשכל חלקיו עברו (4 ברצף או 8 מתוך 10, בשני ימים שונים) ושורד בדיקות-שימור אחרי 1, 3, 7, 14 ו-30 יום.</p>
+ <h3>✅ יודעת (שרד ≥7 ימים)</h3>${lst(L.know,"g")}
+ <h3>📚 לומדת עכשיו</h3>${lst(L.now,"")}
+ <h3>🤝 כדאי לעשות יחד (נתקע)</h3>${lst(L.stuck,"r")}
+ <h3>כל השלבים</h3>
+ <div class="tbl"><table><tr><th>תחום</th><th>שלב</th><th>מצב</th><th>התקדמות</th><th>משימות</th><th>זמן חציוני</th></tr>${rows}</table></div>
  <h3>התקנה על המכשיר 📲</h3>
- <p>ב-Safari: לוחצים על כפתור השיתוף ⬆️ ואז ״הוסף למסך הבית״. האפליקציה תיפתח במסך מלא ותעבוד גם בלי אינטרנט אחרי הפעם הראשונה.</p>
+ <p>ב-Safari: שיתוף ⬆️ ואז ״הוסף למסך הבית״. אחרי הפעם הראשונה עובד גם בלי אינטרנט.</p>
  <h3>הגדרות</h3>
  <div class="form2"><input type="text" id="nm" value="${esc(S.name)}" placeholder="שם הילדה" maxlength="20" aria-label="שם"><button class="btn" id="svn">שמירת שם</button></div>
  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn light" id="snd">צלילי משחק: ${S.sound?"פועלים":"כבויים"}</button>
@@ -557,4 +546,4 @@ const GEN2={
  abc(lv){if(lv<5||Math.random()<.4)return null;const U="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");const i=rnd(0,24);const a=U[i+1];
   return{sk:"abc",key:"abcafter:"+U[i],tag:"סדר האלפבית",p:`${PROMPTS.abcAfter} <span class="en-big">${U[i]}</span>?`,say:[PROMPTS.abcAfter,{en:U[i]}],opts:sh([a].concat(others(U,[a,U[i]],3))).map(x=>opt(x,`<span class="en-big">${x}</span>`,"en")),a:a,after:[{en:U[i]},{en:a}]}}
 };
-Object.keys(GEN2).forEach(k=>{const orig=GEN[k];GEN[k]=lv=>GEN2[k](lv)||orig(Math.min(lv,4))});
+Object.keys(GEN2).forEach(k=>{const orig=GEN[k];GEN[k]=(lv,focus)=>GEN2[k](lv)||orig(Math.min(lv,4),focus)});
