@@ -405,3 +405,27 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .bead.good{box-shadow:0 0 0 5px var(--ok)}.bead.demo{animation:popin .3s var(--spring)}
 .row-btns .clapbtn{flex:2;padding:8px}.clapbtn img.pic{width:70px;height:70px}
 .clapbtn.bump{animation:bump .18s}@keyframes bump{50%{transform:scale(.88)}}
+/* 0.9.3 — מסך נמוך (אייפון 7 פלוס כאפליקציה: ~716px). הכל במסך אחד בלי גלילה */
+.answers.n5,.answers.n6{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card.play .answers.n5 .ans,.card.play .answers.n6 .ans{min-height:92px}
+.card.play .answers.n5 .ans.pic img.pic,.card.play .answers.n6 .ans.pic img.pic{width:64px;height:64px}
+@media (max-height:800px) and (max-width:699px){
+ .card{gap:8px}.card.play{padding:10px 12px 10px}
+ .card.play .pz{gap:6px;min-height:0}
+ .avatar.sing{width:72px;height:94px}.listen .note{font-size:1.1rem}
+ .ear{min-height:46px;padding:6px 18px;font-size:1rem}
+ .card.play .prompt{font-size:1.4rem;line-height:1.45}
+ .card.play .he-big{font-size:4rem;line-height:1.25}.card.play .he-word.big{font-size:3rem;line-height:1.35}
+ .card.play .emo{font-size:4.4rem}.card.play .num-big,.card.play .eq{font-size:2.6rem}
+ .card.play .answers{gap:10px}
+ .card.play .answers .ans{min-height:96px}.card.play .answers .ans.pic{min-height:104px}
+ .card.play .ans.pic img.pic{width:72px;height:72px}
+ .card.play .row-opts .ans{min-height:96px}
+ .card.play .draw-wrap{max-width:min(420px,calc(100vh - 450px));min-width:220px}
+ .card.play .count{font-size:2.2rem}
+}
+.card.play .answers.one .ans.wide{min-height:58px}
+@media (max-height:800px) and (max-width:699px){.card.play .draw-wrap{max-width:min(420px,calc(100vh - 478px))}}
+@media (max-height:800px) and (max-width:699px){.card.play .answers.three .ans.grp .count{font-size:1.3rem;gap:1px}.card.play .answers .ans.grp{min-height:96px;padding:6px}}
+.card.play .answers.n5 .ans,.card.play .answers.n6 .ans{font-size:1.7rem;white-space:nowrap;padding-left:4px;padding-right:4px}
+@media (min-width:700px){.card.play .draw-wrap{max-width:min(460px,calc(100vh - 600px));min-width:300px}}

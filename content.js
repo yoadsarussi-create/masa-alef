@@ -119,11 +119,19 @@ const EN_CONFUSE={b:"dpq",d:"bpq",p:"qbd",q:"pdb",m:"nw",n:"mh",u:"nv",v:"uw",i:
 /* פוניקס: אות → מילה שמתחילה בצליל שלה */
 const PHONICS={b:"ball",c:"cat",d:"dog",e:"egg",f:"fish",g:"gift",h:"hat",k:"key",l:"lion",m:"milk",n:"nose",p:"pig",r:"rabbit",s:"sun",t:"tree",w:"water"};
 /* משפטים: תבנית + תמונה. {x}=מילה מהרשימה */
+/* משפטים באנגלית — רשימה סגורה (לא תבניות): כל משפט נכון דקדוקית, הגיוני לילדה, ומוקלט בקול הורה (אין TTS).
+   x = מילת-התמונה ב-EN, c = צבע, sz = גודל. */
 const SENT=[
- {t:"I see a {x}",pool:"animal",lvl:1},{t:"This is a {x}",pool:"thing",lvl:1},{t:"I have a {x}",pool:"thing",lvl:1},{t:"I like {x}",pool:"food",lvl:1},
- {t:"The {x} is {c}",pool:"colorable",lvl:2},{t:"The {x} is {sz}",pool:"animal",lvl:2},{t:"I eat {x}",pool:"food",lvl:2},{t:"I love my {x}",pool:"family",lvl:2},
- {t:"I see a {sz} {x}",pool:"animal",lvl:3},{t:"The {x} is on the bed",pool:"animal",lvl:3},{t:"My {x} is {c}",pool:"colorable",lvl:3},{t:"I like to eat {x}",pool:"food",lvl:3},
- {t:"The {sz} {x} is {c}",pool:"colorable",lvl:4},{t:"I see two {x}s",pool:"animal",lvl:4},{t:"Mom has a {c} {x}",pool:"colorable",lvl:4}];
+ {t:"I see a cat",x:"cat",lvl:1},{t:"I see a dog",x:"dog",lvl:1},{t:"I see a fish",x:"fish",lvl:1},{t:"I see a bird",x:"bird",lvl:1},{t:"I see a duck",x:"duck",lvl:1},
+ {t:"This is a ball",x:"ball",lvl:1},{t:"This is a car",x:"car",lvl:1},{t:"This is a book",x:"book",lvl:1},{t:"This is a tree",x:"tree",lvl:1},
+ {t:"I have a hat",x:"hat",lvl:1},{t:"I have a bag",x:"bag",lvl:1},{t:"I like pizza",x:"pizza",lvl:1},{t:"I like cake",x:"cake",lvl:1},{t:"I like ice cream",x:"ice cream",lvl:1},
+ {t:"The ball is red",x:"ball",c:"red",lvl:2},{t:"The car is blue",x:"car",c:"blue",lvl:2},{t:"The hat is green",x:"hat",c:"green",lvl:2},{t:"The flower is yellow",x:"flower",c:"yellow",lvl:2},
+ {t:"The lion is big",x:"lion",sz:"big",lvl:2},{t:"The mouse is small",x:"mouse",sz:"small",lvl:2},{t:"The elephant is big",x:"elephant",sz:"big",lvl:2},
+ {t:"I eat an apple",x:"apple",lvl:2},{t:"I eat a banana",x:"banana",lvl:2},{t:"I eat bread",x:"bread",lvl:2},{t:"I love my mom",x:"mom",lvl:2},{t:"I love my dad",x:"dad",lvl:2},{t:"I love my grandma",x:"grandma",lvl:2},
+ {t:"I see a big dog",x:"dog",sz:"big",lvl:3},{t:"I see a small cat",x:"cat",sz:"small",lvl:3},{t:"I see a big bear",x:"bear",sz:"big",lvl:3},
+ {t:"The cat is on the bed",x:"cat",lvl:3},{t:"The dog is on the bed",x:"dog",lvl:3},{t:"My bag is blue",x:"bag",c:"blue",lvl:3},{t:"My ball is green",x:"ball",c:"green",lvl:3},{t:"I like to eat pizza",x:"pizza",lvl:3},{t:"I like to eat cake",x:"cake",lvl:3},
+ {t:"The big ball is red",x:"ball",sz:"big",c:"red",lvl:4},{t:"The small car is blue",x:"car",sz:"small",c:"blue",lvl:4},{t:"I see two cats",x:"cat",lvl:4},{t:"I see two fish",x:"fish",lvl:4},{t:"I see two sheep",x:"sheep",lvl:4},
+ {t:"Mom has a red hat",x:"hat",c:"red",lvl:4},{t:"Mom has a pink balloon",x:"balloon",c:"pink",lvl:4}];
 const COLORABLE=["ball","car","hat","house","flower","book","bag","balloon","shoe","chair","door","boat"];
 const SIZES=[["big","גדול"],["small","קטן"]];
 
