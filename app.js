@@ -493,10 +493,22 @@ function parents(){view="par";hush();const L=parentLists();const days=new Set(S.
  const rows=Object.keys(STEPS).map(k=>{const T=STEPS[k];const p=stepProgress(k);const open=stepOpen(k);const subs=subKeys(k);let n=0,c=0,hint=0,rts=[];subs.forEach(sb=>{const st=subState(k,sb);n+=st.n;c+=st.h.reduce((a,b)=>a+b,0)+(st.box?0:0);hint+=st.nh;rts=rts.concat(st.rt)});rts.sort((a,b)=>a-b);const med=rts.length?Math.round(rts[Math.floor(rts.length/2)]/100)/10:0;
   const lab=stepPassed(k)?["var(--leaf)","עברה"]:!open?["#c3ced3","נעול"]:p>0?["var(--sun)","בתהליך"]:n?["var(--coral)","לומדת"]:["#c3ced3","טרם"];
   return`<tr><td>${DOMAIN_NAME[T.d]}</td><td>${T.n}</td><td><span class="lvl-dot" style="background:${lab[0]}"></span>${lab[1]}</td><td style="font-variant-numeric:tabular-nums">${Math.round(p*100)}%</td><td style="font-variant-numeric:tabular-nums">${n}</td><td style="font-variant-numeric:tabular-nums">${med?med+" ש'":"–"}</td></tr>`}).join("");
+ const T_=k=>STEPS[k].n;
+ /* ציון ממוצע לכל נושא, ומתחתיו פירוט לתתי-נושאים (יועד 07/11). ציון = אחוז הצלחה בתשובות האחרונות (בלי רמזים) */
+ const subScore=(k,sb)=>{const st=subState(k,sb);if(!st.n)return null;if(st.h.length)return Math.round(st.h.reduce((a,b)=>a+b,0)/st.h.length*100);return st.box>=1?100:null};
+ const avg=a=>{const v=a.filter(x=>x!=null);return v.length?Math.round(v.reduce((x,y)=>x+y,0)/v.length):null};
+ const scol=v=>v==null?"#c3ced3":v>=85?"var(--leaf)":v>=60?"var(--sun)":"var(--coral)";
+ const domCards=[["he","📖 עברית"],["ma","🔢 חשבון"],["en","🔤 אנגלית"]].map(([d,nm])=>{
+  const steps=Object.keys(STEPS).filter(k=>STEPS[k].d===d).map(k=>{const subs=subKeys(k);const sc=subs.map(sb=>subScore(k,sb));const v=avg(sc);
+   const per=/^[LE]./.test(subs[0])&&sc.some(x=>x!=null)?`<div class="chips sub-chips">${subs.map((sb,i)=>sc[i]==null?"":`<span class="chip" style="border-color:${scol(sc[i])};box-shadow:inset 0 -4px 0 ${scol(sc[i])}">${sb.slice(1)} · ${sc[i]}</span>`).join("")}</div>`:"";
+   return{v,html:`<div class="srow"><span>${T_(k)}</span><b class="sv" style="background:${scol(v)}">${v}</b></div>${per}`}}).filter(r=>r.v!=null);
+  const dv=avg(steps.map(r=>r.v));
+  return`<details class="dom"><summary><span class="dn">${nm}</span><span class="muted">${steps.length?steps.length+" תתי-נושאים · לחצו לפירוט":"עוד לא תרגלה"}</span><b class="dscore" style="background:${scol(dv)}">${dv==null?"–":dv}</b></summary>${steps.map(r=>r.html).join("")}</details>`}).join("");
  const lst=(arr,cls)=>arr.length?`<div class="chips" style="justify-content:flex-start">${arr.slice(0,24).map(x=>`<span class="chip ${cls}">${x}</span>`).join("")}${arr.length>24?`<span class="muted">+${arr.length-24}</span>`:""}</div>`:`<p class="muted">עדיין אין.</p>`;
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>פינת הורים</h2>
  <p>${S.sessions.length} הופעות ב-${days} ימים · ${S.q} משימות.</p>
  <p class="muted">שלב נסגר כשכל חלקיו עברו: 4 נכונות ברצף או 8 מתוך 10, בשני ימים שונים. אחר-כך הוא נבדק שוב אחרי יום, 3 ימים, שבוע, שבועיים וחודש.</p>
+ <h3>📊 ציון לפי נושא</h3><div class="doms">${domCards}</div>
  <h3>✅ יודעת (נזכרה גם אחרי שבוע)</h3>${lst(L.know,"g")}
  <h3>📚 לומדת עכשיו</h3>${lst(L.now,"")}
  <h3>🤝 כדאי לעשות יחד (נתקע)</h3>${lst(L.stuck,"r")}

@@ -429,3 +429,13 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 @media (max-height:800px) and (max-width:699px){.card.play .answers.three .ans.grp .count{font-size:1.3rem;gap:1px}.card.play .answers .ans.grp{min-height:96px;padding:6px}}
 .card.play .answers.n5 .ans,.card.play .answers.n6 .ans{font-size:1.7rem;white-space:nowrap;padding-left:4px;padding-right:4px}
 @media (min-width:700px){.card.play .draw-wrap{max-width:min(460px,calc(100vh - 600px));min-width:300px}}
+/* פינת הורים — ציון לפי נושא */
+.doms{display:flex;flex-direction:column;gap:10px}
+details.dom{background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:16px;padding:10px 12px}
+details.dom summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;font-weight:700}
+details.dom summary::-webkit-details-marker{display:none}
+details.dom .dn{font-size:1.2rem}details.dom summary .muted{flex:1;font-size:.85rem;font-weight:500}
+.dscore{min-width:56px;text-align:center;border:3px solid var(--ink);border-radius:12px;padding:4px 8px;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;border-top:1px dashed #0002;margin-top:6px}
+.sv{min-width:42px;text-align:center;border:2px solid var(--ink);border-radius:9px;padding:1px 6px;font-variant-numeric:tabular-nums}
+.sub-chips{justify-content:flex-start;margin:4px 0 2px}.sub-chips .chip{font-size:.9rem;border-width:2px}
