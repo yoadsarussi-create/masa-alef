@@ -321,9 +321,9 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  <div class="card play">
   <div class="row-tag"><span class="tag">${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
   ${easy?`<div class="feedback good" style="padding:8px 12px">זה בסדר! גם טיקי טועה לפעמים. הנה אחת קלה 💪</div>`:G.cur.retry?`<div class="feedback good" style="padding:8px 12px">עוד ניסיון — הקשיבי שוב 👂</div>`:""}
-  <div class="pz">${(q.kind==="trace"||q.kind==="dots"||/class="(emo|he-word|en-word|he-big|en-big|num-big|num-seq|eq|count|calc-pic|pattern|shape|scene|clock|he-seq)/.test(q.p))?"":`<div class="listen">${avatarSvg(avDefaults(),"sing")}<span class="note n1">🎵</span><span class="note n2">🎶</span></div>`}<div class="prompt">${q.p}</div>
+  <div class="pz">${(q.kind==="trace"||q.kind==="dots"||(typeof KINDS!=="undefined"&&KINDS[q.kind])||/class="(emo|he-word|en-word|he-big|en-big|num-big|num-seq|eq|count|calc-pic|pattern|shape|scene|clock|he-seq)/.test(q.p))?"":`<div class="listen">${avatarSvg(avDefaults(),"sing")}<span class="note n1">🎵</span><span class="note n2">🎶</span></div>`}<div class="prompt">${q.p}</div>
   <button class="ear" id="ear">🔊 עוד פעם</button></div>
-  ${q.kind==="spell"?`<div class="slots" dir="${q.dir}">${q.ans.map((_,k)=>`<button class="slot ${q.dir==="ltr"?"wordslot":""}" data-k="${k}" aria-label="מקום ${k+1}"></button>`).join("")}</div>
+  ${(typeof KINDS!=="undefined"&&KINDS[q.kind])?KINDS[q.kind].html(q):q.kind==="spell"?`<div class="slots" dir="${q.dir}">${q.ans.map((_,k)=>`<button class="slot ${q.dir==="ltr"?"wordslot":""}" data-k="${k}" aria-label="מקום ${k+1}"></button>`).join("")}</div>
      <div class="tiles" dir="${q.dir}">${q.tiles.map((c,k)=>`<button class="tile ${q.dir==="ltr"?"wordtile":""}" data-t="${k}">${c}</button>`).join("")}</div>`
   :q.kind==="row"?`<div class="row-opts" dir="ltr">${q.opts.map(optHtml).join("")}</div>`
   :q.kind==="lane"?`<div class="lane-wrap" id="lane"><div class="lines"></div><div class="hit"></div><span class="lane-note" style="left:12%">🎵</span><span class="lane-note" style="left:70%;animation-delay:1.2s">🎶</span><div class="fall" style="--dur:${lv===2?6:lv===3?5:4.2}s">${sh(q.opts).map(optHtml).join("")}</div></div>`
@@ -335,11 +335,12 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  app.querySelector("#ear").onclick=()=>speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)});
  app.querySelectorAll(".ans").forEach(b=>b.onclick=()=>answer(b));
  if(q.kind==="spell")setupSpell(q);
+ if(typeof KINDS!=="undefined"&&KINDS[q.kind])KINDS[q.kind].setup(q);
  if(q.kind==="lane"){const f=app.querySelector(".fall");let loops=0;f.addEventListener("animationend",()=>{if(G.cur.done)return;loops++;if(loops===1){f.style.animation="none";void f.offsetWidth;f.style.animation="";speak(q.say)}else{f.classList.add("paused");f.style.transform="translateY(200px)";f.style.animation="none"}})}
  if(q.kind==="trace"){const wrap=app.querySelector("#draw");const fn=(typeof STROKES!=="undefined"&&STROKES[q.glyph])?setupTraceStrokes:setupTrace;const t=fn(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
  if(q.kind==="dots"){setupDots(q,app.querySelector("#draw"),(ok,st)=>{finishQ(true,null,null,st)})}
  scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150);
- if(q.say&&q.say[0]&&!AUDIO[clipKey(q.say[0])]){const area=app.querySelector(".answers,.row-opts,.lane-wrap,.tiles,.draw-wrap");if(area){const h=document.createElement("div");h.className="hand-hint";h.textContent="👆";area.style.position="relative";area.appendChild(h);setTimeout(()=>h.remove(),3600)}}
+ if(q.say&&q.say[0]&&!AUDIO[clipKey(q.say[0])]){const area=app.querySelector(".answers,.row-opts,.lane-wrap,.tiles,.draw-wrap,.multi-grid,.palette,.row-btns");if(area){const h=document.createElement("div");h.className="hand-hint";h.textContent="👆";area.style.position="relative";area.appendChild(h);setTimeout(()=>h.remove(),3600)}}
  clearTimeout(attractT);attractT=setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q&&!G.cur.done){const e=app.querySelector("#ear");if(e)e.classList.add("attract");speak(q.say)}},9000)}
 let attractT=null;
 async function playOptions(q){const tok=seqToken;const els=Array.prototype.slice.call(app.querySelectorAll(".ans"));

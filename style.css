@@ -333,3 +333,36 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .hand-hint{position:absolute;left:50%;top:40%;font-size:3.4rem;pointer-events:none;z-index:5;animation:handhint 1.2s ease-in-out 3;filter:drop-shadow(0 3px 0 #0004)}
 @keyframes handhint{0%{transform:translate(60px,30px)}35%{transform:translate(0,0) scale(.85)}50%{transform:translate(0,0) scale(1)}100%{transform:translate(-60px,30px)}}
 .answers .ans.grp{min-height:130px}
+/* games2 */
+.multi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.multi-grid.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.mcell{background:var(--card);border:var(--ol) solid var(--ink);border-radius:18px;min-height:78px;box-shadow:0 5px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-size:2rem;padding:4px}
+.mcell .he-big{font-size:2.6rem}.mcell .num-big{font-size:2.4rem}
+.mcell img.pic{width:54px;height:54px}
+.mcell.picked{background:#dcfce7;border-color:var(--ok);box-shadow:0 5px 0 var(--ok-d);animation:squash .4s var(--spring)}
+.mcell.picked::after{content:"✓";position:absolute;margin:-48px -48px 0 0;color:var(--ok-d);font-weight:900}
+.box{min-height:110px;background:#fff;border:var(--ol) dashed var(--ink);border-radius:20px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;padding:10px;font-size:2.2rem}
+.box.ref{border-style:solid;background:var(--cream)}
+.box img.pic{width:44px;height:44px}
+.pop-in{animation:popin .35s var(--spring)}
+.row-btns{display:flex;gap:10px;align-items:stretch}
+.row-btns .addbtn{flex:1;font-size:1.5rem}.row-btns .big{width:auto;flex:2}.row-btns .next{flex:1.4;font-size:1.2rem}
+.row-btns img.pic{width:36px;height:36px;vertical-align:middle}
+.paint-wrap{display:flex;justify-content:center}
+.paint-svg{width:100%;max-width:min(380px,calc(100vh - 380px));min-width:240px;background:#fff;border-radius:20px;border:var(--ol) solid var(--ink)}
+.paint-svg .rg{cursor:pointer;transition:fill .25s}
+.blinkt{animation:blink .6s ease-in-out 3}
+.palette{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.sw2{width:64px;height:64px;border-radius:50%;background:var(--c);border:var(--ol) solid var(--ink);box-shadow:0 4px 0 var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-shadow:0 1px 2px #0008;font-size:1.4rem}
+.sw2 small{font-size:.7rem;line-height:1}
+.sw2.on{transform:scale(1.15);box-shadow:0 0 0 5px var(--sun),0 4px 0 var(--ink)}
+.he-word.plain{font-size:2rem;color:var(--ink)}
+.card.play .paint-svg{max-width:min(380px,calc(100vh - 330px))}
+.card.play .pz:has(+ .multi-grid),.card.play .pz{min-height:0}
+.sw2{width:50px;height:50px;font-size:1.2rem;box-shadow:0 3px 0 var(--ink)}
+.palette{gap:6px}
+.card.play .paint-svg{max-width:min(360px,calc(100vh - 360px))}
+.mcell{min-height:70px;overflow:hidden}
+.mcell .he-big{font-size:2.1rem;line-height:1.3}
+.multi-grid.five .mcell .num-big{font-size:2rem}
+@media (min-width:700px){.sw2{width:70px;height:70px;font-size:1.6rem}.mcell{min-height:110px}.mcell .he-big{font-size:3.2rem}.mcell img.pic{width:80px;height:80px}}

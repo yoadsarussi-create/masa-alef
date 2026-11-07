@@ -85,7 +85,7 @@ function dueSubs(){const out=[];Object.keys(STEPS).forEach(step=>subKeys(step).f
 function passedSubs(){const out=[];Object.keys(STEPS).forEach(step=>subKeys(step).forEach(sub=>{if(subPassed(step,sub))out.push({step,sub})}));return out}
 function genFor(step,sub){const g=STEPS[step].gens;const st=subState(step,sub);
  /* תת-מיומנויות של אותיות: מחולל ממוקד על האות */
- if(/^L./.test(sub)){const L=sub.slice(1);const r=Math.random();const sk=r<.4?"let":r<.8?"sound":"write";return{sk:sk,lv:st.n<6?1:2,focus:L}}
+ if(/^L./.test(sub)){const L=sub.slice(1);const r=Math.random();const sk=r<.35?"let":r<.7?"sound":r<.85?"write":"mark";return{sk:sk,lv:st.n<6?1:2,focus:L}}
  if(/^E[A-Z]$/.test(sub))return{sk:"abc",lv:st.n<6?1:2,focus:sub.slice(1)};
  const pick1=g[Math.min(g.length-1,Math.floor(Math.random()*g.length))];return{sk:pick1[0],lv:pick1[1]}}
 function interleave(items){const out=[];let rest=items.slice();while(rest.length){const prev=out[out.length-1];let k=rest.findIndex(x=>!prev||x.step!==prev.step);if(k<0)k=0;out.push(rest.splice(k,1)[0])}return out}
