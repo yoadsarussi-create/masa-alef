@@ -1,0 +1,72 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מוקאפ — על הבמה v1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@500;700;900&family=Fredoka:wght@500;700&family=Andika:wght@700&display=swap">
+<style>
+:root{--bg:#2B1B5A;--bg2:#1A1140;--sun:#FFD93D;--pink:#FF5C8A;--teal:#2ED8C3;--orange:#FF9F43;--ink:#1E1B3A;--card:#FFFFFF;--cream:#FFF8E7;--ok:#22C55E;--spring:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#3a2577 0,var(--bg) 45%,var(--bg2) 100%);color:#fff;font-family:Fredoka,"Varela Round",sans-serif;font-size:18px;padding:14px;-webkit-user-select:none}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;align-items:center;gap:8px}.top h1{font-size:1.4rem;margin:0;flex:1}
+.pill{background:#ffffff1f;border:3px solid #ffffff33;border-radius:999px;padding:6px 12px;font-weight:700;display:flex;gap:6px;align-items:center}
+.btn{font:inherit;color:var(--ink);background:var(--sun);border:4px solid var(--ink);border-radius:20px;padding:14px 20px;font-weight:700;font-size:1.25rem;box-shadow:0 6px 0 var(--ink);cursor:pointer;transition:transform .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.btn.pink{background:var(--pink);color:#fff}.btn.teal{background:var(--teal)}
+.card{background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:24px;padding:16px;box-shadow:0 8px 0 var(--ink);display:flex;flex-direction:column;gap:12px}
+.tag{align-self:flex-start;background:var(--ink);color:#fff;border-radius:999px;padding:4px 14px;font-size:.95rem}
+.prompt{font-family:"Noto Sans Hebrew",sans-serif;font-weight:700;font-size:1.5rem;text-align:center;line-height:1.7}
+.glyph{font-family:"Noto Sans Hebrew",sans-serif;font-weight:900;font-size:7rem;line-height:1.1;text-align:center;color:var(--ink)}
+.nik{font-family:"Noto Sans Hebrew",sans-serif;font-weight:700;font-size:2.2rem;line-height:1.8;text-align:center}
+.ans{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.opt{background:#fff;border:4px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink);padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .15s var(--spring)}
+.opt img{width:72px;height:72px}.opt:active{transform:scale(.94) translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.opt.ok{background:#dcfce7;border-color:var(--ok);box-shadow:0 6px 0 var(--ok)}
+.opt.no{border-color:var(--orange);box-shadow:0 6px 0 var(--orange);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.ear{align-self:center;background:var(--teal);color:var(--ink);border:4px solid var(--ink);border-radius:999px;padding:10px 22px;font-weight:700;box-shadow:0 5px 0 var(--ink);font-size:1.1rem}
+.stage{display:flex;align-items:flex-end;gap:10px;justify-content:center;background:linear-gradient(180deg,#ffffff00,#ffffff14);border-radius:24px;padding:10px 10px 0;position:relative;overflow:hidden}
+.crowd{position:absolute;left:0;right:0;bottom:0;height:34px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='34'><circle cx='10' cy='12' r='7' fill='%231E1B3A'/><rect x='3' y='19' width='14' height='15' rx='5' fill='%231E1B3A'/><circle cx='30' cy='16' r='7' fill='%231E1B3A' opacity='.7'/><rect x='23' y='23' width='14' height='11' rx='5' fill='%231E1B3A' opacity='.7'/></svg>") repeat-x bottom}
+.singer{width:150px;height:200px}
+.part{transform-box:fill-box;transform-origin:50% 100%}
+.bob{animation:bob 2.4s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-5px)}}
+.eyes{animation:blink 4s steps(1) infinite;transform-origin:50% 50%}@keyframes blink{0%,92%,100%{transform:scaleY(1)}94%,98%{transform:scaleY(.08)}}
+.armR{transform-origin:10% 10%;animation:wave 1.6s ease-in-out infinite}@keyframes wave{50%{transform:rotate(-28deg)}}
+.hair{animation:hair 2.4s ease-in-out infinite;transform-origin:50% 0}@keyframes hair{50%{transform:rotate(3deg)}}
+.turtle{width:110px;height:92px;animation:drum .5s ease-in-out infinite alternate}@keyframes drum{to{transform:rotate(4deg) translateY(-3px)}}
+.row{display:flex;gap:10px;flex-wrap:wrap}.sw{width:46px;height:46px;border-radius:12px;border:4px solid var(--ink);box-shadow:0 4px 0 var(--ink)}
+.hall{background:#ffffff14;border:3px solid #ffffff33;border-radius:20px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.hall .meter{flex:1;height:16px;background:#0006;border-radius:99px;overflow:hidden;border:2px solid #ffffff44}.hall .meter i{display:block;width:62%;height:100%;background:linear-gradient(90deg,var(--teal),var(--sun))}
+small{opacity:.8}
+</style></head><body><div class="app">
+<div class="top"><h1>🎤 אגם על הבמה</h1><span class="pill">🎵 24</span><span class="pill">⭐ 7</span><span class="pill">👥 180</span></div>
+<div class="stage"><svg class="singer" viewBox="0 0 100 130">
+ <g class="part bob">
+  <g class="hair"><path d="M30 40 Q18 60 26 92 Q34 96 40 90 Q30 70 36 46Z" fill="#5a3b1e" stroke="#1E1B3A" stroke-width="3"/></g>
+  <path d="M34 72 L26 118 L74 118 L66 72Z" fill="#FF5C8A" stroke="#1E1B3A" stroke-width="4" stroke-linejoin="round"/>
+  <text x="42" y="98" font-size="10">⭐</text><text x="56" y="108" font-size="10">⭐</text>
+  <rect x="38" y="116" width="8" height="10" rx="3" fill="#f6d3b8" stroke="#1E1B3A" stroke-width="3"/><rect x="54" y="116" width="8" height="10" rx="3" fill="#f6d3b8" stroke="#1E1B3A" stroke-width="3"/>
+  <path d="M34 76 L22 98" stroke="#1E1B3A" stroke-width="11" stroke-linecap="round"/><path d="M34 76 L22 98" stroke="#f6d3b8" stroke-width="6" stroke-linecap="round"/>
+  <g class="armR"><path d="M66 76 L80 60" stroke="#1E1B3A" stroke-width="11" stroke-linecap="round"/><path d="M66 76 L80 60" stroke="#f6d3b8" stroke-width="6" stroke-linecap="round"/><circle cx="84" cy="54" r="7" fill="#2ED8C3" stroke="#1E1B3A" stroke-width="3"/><rect x="82" y="60" width="4" height="10" fill="#1E1B3A"/></g>
+  <circle cx="50" cy="46" r="23" fill="#f6d3b8" stroke="#1E1B3A" stroke-width="4"/>
+  <path d="M27 44 Q30 20 50 20 Q70 20 73 44 Q62 32 50 35 Q38 32 27 44Z" fill="#5a3b1e" stroke="#1E1B3A" stroke-width="3"/>
+  <g class="eyes"><circle cx="42" cy="47" r="3.5" fill="#1E1B3A"/><circle cx="58" cy="47" r="3.5" fill="#1E1B3A"/><circle cx="43.5" cy="45.5" r="1.2" fill="#fff"/><circle cx="59.5" cy="45.5" r="1.2" fill="#fff"/></g>
+  <circle cx="36" cy="54" r="3.5" fill="#FF5C8A" opacity=".5"/><circle cx="64" cy="54" r="3.5" fill="#FF5C8A" opacity=".5"/>
+  <path d="M42 57 Q50 66 58 57" stroke="#1E1B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M34 24 L40 10 L50 20 L60 10 L66 24Z" fill="#FFD93D" stroke="#1E1B3A" stroke-width="3" stroke-linejoin="round"/>
+ </g></svg>
+ <svg class="turtle" viewBox="0 0 76 64"><ellipse cx="36" cy="40" rx="24" ry="17" fill="#3fbf6f" stroke="#1E1B3A" stroke-width="3"/><path d="M20 38 Q36 18 52 38" fill="#8fe39f" stroke="#1E1B3A" stroke-width="3"/><circle cx="64" cy="32" r="10" fill="#8fe39f" stroke="#1E1B3A" stroke-width="3"/><circle cx="67" cy="30" r="3" fill="#1E1B3A"/><path d="M62 36 Q66 39 70 35" stroke="#1E1B3A" stroke-width="2" fill="none"/><ellipse cx="18" cy="52" rx="7" ry="5" fill="#3fbf6f" stroke="#1E1B3A" stroke-width="3"/><ellipse cx="54" cy="52" rx="7" ry="5" fill="#3fbf6f" stroke="#1E1B3A" stroke-width="3"/><circle cx="12" cy="30" r="9" fill="#FF9F43" stroke="#1E1B3A" stroke-width="3"/><line x1="12" y1="30" x2="26" y2="18" stroke="#1E1B3A" stroke-width="3"/></svg>
+ <div class="crowd"></div></div>
+<div class="hall"><span>🌴 אולם הג'ונגל</span><div class="meter"><i></i></div><span>👥 31/50</span></div>
+<div class="card"><span class="tag">במת הצלילים · האות והצליל</span>
+ <div class="prompt">מִצְאִי מִלָּה שֶׁמַּתְחִילָה בָּאוֹת</div>
+ <div class="glyph">כּ</div>
+ <button class="ear">🔊 עוד פעם</button>
+ <div class="ans">
+  <div class="opt ok"><img src="pics/26bd.svg" alt=""><span class="nik" style="font-size:1.3rem">כַּדּוּר</span></div>
+  <div class="opt"><img src="pics/1f478.svg" alt=""><span class="nik" style="font-size:1.3rem">מַלְכָּה</span></div>
+  <div class="opt"><img src="pics/2708.svg" alt=""><span class="nik" style="font-size:1.3rem">מָטוֹס</span></div>
+ </div>
+ <div class="nik" style="font-size:1.1rem;opacity:.7">בדיקת ניקוד: שָׁלוֹם בֹּקֶר תּוֹדָה וּבֵן</div>
+</div>
+<div class="row"><button class="btn">יאללה! 🚀</button><button class="btn pink">הופעה</button><button class="btn teal">🎧 אולפן</button></div>
+<div class="row"><i class="sw" style="background:#2B1B5A"></i><i class="sw" style="background:#FFD93D"></i><i class="sw" style="background:#FF5C8A"></i><i class="sw" style="background:#2ED8C3"></i><i class="sw" style="background:#FF9F43"></i><i class="sw" style="background:#FFF8E7"></i><i class="sw" style="background:#22C55E"></i></div>
+<small>מוקאפ בלבד — סגנון "פלאט-מעוגל עם קו-מתאר", Noto Sans Hebrew לאותיות, איורי Twemoji, צל קשה, דמויות SVG מונפשות.</small>
+</div></body></html>

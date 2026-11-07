@@ -267,3 +267,6 @@ OK   en:fish <- File:En-us-fish.ogg Public domain
 OK   en:five <- File:En-us-five.ogg Public domain
 OK   en:four <- File:En-us-four.ogg Public domain
 OK   en:i <- File:En-us-i.ogg Public domain
+
+## איורים
+איורי המילים: Twemoji (CC-BY 4.0, © Twitter/X, תחזוקה jdecked) — `tools/pics_fetch.py` → `pics/`.
