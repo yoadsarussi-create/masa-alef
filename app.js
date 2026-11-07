@@ -94,7 +94,11 @@ function shapeSvg(k,fill){fill=fill||"#1aa6b7";const m={circle:`<circle cx="50" 
 /* ---------- question generators: GEN[sk](lv) → q ---------- */
 /* q={sk,key,tag,p,say:[...],opts:[{v,html,cls}],a,kind:"opts"|"spell"|"row",after:[...],info,wide} */
 const bigHe=t=>`<span class="he-big">${t}</span>`;
-const hasClip=w=>!!AUDIO["he:"+w.w];
+(function aliasClips(){const A=AUDIO;const add=(nik,plain)=>{const k="he:"+strip(nik).replace(/[!?,.]/g,"").trim(),p="he:"+plain;if(!A[k]&&A[p])A[k]=A[p]};
+ WORDS.forEach(w=>add(w.s,w.w));LET.forEach(l=>add(l.n,strip(l.n)));
+ ["אפס","אחת","שתיים","שלוש","ארבע","חמש","שש","שבע","שמונה","תשע","עשר","אחת עשרה","שתים עשרה","שלוש עשרה","ארבע עשרה","חמש עשרה","שש עשרה","שבע עשרה","שמונה עשרה","תשע עשרה","עשרים"].forEach((p,i)=>add(NUMNAME[i],p));
+ ["עיגול","משולש","ריבוע","מלבן","כוכב","לב"].forEach((p,i)=>add(SHAPES[i].n,p))})();
+const hasClip=w=>!!(AUDIO["he:"+w.w]||AUDIO["he:"+strip(w.s)]);
 function clipCoverage(){let n=0,k=0;LET.forEach(l=>{n++;if(AUDIO["he:"+strip(l.n)])k++});return k+"/"+n}
 const clearWords=()=>{const a=WORDS.filter(w=>w.w.indexOf("'")<0&&hasClip(w));return a.length>40?a:WORDS.filter(w=>w.w.indexOf("'")<0)};
 const wordsBy=f=>clearWords().filter(f);
@@ -104,7 +108,7 @@ function letterOpts(t,n,confuse){let pool=LETTERS.filter(x=>x!==t);let o=[];
 function dotsQ(sk,labels,sayLabel){const shape=pick(Object.keys(DOT_SHAPES).filter(k=>DOT_SHAPES[k].p.length>=labels.length));const lab=labels.slice(0,DOT_SHAPES[shape].p.length);
  return{sk:sk,key:"dots:"+shape,tag:"חבר את הנקודות",p:PROMPTS.dots,say:[PROMPTS.dots],kind:"dots",shape:shape,labels:lab,sayLabel:sayLabel,a:"done",after:[]}}
 const GEN={
- write(lv){if(lv===1||(lv>=3&&Math.random()<.3)){const t=pick(LETTERS);return{sk:"write",key:"wr:"+t,tag:"כותבים אות",p:`${PROMPTS.trace} <span class="he-word">${LETNAME[t]}</span>`,say:[PROMPTS.trace,LETNAME[t]],kind:"trace",glyph:t,dir:"rtl",a:"done",after:[LETNAME[t]]}}
+ write(lv,focus){if(focus||lv===1||(lv>=3&&Math.random()<.3)){const t=focus||pick(LETTERS);return{sk:"write",key:"wr:"+t,tag:"כותבים אות",p:`${PROMPTS.trace} <span class="he-word">${LETNAME[t]}</span>`,say:[PROMPTS.trace,LETNAME[t]],kind:"trace",glyph:t,dir:"rtl",a:"done",after:[LETNAME[t]]}}
   if(lv===2){const n=rnd(0,9);return{sk:"write",key:"wrn:"+n,tag:"כותבים ספרה",p:`${PROMPTS.trace} <span class="num-big">${n}</span>`,say:[PROMPTS.trace,NUMNAME[n]],kind:"trace",glyph:String(n),font:"Fredoka",dir:"ltr",a:"done",after:[NUMNAME[n]]}}
   if(lv===3){const w=WORD_BY(pick(SPELL_L1));return{sk:"write",key:"wrw:"+w.w,tag:"כותבים מילה",p:`${PROMPTS.traceWord}${pic(w.e)}<span class="he-word">${w.s}</span>`,say:[PROMPTS.traceWord,w.s],kind:"trace",glyph:w.w,dir:"rtl",a:"done",after:[w.s]}}
   const L=pick("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));const g=Math.random()<.5?L:L.toLowerCase();return{sk:"write",key:"wre:"+g,tag:"כותבים באנגלית",p:`${PROMPTS.trace} <span class="en-big">${g}</span>`,say:[PROMPTS.trace,{en:L}],kind:"trace",glyph:g,font:"Andika",dir:"ltr",a:"done",after:[{en:L}]}},
@@ -116,10 +120,10 @@ const GEN={
    return{sk:"let",key:"let:seq:"+LETTERS[i],tag:"סדר הא״ב",p:`${PROMPTS.letNext}<span class="he-seq">${seq.join(" ")}</span>`,say:[PROMPTS.letNext],opts:o.map(x=>opt(x,bigHe(x),"he")),a:LETTERS[i],after:[LETNAME[LETTERS[i-1]],LETNAME[LETTERS[i]],LETNAME[LETTERS[i+1]]]}}
   const lane=lv>=2&&Math.random()<.4;const n=lane?3:lv===1?3:4;const o=letterOpts(t,n,lv>=2);
   return{sk:"let",key:"let:"+t,tag:lane?"תפסי את האות":"שמות האותיות",p:lane?`${PROMPTS.lane} <span class="he-word">${LETNAME[t]}</span>`:PROMPTS.letHear,say:[lane?PROMPTS.lane:PROMPTS.letHear,LETNAME[t]],kind:lane?"lane":"opts",opts:o.map(x=>opt(x,bigHe(x),"he")),a:t,after:[LETNAME[t]]}},
- sound(lv){if(Math.random()<.35){const t=pick(LETTERS.filter(l=>wordsBy(w=>w.w[0]===l).length>=1));const w=pick(wordsBy(x=>x.w[0]===t));const n=lv>=3?4:3;
+ sound(lv,focus){if(focus?Math.random()<.5:Math.random()<.35){const t=focus||pick(LETTERS.filter(l=>wordsBy(w=>w.w[0]===l).length>=1));if(!wordsBy(x=>x.w[0]===t).length)return GEN.let(lv,focus);const w=pick(wordsBy(x=>x.w[0]===t));const n=lv>=3?4:3;
    const dis=others(wordsBy(x=>x.w[0]!==t&&(lv<2||!(CONFUSE_SOUND[t]||"").includes(x.w[0]))),[],n-1);const o=sh([w].concat(dis)).map(x=>Object.assign(opt(x.w,picHtml(x.e),"pic"),{say:x.s}));
    return{sk:"sound",key:"l2w:"+t,tag:"האות והצליל",p:`${PROMPTS.letterWord} ${bigHe(t)}`,say:[PROMPTS.letterWord,LETNAME[t]],playOpts:true,opts:o,a:w.w,after:[w.s,LETNAME[t]],info:`<span class="he-word">${w.s}</span>`}}
-  const last=lv===3||(lv===4&&Math.random()<.5);const pool=wordsBy(w=>last?true:w.syl<=3);const w=pick(pool);
+  const last=!focus&&(lv===3||(lv===4&&Math.random()<.5));const pool0=wordsBy(w=>last?true:w.syl<=3);const pool=focus?pool0.filter(w=>w.w[0]===focus):pool0;if(!pool.length)return GEN.let(lv,focus);const w=pick(pool);
   const t=last?w.w[w.w.length-1]:w.w[0];const base=FINAL_TO_BASE[t]||t;const n=lv===1?3:4;
   let o=letterOpts(base,n,lv>=2);if(FINAL_TO_BASE[t])o=o.map(x=>x===base?t:x);
   const pr=last?PROMPTS.soundLast:PROMPTS.soundFirst;
@@ -175,7 +179,7 @@ const GEN={
    return{sk:"think",key:"pat:"+k,tag:"מה בא אחר כך?",p:`${PROMPTS.pattern}<div class="pattern" dir="ltr">${seq.slice(0,len).map(x=>`<span>${picHtml(x)}</span>`).join("")}<span class="q">?</span></div>`,say:[PROMPTS.pattern],opts:sh(em).map(x=>opt(x,picHtml(x),"pic")),a:a}}
   if(lv>=2&&r<(lv===2?.75:.7)){const n=lv===2?3:4;const ws=sh(clearWords()).slice(0,n);let idx,pr,sayx=[];
    if(lv===2){const dir=Math.random()<.5?"R":"L";let x=dir==="R"?rnd(0,n-2):rnd(1,n-1);idx=dir==="R"?x+1:x-1;pr=dir==="R"?PROMPTS.dirRight:PROMPTS.dirLeft;sayx=[pr,ws[x].s];
-    return{sk:"think",key:"dir:"+dir,tag:"ימין ושמאל",p:`${pr} <span class="he-word">${ws[x].s}</span>`,say:sayx,kind:"row",opts:ws.map((w,i)=>opt(i,picHtml(w.e),"pic")),a:String(idx),after:[ws[idx].s]}}
+    return{sk:"think",key:"dir:"+dir,tag:"ימין ושמאל",p:`${pr}<span class="he-word" style="padding-right:0">${ws[x].s}</span>`,say:sayx,kind:"row",opts:ws.map((w,i)=>opt(i,picHtml(w.e),"pic")),a:String(idx),after:[ws[idx].s]}}
    const kind=pick(["mid","firstR","firstL","secondR"]);if(kind==="mid"&&n%2===0)return GEN.think(2);
    idx=kind==="mid"?Math.floor(n/2):kind==="firstR"?n-1:kind==="firstL"?0:n-2;pr=kind==="mid"?PROMPTS.dirMid:kind==="firstR"?PROMPTS.dirFirstR:kind==="firstL"?PROMPTS.dirFirstL:PROMPTS.dirSecondR;
    return{sk:"think",key:"dir:"+kind,tag:"ימין ושמאל",p:pr,say:[pr],kind:"row",opts:ws.map((w,i)=>opt(i,picHtml(w.e),"pic")),a:String(idx),after:[ws[idx].s]}}
@@ -227,7 +231,7 @@ function lvIcon(L){if(L.boss)return L.boss==="all"?"🏆":"👑";return SK[L.sk]
 const isEnIc=ic=>/^[A-Za-z0-9+ ]+$/.test(ic);
 
 function onboarding(){view="onb";app.innerHTML=`<div class="card end">
- <div class="dancers"><div class="bounce">${avatarSvg(avDefaults(),"big")}</div><div class="bounce" style="animation-delay:.4s">${TURTLE.replace("viewBox",'width="110" height="92" viewBox')}</div></div>
+ <div class="dancers"><div class="bounce">${avatarSvg(avDefaults(),"lg")}</div><div class="bounce" style="animation-delay:.4s">${TURTLE.replace("viewBox",'width="110" height="92" viewBox')}</div></div>
  <h2>איך קוראים לך?</h2>
  <input type="text" id="nm" placeholder="השם שלך" maxlength="20" autocomplete="off" aria-label="השם שלך" style="font-size:1.5rem;text-align:center">
  <button class="big" id="go">בואי נתחיל! 🚀</button>
@@ -252,7 +256,7 @@ function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const t
   <button class="ic" id="col"><span>🎁</span><b>מדבקות</b></button>
  </div>
  <div class="hall mini"><div class="hall-head"><span class="hall-e">${hall.e}</span><b>${hall.n}</b><span class="meter"><i style="width:${Math.round(prog*100)}%"></i></span><span class="fans">👥 ${Math.round(prog*50)}/50</span></div></div>
- <button class="back" id="par" style="align-self:center;background:#ffffff22;color:#fff;border-color:#ffffff44;box-shadow:none;font-size:.9rem">👨‍👧 הורים · v${window.APP_VER}</button>`;
+ <button class="back" id="par" style="align-self:center;background:#ffffff22;color:#fff;border-color:#ffffff44;box-shadow:none;font-size:.9rem">👨‍👧 הורים</button>`;
  app.querySelector("#smart").onclick=()=>start(null);
  app.querySelector("#map").onclick=()=>mapScreen(curHallIndex());
  app.querySelector("#col").onclick=collection;app.querySelector("#par").onclick=parentGate;app.querySelector("#stu").onclick=studio;app.querySelector("#ward").onclick=wardrobe;
@@ -264,7 +268,7 @@ function mapScreen(hi){view="map";hush();hi=Math.max(0,Math.min(HALLS.length-1,h
   return`<button class="tile2 ${d} ${o?"":"locked"} ${done?"done":""}" data-step="${st}" aria-label="${STEPS[st].n}"><span class="t-ic ${/^[\u0590-\u05FF]/.test(ic)?"he":""}">${o?(done?"🏆":picHtml(ic)):"🔒"}</span><span class="t-n">${STEPS[st].n}</span><span class="stg-bar"><i style="width:${Math.round(p*100)}%"></i></span></button>`}).join("");
  app.innerHTML=`<div class="top"><button class="x" id="home" aria-label="חזרה">✕</button><h1 style="text-align:center">${h.e} ${h.n}</h1><span class="pill">👥 ${Math.round(prog*50)}/50</span></div>
  <div class="hall ${open?"":"locked"}"><div class="meter big"><i style="width:${Math.round(prog*100)}%"></i></div>
- ${open?`<div class="tiles2">${tiles}</div>`:`<p style="color:#fff;text-align:center;font-size:1.1rem;margin:20px 0">🔒 נפתח כש"${HALLS[hi-1].n}" מתמלא במעריצים</p>`}</div>
+ ${open?`<div class="tiles2">${tiles}</div>`:`<p style="color:#fff;text-align:center;font-size:1.1rem;margin:20px 0">🔒 ייפתח כשהאולם הקודם יתמלא במעריצים 👥</p>`}</div>
  <div class="nav2"><button class="btn light" id="prev" ${hi===0?"disabled":""}>◀ ${hi>0?HALLS[hi-1].e+" "+HALLS[hi-1].n:""}</button><button class="btn light" id="next" ${hi===HALLS.length-1?"disabled":""}>${hi<HALLS.length-1?HALLS[hi+1].e+" "+HALLS[hi+1].n:""} ▶</button></div>`;
  app.querySelector("#home").onclick=home;app.querySelector("#prev").onclick=()=>mapScreen(hi-1);app.querySelector("#next").onclick=()=>mapScreen(hi+1);
  app.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const st=b.dataset.step;if(!stepOpen(st)||b.classList.contains("locked")){b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400);const deps=STEPS[st].deps.filter(d=>!stepPassed(d)).map(d=>STEPS[d].n);toast("עוד נעול 🔒 קודם: "+deps.join(" · "),2600);return}levelIntro(st)});
@@ -296,23 +300,25 @@ function start(step){const plan=buildSession(step||null,ROUND);G={step:step||nul
 function ask(){view="play";quitArm=false;clearTimeout(advT);
  if(G.pendingUp){const sk=G.pendingUp;G.pendingUp=null;levelUp(sk);return}
  const item=G.plan[G.i];const sk=item.sk;let lv=item.lv;const easy=G.easy;G.easy=false;if(easy)lv=Math.max(1,lv-1);
+ if(item.focus&&!item.introDone){const st=subState(item.step,item.sub);const h=st.h;const last2=h.slice(-2).join("")==="00";const acc=h.length>=4?h.slice(-6).reduce((a,b)=>a+b,0)/Math.min(6,h.length):1;
+  if(st.n===0||last2||acc<.5){item.introDone=true;item.reteach=st.n>0;introCard(item);return}}
  let q=G.retryQ||makeQ(sk,lv,item.focus);G.retryQ=null;if(!q){G.i++;G.i<G.plan.length?ask():finish();return}q.item=item;
  if(easy&&q.kind!=="spell"&&q.kind!=="row"&&q.opts.length>2){q.opts=sh([q.opts.find(o=>o.v===q.a),q.opts.find(o=>o.v!==q.a)])}
  G.cur={q,done:false,t0:Date.now(),retry:q._retry||0};
- const dots=G.list.map((_,k)=>`<i class="${k<G.res.length?(G.res[k]?"ok":"no"):k===G.i?"now":""}"></i>`).join("");
+ const dots=G.plan.map((_,k)=>`<i class="${k<G.res.length?(G.res[k]===1?"ok":G.res[k]?"half":"no"):k===G.i?"now":""}"></i>`).join("");
  const optHtml=o=>`<button class="ans ${o.cls}" data-o="${esc(o.v)}">${o.html}</button>`;
  app.innerHTML=`
  <div class="hud"><button class="x" id="quit" aria-label="חזרה למפה">✕</button><div class="dots">${dots}</div><span class="pill" id="hc">👥 ${S.coins}</span></div>
  <div class="card play">
-  <div class="row-tag"><span class="tag">${STEPS[item.step].n} · ${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
+  <div class="row-tag"><span class="tag">${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
   ${easy?`<div class="feedback good" style="padding:8px 12px">זה בסדר! גם טיקי טועה לפעמים. הנה אחת קלה 💪</div>`:G.cur.retry?`<div class="feedback good" style="padding:8px 12px">עוד ניסיון — הקשיבי שוב 👂</div>`:""}
-  <div class="pz">${/class="(emo|he-word|en-word|he-big|en-big|num-big|num-seq|eq|count|calc-pic|pattern|shape|scene|clock|he-seq)/.test(q.p)?"":`<div class="listen">${avatarSvg(avDefaults(),"sing")}<span class="note n1">🎵</span><span class="note n2">🎶</span></div>`}<div class="prompt">${q.p}</div>
+  <div class="pz">${(q.kind==="trace"||q.kind==="dots"||/class="(emo|he-word|en-word|he-big|en-big|num-big|num-seq|eq|count|calc-pic|pattern|shape|scene|clock|he-seq)/.test(q.p))?"":`<div class="listen">${avatarSvg(avDefaults(),"sing")}<span class="note n1">🎵</span><span class="note n2">🎶</span></div>`}<div class="prompt">${q.p}</div>
   <button class="ear" id="ear">🔊 עוד פעם</button></div>
   ${q.kind==="spell"?`<div class="slots" dir="${q.dir}">${q.ans.map((_,k)=>`<button class="slot ${q.dir==="ltr"?"wordslot":""}" data-k="${k}" aria-label="מקום ${k+1}"></button>`).join("")}</div>
      <div class="tiles" dir="${q.dir}">${q.tiles.map((c,k)=>`<button class="tile ${q.dir==="ltr"?"wordtile":""}" data-t="${k}">${c}</button>`).join("")}</div>`
   :q.kind==="row"?`<div class="row-opts" dir="ltr">${q.opts.map(optHtml).join("")}</div>`
   :q.kind==="lane"?`<div class="lane-wrap" id="lane"><div class="lines"></div><div class="hit"></div><span class="lane-note" style="left:12%">🎵</span><span class="lane-note" style="left:70%;animation-delay:1.2s">🎶</span><div class="fall" style="--dur:${lv===2?6:lv===3?5:4.2}s">${sh(q.opts).map(optHtml).join("")}</div></div>`
-  :q.kind==="trace"||q.kind==="dots"?`<div class="draw-wrap" id="draw"></div><div class="draw-tools">${q.kind==="trace"?`<button class="btn light" id="clr">🧽 נקי</button>`:""}</div>`
+  :q.kind==="trace"||q.kind==="dots"?`${q.kind==="trace"?`<div class="draw-tools"><button class="btn light" id="clr">🧽 מהתחלה</button></div>`:""}<div class="draw-wrap" id="draw"></div>`
   :`<div class="answers ${q.wide?"one":""} ${q.opts.length===3?"three":""}">${q.opts.map(optHtml).join("")}</div>`}
   <div id="fb"></div>
  </div>`;
@@ -321,13 +327,27 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  app.querySelectorAll(".ans").forEach(b=>b.onclick=()=>answer(b));
  if(q.kind==="spell")setupSpell(q);
  if(q.kind==="lane"){const f=app.querySelector(".fall");let loops=0;f.addEventListener("animationend",()=>{if(G.cur.done)return;loops++;if(loops===1){f.style.animation="none";void f.offsetWidth;f.style.animation="";speak(q.say)}else{f.classList.add("paused");f.style.transform="translateY(200px)";f.style.animation="none"}})}
- if(q.kind==="trace"){const wrap=app.querySelector("#draw");const t=setupTrace(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
+ if(q.kind==="trace"){const wrap=app.querySelector("#draw");const fn=(typeof STROKES!=="undefined"&&STROKES[q.glyph])?setupTraceStrokes:setupTrace;const t=fn(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
  if(q.kind==="dots"){setupDots(q,app.querySelector("#draw"),(ok,st)=>{finishQ(true,null,null,st)})}
  scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150);
  clearTimeout(attractT);attractT=setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q&&!G.cur.done){const e=app.querySelector("#ear");if(e)e.classList.add("attract");speak(q.say)}},9000)}
 let attractT=null;
 async function playOptions(q){const tok=seqToken;const els=Array.prototype.slice.call(app.querySelectorAll(".ans"));
  for(let i=0;i<els.length;i++){if(tok!==seqToken||!G.cur||G.cur.q!==q||G.cur.done)return;const o=q.opts.find(x=>x.v===els[i].dataset.o);els[i].classList.add("hl");await playOne(o&&o.say?o.say:"");els[i].classList.remove("hl");await new Promise(r=>setTimeout(r,150))}}
+/* הצגה לפני שאלה: אות חדשה — רואים, שומעים, נוגעים */
+function introCard(item){view="play";const L=item.focus;const he=/[\u0590-\u05FF]/.test(L);const w=he?pick(wordsBy(x=>x.w[0]===L)||[]):null;const ew=!he?EN.find(x=>x.w[0]===L.toLowerCase()&&x.c!=="color"):null;
+ const nameSay=he?[LETNAME[L]]:[{en:L}];const exSay=he&&w?[w.s]:(ew?[{en:ew.w}]:[]);
+ app.innerHTML=`<div class="hud"><button class="x" id="quit" aria-label="חזרה">✕</button><div class="dots"></div><span class="pill" id="hc">👥 ${S.coins}</span></div>
+ <div class="card play"><div class="row-tag"><span class="tag">${item.reteach?"נלמד שוב ביחד 🤝":"אות חדשה ✨"}</span></div>
+ <div class="pz"><button class="live ${he?"":"en"}" id="live">${L}${he?"":"<small>"+L.toLowerCase()+"</small>"}</button>
+ <div class="prompt">${he?LETNAME[L]:L}</div>
+ ${(w||ew)?`<button class="ans pic ex" id="ex">${picHtml((w||ew).e)}<span class="${he?"he-word":"en-word"}">${he?w.s:ew.w}</span></button>`:""}
+ <p class="muted">נוגעים באות ושומעים אותה</p></div>
+ <button class="next" id="nx">הבנתי, שואלים! ←</button></div>`;
+ const liveTap=()=>{const b=app.querySelector("#live");b.classList.remove("hit");void b.offsetWidth;b.classList.add("hit");note(PENTA[3],"marimba",0,.4);speak(nameSay)};
+ app.querySelector("#live").onclick=liveTap;const ex=app.querySelector("#ex");if(ex)ex.onclick=()=>speak(exSay);
+ app.querySelector("#quit").onclick=home;app.querySelector("#nx").onclick=()=>{G.easy=true;ask()};
+ setTimeout(()=>speak(["זֹאת הָאוֹת"].concat(nameSay,exSay)),200);scrollTo(0,0)}
 function setupSpell(q){const slots=Array.prototype.slice.call(app.querySelectorAll(".slot")),tiles=Array.prototype.slice.call(app.querySelectorAll(".tile"));const fill=[];
  const render=()=>{slots.forEach((sl,k)=>{const t=fill[k];sl.textContent=t!=null?q.tiles[t]:"";sl.classList.toggle("on",t!=null)});tiles.forEach((t,k)=>t.disabled=fill.indexOf(k)>=0||G.cur.done)};
  tiles.forEach((t,k)=>t.onclick=()=>{if(G.cur.done)return;let pos=-1;for(let i=0;i<slots.length;i++)if(fill[i]==null){pos=i;break}if(pos<0)return;fill[pos]=k;tick();render();
@@ -351,9 +371,10 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  if(b&&!ok)b.classList.add("wrong");
  if(q.kind==="spell"){const sl=app.querySelector(".slots");sl.classList.add(ok?"right":"wrong");app.querySelectorAll(".tile").forEach(t=>t.disabled=true);
   if(!ok)sl.insertAdjacentHTML("afterend",`<div class="slots fix" dir="${q.dir}">${q.ans.map((c,k)=>`<span class="slot on ${q.dir==="ltr"?"wordslot":""} ${typed&&typed[k]!==c?"bad":""}">${c}</span>`).join("")}</div>`)}
- const rt=Date.now()-G.cur.t0;const change=e2record(q.item.step,q.item.sub,ok,rt,hinted);record(q.sk,q.key,ok);G.res.push(ok?1:0);
+ const rt=Date.now()-G.cur.t0;const change=e2record(q.item.step,q.item.sub,ok,rt,hinted);record(q.sk,q.key,ok);G.res.push(ok?(hinted?.5:1):0);
  let gain=0;
- if(ok){G.combo++;G.wrongRow=0;gain=10+(G.combo>=3?5:0);S.xp+=gain;S.coins+=gain;G.gain+=gain;S.best=Math.max(S.best,G.combo);confetti(G.combo>=3?50:26);comboNote(G.combo-1);if(G.combo>=3)cheer();const hc=document.getElementById("hc");if(hc)flyTo(b||app.querySelector(".card"),hc,"👥+"+gain)}
+ if(ok&&hinted){G.wrongRow=0;gain=5;S.xp+=gain;S.coins+=gain;G.gain+=gain;confetti(16);comboNote(0);const hc=document.getElementById("hc");if(hc)flyTo(b||app.querySelector(".card"),hc,"👥+"+gain)}
+ else if(ok){G.combo++;G.wrongRow=0;gain=10+(G.combo>=3?5:0);S.xp+=gain;S.coins+=gain;G.gain+=gain;S.best=Math.max(S.best,G.combo);confetti(G.combo>=3?50:26);comboNote(G.combo-1);if(G.combo>=3)cheer();const hc=document.getElementById("hc");if(hc)flyTo(b||app.querySelector(".card"),hc,"👥+"+gain)}
  else{G.combo=0;G.wrongRow++;S.xp+=2;S.coins+=2;G.gain+=2;
   if(G.retried<2&&G.plan.length<CAP){G.retried++;G.plan.splice(Math.min(G.i+3,G.plan.length),0,Object.assign({},q.item))}
   if(G.wrongRow>=2){G.easy=true;G.wrongRow=0}}
@@ -365,16 +386,16 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  if(ok){const f=document.createElement("div");f.className="flash";document.body.appendChild(f);setTimeout(()=>f.remove(),250)}
  document.getElementById("fb").innerHTML=ok
   ?`<div class="feedback good">${Math.random()<.5?avatarSvg(avDefaults(),"small cheer"):TURTLE.replace('viewBox','width="54" height="46" viewBox')}<div><b>${PRAISE_SHOW[praise]||praise}${starsTxt} +${gain} 👥</b>${G.combo>=3?"רצף של "+G.combo+"! בונוס!":""}${q.info?"<br>"+q.info:""}</div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`
-  :`<div class="feedback bad">${avatarSvg(avDefaults(),"small sad")}<div><b>כמעט! התשובה: <span class="ans-mini">${ansHtml}</span></b>${q.info?"<br>"+q.info:""}<br><span class="muted">+2 👥 על הניסיון</span></div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`;
+  :`<div class="feedback bad">${avatarSvg(avDefaults(),"small sad")}<div><b>כמעט! זאת התשובה: <span class="ans-mini">${ansHtml}</span></b>${q.info?"<br>"+q.info:""}<br><span class="muted">+2 👥 על הניסיון</span></div></div><button class="next" id="nx">${last?"לסיום ⭐":"הבא ←"}</button>`;
  const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;(G.i<G.plan.length||G.easy)?ask():finish()};
  const nx=document.getElementById("nx");const tAns=Date.now();
  nx.onclick=()=>{if(Date.now()-tAns<400)return;go()};
  const seq=ok?[praise].concat(q.after||[]):[enc].concat(q.after||[]);
- speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);advT=setTimeout(go,ok?500:1600)}});
- advT=setTimeout(go,ok?6000:9000);
+ const tFb=Date.now();speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);const minMs=ok?2200:3400;advT=setTimeout(go,Math.max(300,minMs-(Date.now()-tFb)))}});
+ advT=setTimeout(go,ok?7000:10000);
  nx.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})}
 function levelUp(step){view="up";const f=document.createElement("div");f.className="flash";document.body.appendChild(f);setTimeout(()=>f.remove(),250);jingle("win");setTimeout(()=>{confetti(50);cheer()},500);const nxt=Object.keys(STEPS).filter(k=>STEPS[k].deps.indexOf(step)>=0&&stepOpen(k));
- app.innerHTML=`<div class="card end"><div class="sticker-new">🏆</div><div class="dancers" style="margin-top:4px"><div class="dance">${avatarSvg(avDefaults(),"big cheer")}</div></div><h2>סיימת את "${STEPS[step].n}"!</h2>
+ app.innerHTML=`<div class="card end"><div class="sticker-new">🏆</div><div class="dancers" style="margin-top:4px"><div class="dance">${avatarSvg(avDefaults(),"lg cheer")}</div></div><h2>סיימת את "${STEPS[step].n}"!</h2>
  <p style="margin:0;font-size:1.15rem">${nxt.length?"נפתח: "+nxt.map(k=>STEPS[k].n).join(" · "):"כל הכבוד! ממשיכים הלאה"} 💪</p>
  <button class="big" id="go">יאללה, ממשיכים!</button></div>`;
  speak([SAY_LEVELUP]);app.querySelector("#go").onclick=()=>ask();scrollTo(0,0)}
@@ -393,7 +414,7 @@ function bonus(){view="bonus";hush();const pool=sh(wordsBy(w=>w.w.length<=4)).sl
    if(done===4){save();setTimeout(end,900)}}
   else{tone(false);b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400)}})}
 function finish(){
- if(!G.encore){G.encore=true;const okItems=G.plan.filter((it,k)=>G.res[k]===1&&it.role==="focus");if(okItems.length){const it=Object.assign({},pick(okItems),{role:"encore"});G.plan.push(it);toast("🎤 הדרן! עוד פעם אחת, אתן יודעות אותה",1800);ask();return}}
+ if(!G.encore){G.encore=true;const okItems=G.plan.filter((it,k)=>G.res[k]===1&&(it.role==="focus"||it.role==="place"));if(okItems.length){const it=Object.assign({},pick(okItems),{role:"encore"});G.plan.push(it);toast("🎤 הדרן! עוד פעם אחת, את כבר יודעת אותה",1800);ask();return}}
  if(!G.bonus){if(S.sessions.length%2===1)danceBreak();else bonus();return}view="end";hush();const right=G.res.reduce((a,b)=>a+b,0),tot=G.res.length,pct=tot?right/tot:0;
  const st=pct>=.85?3:pct>=.6?2:Math.max(1,pct>=.5?1:0);const lv=G.step;let firstClear=false;
  if(lv!=null){firstClear=!S.levels[lv]&&st>0;if(st>(S.levels[lv]||0))S.levels[lv]=st;if(firstClear){S.coins+=20;G.gain+=20}}
@@ -421,7 +442,7 @@ function finish(){
 
 /* ---------- stickers ---------- */
 function collection(){view="col";hush();app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>המדבקות של ${KID()}</h2>
- <p>כל הרפתקה שמסיימים = מדבקה חדשה. יש לך ${S.stickers.length} מתוך ${STICKERS.length}.</p>
+ <p>כל הופעה שמסיימים = מדבקה חדשה. יש לך ${S.stickers.length} מתוך ${STICKERS.length}.</p>
  <div class="stickers">${STICKERS.map((s,i)=>`<div class="stk ${i<S.stickers.length?"":"locked"}">${i<S.stickers.length?s:"?"}</div>`).join("")}</div>
  <p class="muted">הרצף הכי ארוך שלך: ${S.best} תשובות נכונות ברצף 🔥</p></div>`;
  app.querySelector("#b").onclick=home;scrollTo(0,0)}
@@ -454,8 +475,9 @@ function parents(){view="par";hush();const L=parentLists();const days=new Set(S.
   return`<tr><td>${DOMAIN_NAME[T.d]}</td><td>${T.n}</td><td><span class="lvl-dot" style="background:${lab[0]}"></span>${lab[1]}</td><td style="font-variant-numeric:tabular-nums">${Math.round(p*100)}%</td><td style="font-variant-numeric:tabular-nums">${n}</td><td style="font-variant-numeric:tabular-nums">${med?med+" ש'":"–"}</td></tr>`}).join("");
  const lst=(arr,cls)=>arr.length?`<div class="chips" style="justify-content:flex-start">${arr.slice(0,24).map(x=>`<span class="chip ${cls}">${x}</span>`).join("")}${arr.length>24?`<span class="muted">+${arr.length-24}</span>`:""}</div>`:`<p class="muted">עדיין אין.</p>`;
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>פינת הורים</h2>
- <p>${S.sessions.length} הופעות ב-${days} ימים · ${S.q} משימות. שלב נסגר כשכל חלקיו עברו (4 ברצף או 8 מתוך 10, בשני ימים שונים) ושורד בדיקות-שימור אחרי 1, 3, 7, 14 ו-30 יום.</p>
- <h3>✅ יודעת (שרד ≥7 ימים)</h3>${lst(L.know,"g")}
+ <p>${S.sessions.length} הופעות ב-${days} ימים · ${S.q} משימות.</p>
+ <p class="muted">שלב נסגר כשכל חלקיו עברו: 4 נכונות ברצף או 8 מתוך 10, בשני ימים שונים. אחר-כך הוא נבדק שוב אחרי יום, 3 ימים, שבוע, שבועיים וחודש.</p>
+ <h3>✅ יודעת (נזכרה גם אחרי שבוע)</h3>${lst(L.know,"g")}
  <h3>📚 לומדת עכשיו</h3>${lst(L.now,"")}
  <h3>🤝 כדאי לעשות יחד (נתקע)</h3>${lst(L.stuck,"r")}
  <h3>כל השלבים</h3>

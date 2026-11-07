@@ -66,8 +66,9 @@ function hallProgress(h){const ss=h.steps;return ss.reduce((a,s)=>a+stepProgress
 function hallOpen(i){return i===0||hallProgress(HALLS[i-1])>=.7}
 /* רישום תשובה בתת-מיומנות. מחזיר: "pass" (תת-מיומנות עברה), "step" (שלב נסגר), "down" (ירידה), null */
 function e2record(step,sub,ok,rt,hinted){const st=subState(step,sub);const sess=S.sessions.length;
- st.h=st.h.concat(ok?1:0).slice(-12);st.att++;st.n++;if(!hinted)st.nh+=ok?1:0;if(rt)st.rt=st.rt.concat(Math.min(rt,20000)).slice(-10);
- if(st.sess.indexOf(sess)<0)st.sess.push(sess);st.st=ok?st.st+1:0;
+ const first=st.n===0;st.n++;if(rt)st.rt=st.rt.concat(Math.min(rt,20000)).slice(-10);if(st.sess.indexOf(sess)<0)st.sess.push(sess);
+ if(hinted||(first&&!ok)){st.att++;return null}/* רמז או טעות בחשיפה ראשונה — לא נספרים לשליטה ולא לירידה */
+ st.h=st.h.concat(ok?1:0).slice(-12);st.att++;st.nh+=ok?1:0;st.st=ok?st.st+1:0;
  const l10=st.h.slice(-10),c10=l10.reduce((a,b)=>a+b,0);const multi=st.sess.length>=2;
  if(st.box===0){if((st.st>=4||(l10.length>=10&&c10>=8))&&multi){st.box=1;st.due=Date.now()+BOXES[0]*DAY;st.h=[];st.st=0;st.att=0;return stepPassed(step)?"step":"pass"}
   if(st.att>=10&&st.st<3&&!st.h.slice(-10).join("").includes("111")){st.att=0;return "down"}return null}
@@ -84,7 +85,7 @@ function dueSubs(){const out=[];Object.keys(STEPS).forEach(step=>subKeys(step).f
 function passedSubs(){const out=[];Object.keys(STEPS).forEach(step=>subKeys(step).forEach(sub=>{if(subPassed(step,sub))out.push({step,sub})}));return out}
 function genFor(step,sub){const g=STEPS[step].gens;const st=subState(step,sub);
  /* תת-מיומנויות של אותיות: מחולל ממוקד על האות */
- if(/^L./.test(sub))return{sk:"let",lv:st.n<6?1:2,focus:sub.slice(1)};
+ if(/^L./.test(sub)){const L=sub.slice(1);const r=Math.random();const sk=r<.4?"let":r<.8?"sound":"write";return{sk:sk,lv:st.n<6?1:2,focus:L}}
  if(/^E[A-Z]$/.test(sub))return{sk:"abc",lv:st.n<6?1:2,focus:sub.slice(1)};
  const pick1=g[Math.min(g.length-1,Math.floor(Math.random()*g.length))];return{sk:pick1[0],lv:pick1[1]}}
 function interleave(items){const out=[];let rest=items.slice();while(rest.length){const prev=out[out.length-1];let k=rest.findIndex(x=>!prev||x.step!==prev.step);if(k<0)k=0;out.push(rest.splice(k,1)[0])}return out}
@@ -96,7 +97,9 @@ function buildSession(focusStep,n){n=n||8;const e=E2();let plan=[];
   if(S.sessions.length>=2)e.placed=true;return interleave(sh(plan)).slice(0,n)}
  const due=sh(dueSubs()).slice(0,2).map(x=>Object.assign({role:"review"},x,genFor(x.step,x.sub)));
  const open=openSubs();const byDom={};open.forEach(x=>{(byDom[STEPS[x.step].d]=byDom[STEPS[x.step].d]||[]).push(x)});
- const doms=sh(Object.keys(byDom));const focus=[];let i=0;while(focus.length<n-due.length-2&&doms.length){const d=doms[i%doms.length];const arr=byDom[d];if(arr.length){const x=arr.splice(Math.floor(Math.random()*arr.length),1)[0];focus.push(Object.assign({role:"focus"},x,genFor(x.step,x.sub)))}else doms.splice(i%doms.length,1);i++}
+ const weight=x=>{const st=subState(x.step,x.sub);const h=st.h.slice(-6);if(st.n===0)return 1.0+Math.random()*.4;const acc=h.length?h.reduce((a,b)=>a+b,0)/h.length:.5;return (acc>=.4&&acc<.85?2.2:acc<.4?1.6:.6)+Math.random()*.5};
+ let newCount=0;
+ const doms=sh(Object.keys(byDom));Object.keys(byDom).forEach(d=>byDom[d].sort((a,b)=>weight(b)-weight(a)));const focus=[];let i=0;while(focus.length<n-due.length-2&&doms.length){const d=doms[i%doms.length];const arr=byDom[d];if(arr.length){let idx=Math.random()<.7?0:Math.floor(Math.random()*arr.length);if(newCount>=2){const j=arr.findIndex(y=>subState(y.step,y.sub).n>0);if(j>=0)idx=j}const x=arr.splice(idx,1)[0];if(subState(x.step,x.sub).n===0)newCount++;focus.push(Object.assign({role:"focus"},x,genFor(x.step,x.sub)))}else doms.splice(i%doms.length,1);i++}
  const warmPool=sh(passedSubs());const warm=warmPool.slice(0,Math.max(1,n-due.length-focus.length)).map(x=>Object.assign({role:"warm"},x,genFor(x.step,x.sub)));
  plan=interleave(sh(warm.concat(due,focus)));
  while(plan.length<n&&open.length){const x=pick(open);plan.push(Object.assign({role:"focus"},x,genFor(x.step,x.sub)))}

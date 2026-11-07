@@ -79,7 +79,7 @@ function setupDots(q,wrap,onDone){const W=wrap.clientWidth||340,H=W;const dpr=Ma
  return{}}
 
 /* ---------- אולפן ---------- */
-const INSTR=[{k:"piano",n:"פסנתר 🎹",cost:0},{k:"marimba",n:"מרימבה 🪘",cost:40},{k:"synth",n:"סינת׳ 🎛️",cost:120},{k:"bell",n:"פעמונים 🔔",cost:250}];
+const INSTR=[{k:"piano",n:"פסנתר 🎹",cost:0},{k:"marimba",n:"מרימבה 🪘",cost:40},{k:"synth",n:"סינתיסייזר 🎛️",cost:120},{k:"bell",n:"פעמונים 🔔",cost:250}];
 function studio(){view="studio";hush();S.inst=S.inst||"piano";S.owned=S.owned||["piano"];const labels=S.padLabels==="num"?["1","2","3","4","5","6","7","8"]:["א","ב","ג","ד","ה","ו","ז","ח"];
  const cols=["#ff6f61","#ffc23d","#3fbf6f","#2ee6d6","#1e88e5","#8e24aa","#ff5fa2","#fb8c00"];
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>האולפן של ${KID()} 🎧</h2>
@@ -102,7 +102,7 @@ function studio(){view="studio";hush();S.inst=S.inst||"piano";S.owned=S.owned||[
 
 /* ---------- אווטאר-זמרת + ארון ---------- */
 const AV_ITEMS=[
- {id:"hair:pony",cat:"שיער",n:"קוקו",cost:0},{id:"hair:curly",cat:"שיער",n:"מתולתל",cost:30},{id:"hair:long",cat:"שיער",n:"ארוך",cost:30},{id:"hair:bun",cat:"שיער",n:"קוקו-גבוה",cost:40},
+ {id:"hair:pony",cat:"שיער",n:"קוקו",cost:0},{id:"hair:curly",cat:"שיער",n:"מתולתל",cost:30},{id:"hair:long",cat:"שיער",n:"ארוך",cost:30},{id:"hair:bun",cat:"שיער",n:"קוקו גבוה",cost:40},
  {id:"hc:#5a3b1e",cat:"צבע שיער",n:"חום",cost:0,sw:"#5a3b1e"},{id:"hc:#1b1b1b",cat:"צבע שיער",n:"שחור",cost:0,sw:"#1b1b1b"},{id:"hc:#e9c46a",cat:"צבע שיער",n:"בלונד",cost:20,sw:"#e9c46a"},{id:"hc:#c0392b",cat:"צבע שיער",n:"ג'ינג'י",cost:20,sw:"#c0392b"},{id:"hc:#ff5fa2",cat:"צבע שיער",n:"ורוד",cost:80,sw:"#ff5fa2"},{id:"hc:#2ee6d6",cat:"צבע שיער",n:"טורקיז",cost:80,sw:"#2ee6d6"},
  {id:"dress:#ff5fa2",cat:"שמלה",n:"ורוד",cost:0,sw:"#ff5fa2"},{id:"dress:#8e24aa",cat:"שמלה",n:"סגול",cost:20,sw:"#8e24aa"},{id:"dress:#1aa6b7",cat:"שמלה",n:"טורקיז",cost:20,sw:"#1aa6b7"},{id:"dress:#ffc23d",cat:"שמלה",n:"זהב",cost:60,sw:"#ffc23d"},{id:"dress:rainbow",cat:"שמלה",n:"קשת 🌈",cost:120},
  {id:"pat:stars",cat:"דוגמה",n:"כוכבים ⭐",cost:50},{id:"pat:hearts",cat:"דוגמה",n:"לבבות ❤️",cost:50},{id:"pat:none",cat:"דוגמה",n:"חלק",cost:0},
@@ -135,7 +135,7 @@ function avatarSvg(av,cls){av=av||avDefaults();const hc=av.hc,skin="#f6d3b8",ol=
 function wardrobe(){view="ward";hush();const av=avDefaults();const cats=[...new Set(AV_ITEMS.map(x=>x.cat))];
  const eq=id=>{const [k,v]=id.split(":");if(k==="acc")return av.acc.indexOf(v)>=0;return av[k]===v};
  app.innerHTML=`<div class="panel"><button class="back" id="b">→ למפה</button><h2>הארון של ${KID()} 👗</h2>
- <div class="av-preview">${avatarSvg(av,"big dance")}</div>
+ <div class="av-preview">${avatarSvg(av,"lg dance")}</div>
  <p class="muted" style="text-align:center">מעריצים: 👥 ${S.coins}</p>
  ${cats.map(c=>`<h3>${c}</h3><div class="inst">${AV_ITEMS.filter(x=>x.cat===c).map(it=>{const own=S.wardrobe.indexOf(it.id)>=0;return`<button data-id="${it.id}" aria-pressed="${eq(it.id)}" class="${own?"":"locked"}">${it.sw?`<i class="sw" style="background:${it.sw}"></i>`:""}${it.n}${own?"":` · 👥${it.cost}`}</button>`}).join("")}</div>`).join("")}</div>`;
  app.querySelector("#b").onclick=home;
@@ -154,7 +154,7 @@ function beat(bpm,secs){const a=ctx();if(!a||!S.sound)return;const step=60/bpm/2
  beatTimer=setInterval(()=>{if(i>=n||view!=="dance"){clearInterval(beatTimer);return}const t=a.currentTime+.05;if(i%2===0)kick(t);hat(t);if(i%4===0)note(PENTA[0]/2*Math.pow(2,bass[(i/4)%8]/12),"synth",.05,.3);i++},step*1000)}
 function danceBreak(){view="dance";hush();let claps=0;const t0=Date.now();
  app.innerHTML=`<div class="card end dance-card"><span class="tag">הפסקת ריקוד 🎶</span><h2>רוקדים! ${KID()} והלהקה</h2>
- <div class="dancers"><div class="dance">${avatarSvg(null,"big")}</div><div class="dance" style="animation-delay:.25s">${TURTLE.replace("viewBox",'width="110" height="92" viewBox')}</div></div>
+ <div class="dancers"><div class="dance">${avatarSvg(null,"lg")}</div><div class="dance" style="animation-delay:.25s">${TURTLE.replace("viewBox",'width="110" height="92" viewBox')}</div></div>
  <button class="big pink" id="clap">👏 מחיאת כף!</button><p class="muted" id="cnt">מוחאים כפיים בקצב</p>
  <button class="next" id="go" style="width:100%;opacity:.4" disabled>ממשיכים! ←</button></div>`;
  beat(104,14);
