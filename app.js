@@ -339,7 +339,10 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  if(q.kind==="lane"){const f=app.querySelector(".fall");let loops=0;f.addEventListener("animationend",()=>{if(G.cur.done)return;loops++;if(loops===1){f.style.animation="none";void f.offsetWidth;f.style.animation="";speak(q.say)}else{f.classList.add("paused");f.style.transform="translateY(200px)";f.style.animation="none"}})}
  if(q.kind==="trace"){const wrap=app.querySelector("#draw");const fn=(typeof STROKES!=="undefined"&&STROKES[q.glyph])?setupTraceStrokes:setupTrace;const t=fn(q,wrap,(ok,st)=>{jingle("level");finishQ(true,null,null,st)});app.querySelector("#clr").onclick=()=>t.clear()}
  if(q.kind==="dots"){setupDots(q,app.querySelector("#draw"),(ok,st)=>{finishQ(true,null,null,st)})}
- scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(q.say).then(done=>{if(done&&q.playOpts)playOptions(q)})},150);
+ /* ילדה זריזה: אחרי 3 הצלחות בסוג-שאלה לא חוזרים על ההוראה — רק הגירוי (🔊 עדיין משמיע הכל) */
+ const PV=Object.values(PROMPTS);const known=S.tagN&&S.tagN[q.tag]>=3&&!q._retry&&q.say&&q.say.length>1&&PV.indexOf(q.say[0])>=0;
+ const autoSay=known?q.say.slice(1):q.say;
+ scrollTo(0,0);setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q)speak(autoSay).then(done=>{if(done&&q.playOpts)playOptions(q)})},known?60:150);
  if(q.say&&q.say[0]&&!AUDIO[clipKey(q.say[0])]){const area=app.querySelector(".answers,.row-opts,.lane-wrap,.tiles,.draw-wrap,.multi-grid,.palette,.row-btns");if(area){const h=document.createElement("div");h.className="hand-hint";h.textContent="👆";area.style.position="relative";area.appendChild(h);setTimeout(()=>h.remove(),3600)}}
  clearTimeout(attractT);attractT=setTimeout(()=>{if(view==="play"&&G.cur&&G.cur.q===q&&!G.cur.done){const e=app.querySelector("#ear");if(e)e.classList.add("attract");speak(q.say)}},9000)}
 let attractT=null;
@@ -401,9 +404,15 @@ function finishQ(ok,b,typed,st){if(G.cur.done)return;const q=G.cur.q;
  const go=()=>{clearTimeout(advT);if(view!=="play"||G.cur.q!==q)return;G.i++;if(G.i>=G.plan.length&&G.easy&&!G.endEasy){G.endEasy=true;G.plan.push(Object.assign({},G.plan[G.plan.length-1],{role:"easy",introDone:true}))}G.i<G.plan.length?ask():finish()};
  const nx=document.getElementById("nx");const tAns=Date.now();
  nx.onclick=()=>{if(Date.now()-tAns<400)return;go()};
- const seq=ok?[{sfx:"ok"},praise].concat(q.after||[]):[{sfx:"wrong"},enc].concat(q.after||[]);
- const tFb=Date.now();speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);const minMs=ok?2200:3400;advT=setTimeout(go,Math.max(300,minMs-(Date.now()-tFb)))}});
- advT=setTimeout(go,ok?7000:10000);
+ /* הצלחה: צליל + התשובה עצמה, ואחרי ~1.2ש' ממשיכים לבד (יועד 07/11: ההמתנה מיותרת). שבח מדובר רק לפעמים */
+ const sayPraise=ok&&(G.combo===3||G.combo===5||(G.combo>=7&&G.combo%3===1));
+ /* נכון ומהיר (בלי רמז) = היא יודעת: רק צליל-הצלחה וממשיכים. איטי/רמז: שומעים שוב את התשובה */
+ const fast=ok&&!hinted&&rt<4500;
+ const seq=ok?[{sfx:"ok"}].concat(sayPraise?[praise]:[],fast?[]:(q.after||[])):[{sfx:"wrong"},enc].concat(q.after||[]);
+ if(ok&&!hinted){S.tagN=S.tagN||{};S.tagN[q.tag]=(S.tagN[q.tag]||0)+1}
+ if(ok){const cd=app.querySelector(".card");if(cd)cd.addEventListener("click",()=>{if(G.cur.q===q&&Date.now()-tAns>350)go()})}
+ const tFb=Date.now();speak(seq).then(done=>{if(done&&view==="play"&&G.cur.q===q){clearTimeout(advT);advT=setTimeout(go,ok?(fast?450:800):Math.max(300,3400-(Date.now()-tFb)))}});
+ advT=setTimeout(go,ok?6000:10000);
  nx.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"})}
 function levelUp(step){view="up";const f=document.createElement("div");f.className="flash";document.body.appendChild(f);setTimeout(()=>f.remove(),250);jingle("win");setTimeout(()=>{confetti(50);cheer()},500);const nxt=Object.keys(STEPS).filter(k=>STEPS[k].deps.indexOf(step)>=0&&stepOpen(k));
  app.innerHTML=`<div class="card end"><div class="sticker-new">🏆</div><div class="dancers" style="margin-top:4px"><div class="dance">${avatarSvg(avDefaults(),"lg cheer")}</div></div><h2>סיימת את "${STEPS[step].n}"!</h2>
