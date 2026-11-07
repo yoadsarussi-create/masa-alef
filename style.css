@@ -290,3 +290,33 @@ canvas#fx{position:fixed;left:0;top:0;pointer-events:none;z-index:50;width:100%;
 .card.play .tile{width:66px;height:70px;font-size:2.5rem}
 .card.play .slot{width:60px;height:68px;font-size:2.5rem}
 @media (min-width:700px){.card.play .answers .ans{min-height:150px}.card.play .ans.pic img.pic{width:120px;height:120px}.card.play .he-big{font-size:6.5rem}.card.play .emo{font-size:7rem}}
+/* מסך ראשי מינימלי */
+.hero{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:14px;padding:6px 0 0;background:linear-gradient(180deg,#ffffff00,#ffffff14);border-radius:24px;overflow:hidden;min-height:170px}
+.hero .crowd{position:absolute;left:0;right:0;bottom:0;height:30px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='30'><circle cx='10' cy='10' r='7' fill='%231E1B3A'/><rect x='3' y='17' width='14' height='13' rx='5' fill='%231E1B3A'/><circle cx='30' cy='14' r='7' fill='%231E1B3A' opacity='.7'/><rect x='23' y='21' width='14' height='9' rx='5' fill='%231E1B3A' opacity='.7'/></svg>") repeat-x bottom}
+.avatar.hero{width:130px;height:169px}
+.big.xl{font-size:1.9rem;padding:20px}
+.icons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ic{background:var(--card);color:var(--ink);border:var(--ol) solid var(--ink);border-radius:22px;padding:10px 4px;box-shadow:0 5px 0 var(--ink);display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;font-size:.95rem}
+.ic span{font-size:2rem;line-height:1.1}
+.hall.mini{padding:8px 12px}
+/* מסך מפה */
+.hall .meter.big{height:22px;margin:4px 0 10px}
+.tiles2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile2{background:var(--cream);color:var(--ink);border:var(--ol) solid var(--ink);border-radius:20px;padding:12px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 5px 0 var(--ink);min-height:124px;text-align:center}
+.tile2 .t-ic{font-size:2.6rem;line-height:1}
+.tile2 .t-ic img.pic{width:48px;height:48px}
+.tile2 .t-ic.he{font-family:var(--glyph);font-weight:900}
+.tile2 .t-n{font-size:1rem;font-weight:700;line-height:1.2}
+.tile2.he{border-bottom:8px solid var(--pink)} .tile2.ma{border-bottom:8px solid var(--teal)} .tile2.en{border-bottom:8px solid var(--sun)}
+.tile2.locked{background:#4a4370;color:#fffa;border-color:#2a2547;box-shadow:0 5px 0 #2a2547}
+.tile2.done{background:#dcfce7}
+.nav2{display:flex;justify-content:space-between;gap:10px}
+.nav2 .btn{flex:1;font-size:.95rem}.nav2 .btn:disabled{opacity:.3}
+/* דמות שומעת במשימות-שמיעה */
+.listen{position:relative;display:flex;justify-content:center}
+.avatar.sing{width:120px;height:156px;animation:bob 1.2s ease-in-out infinite}
+.listen .note{position:absolute;font-size:1.6rem;animation:floatnote 1.6s ease-out infinite}
+.listen .n1{right:28%;top:10px}.listen .n2{left:28%;top:30px;animation-delay:.6s}
+@keyframes floatnote{from{transform:translateY(0);opacity:0}30%{opacity:1}to{transform:translateY(-40px);opacity:0}}
+/* טאבלט: לא למתוח את הכרטיס לכל הגובה; להגדיל תוכן */
+@media (min-width:700px){.card.play{min-height:72vh}.card.play .prompt{font-size:2rem}.avatar.sing{width:170px;height:221px}.card.play .answers .ans{min-height:160px}.card.play .answers .ans.he,.card.play .answers .ans.en{font-size:2rem}.card.play .he-big{font-size:6.5rem}.tiles2{grid-template-columns:repeat(3,minmax(0,1fr))}.avatar.hero{width:160px;height:208px}.hero{min-height:220px}}

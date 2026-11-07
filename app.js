@@ -227,46 +227,48 @@ function lvIcon(L){if(L.boss)return L.boss==="all"?"🏆":"👑";return SK[L.sk]
 const isEnIc=ic=>/^[A-Za-z0-9+ ]+$/.test(ic);
 
 function onboarding(){view="onb";app.innerHTML=`<div class="card end">
- <div class="bounce">${TURTLE.replace("viewBox",'width="120" height="100" viewBox')}</div>
- <h2>היי! אני טיקי הצב 🐢</h2><p style="margin:0;font-size:1.15rem">איך קוראים לך?</p>
- <input type="text" id="nm" placeholder="השם שלך" maxlength="20" autocomplete="off" aria-label="השם שלך" style="font-size:1.4rem;text-align:center">
- <button class="ear" id="snd">🔊 בדיקת קול</button>
+ <div class="dancers"><div class="bounce">${avatarSvg(avDefaults(),"big")}</div><div class="bounce" style="animation-delay:.4s">${TURTLE.replace("viewBox",'width="110" height="92" viewBox')}</div></div>
+ <h2>איך קוראים לך?</h2>
+ <input type="text" id="nm" placeholder="השם שלך" maxlength="20" autocomplete="off" aria-label="השם שלך" style="font-size:1.5rem;text-align:center">
  <button class="big" id="go">בואי נתחיל! 🚀</button>
  <p class="muted">הורים: אפשר לשנות את השם ואת ההגדרות בפינת ההורים.</p></div>`;
  const inp=app.querySelector("#nm");inp.value=S.name||"";
- app.querySelector("#snd").onclick=()=>speak([SAY_HI]);
- app.querySelector("#go").onclick=()=>{S.name=inp.value.trim().slice(0,20);save();speak([SAY_HI]);home()}}
+ app.querySelector("#go").onclick=()=>{S.name=inp.value.trim().slice(0,20)||S.name;save();home()}}
 
 function buddyLine(cur){const L=LEVELS[cur];if(!S.q)return`היי ${KID()}! אני טיקי הצב 🐢 בואי נצא למסע עד כיתה א!`;
  if(Object.keys(S.levels).length===LEVELS.length)return`עברת את כל השלבים! 🏆 אפשר לשחק שוב, להשיג 3 כוכבים בכל שלב, או לעשות אימון חכם.`;
  const w=weakest();return`הבא בתור: <b>שלב ${cur+1} · ${L.t}</b>${w?`<br><span class="muted">באימון החכם נחזק את ${SK[w].n}</span>`:""}`}
+function firstName(){return (S.name||"").split(" ")[0]||"אלופה"}
 function home(){if(!S.name&&!S.q){onboarding();return}view="home";hush();const totalStars=Object.keys(S.levels).reduce((a,k)=>a+S.levels[k],0);
- const hallsHtml=HALLS.map((h,hi)=>{const open=hallOpen(hi);const prog=hallProgress(h);const fans=Math.round(prog*50);
-  const steps=h.steps.map(st=>{const o=open&&stepOpen(st);const p=stepProgress(st);const done=stepPassed(st);const d=STEPS[st].d;
-   return`<button class="stg ${d} ${o?"":"locked"} ${done?"done":""}" data-step="${st}" aria-label="${STEPS[st].n}"><span class="stg-ic">${o?(done?"🏆":{he:"א",ma:"1",en:"A"}[d]):"🔒"}</span><span class="stg-n">${STEPS[st].n}</span><span class="stg-bar"><i style="width:${Math.round(p*100)}%"></i></span></button>`}).join("");
-  return`<section class="hall ${open?"":"locked"}"><div class="hall-head"><span class="hall-e">${h.e}</span><b>${h.n}</b><span class="meter"><i style="width:${Math.round(prog*100)}%"></i></span><span class="fans">👥 ${fans}/50</span></div>${open?`<div class="stages">${steps}</div>`:`<p class="muted" style="color:#fff9;margin:6px 0 0">נפתח כשהאולם הקודם מתמלא</p>`}</section>`}).join("");
+ const hall=HALLS[curHallIndex()];const prog=hallProgress(hall);
  app.innerHTML=`
- <div class="top"><h1>🎤 ${KID()} על הבמה</h1><button class="pill" id="sndtest" aria-label="בדיקת קול">🔊</button><span class="pill">⭐ ${totalStars}</span><span class="pill" aria-label="מעריצים">👥 ${S.coins}</span></div>
- <div class="buddy"><div class="bounce">${avatarSvg(avDefaults())}</div><div class="bubble">${S.q?`הבא בתור: <b>הופעה</b> — המשחק בוחר לבד מה לתרגל. או בוחרים במה באולם.`:`היי ${KID()}! אני טיקי הצב 🐢 בואי נצא למסע עד כיתה א!`}</div><div class="bounce" style="animation-delay:.4s">${TURTLE}</div></div>
- <button class="big pink" id="smart">🎤 הופעה! (8 משימות)</button>
- <div class="row4">
-  <button class="small" id="stu"><span>🎧</span><span>האולפן</span></button>
-  <button class="small" id="ward"><span>👗</span><span>הארון</span></button>
-  <button class="small" id="col"><span>🎁</span><span>מדבקות</span></button>
-  <button class="small" id="par"><span>👨‍👧</span><span>הורים</span></button>
+ <div class="top"><h1>🎤 ${firstName()} על הבמה</h1><span class="pill">⭐ ${totalStars}</span><span class="pill" aria-label="מעריצים">👥 ${S.coins}</span></div>
+ <div class="hero"><div class="bounce">${avatarSvg(avDefaults(),"hero")}</div><div class="bounce" style="animation-delay:.4s">${TURTLE.replace("viewBox",'width="120" height="100" viewBox')}</div><div class="crowd"></div></div>
+ <button class="big pink xl" id="smart">🎤 הופעה!</button>
+ <div class="icons">
+  <button class="ic" id="map"><span>${hall.e}</span><b>מפה</b></button>
+  <button class="ic" id="stu"><span>🎧</span><b>אולפן</b></button>
+  <button class="ic" id="ward"><span>👗</span><b>ארון</b></button>
+  <button class="ic" id="col"><span>🎁</span><b>מדבקות</b></button>
  </div>
- <div class="halls">${hallsHtml}</div>
- <p class="muted" style="color:#fff8;text-align:center">v${window.APP_VER}</p>`;
- app.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const st=b.dataset.step;if(!stepOpen(st)||b.classList.contains("locked")){b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400);const deps=STEPS[st].deps.filter(d=>!stepPassed(d)).map(d=>STEPS[d].n);toast("עוד נעול 🔒 קודם: "+deps.join(" · "),2600);return}levelIntro(st)});
+ <div class="hall mini"><div class="hall-head"><span class="hall-e">${hall.e}</span><b>${hall.n}</b><span class="meter"><i style="width:${Math.round(prog*100)}%"></i></span><span class="fans">👥 ${Math.round(prog*50)}/50</span></div></div>
+ <button class="back" id="par" style="align-self:center;background:#ffffff22;color:#fff;border-color:#ffffff44;box-shadow:none;font-size:.9rem">👨‍👧 הורים · v${window.APP_VER}</button>`;
  app.querySelector("#smart").onclick=()=>start(null);
+ app.querySelector("#map").onclick=()=>mapScreen(curHallIndex());
  app.querySelector("#col").onclick=collection;app.querySelector("#par").onclick=parentGate;app.querySelector("#stu").onclick=studio;app.querySelector("#ward").onclick=wardrobe;
- app.querySelector("#sndtest").onclick=()=>{const w=WORDS.filter(hasClip);const x=w.length?pick(w):null;if(!x){toast("אין עדיין הקלטות במכשיר הזה",2000);return}toast(`🔊 ${x.e} ${x.s}`,1800);speak([x.s])};
  installHint();scrollTo(0,0)}
-function drawPath(){const saga=document.getElementById("saga"),svg=document.getElementById("path");if(!saga||!svg)return;
- const r0=saga.getBoundingClientRect();const pts=Array.prototype.map.call(saga.querySelectorAll(".node"),n=>{const r=n.getBoundingClientRect();return[r.left-r0.left+r.width/2,r.top-r0.top+r.height/2,n.classList.contains("done")]});
- svg.setAttribute("viewBox",`0 0 ${r0.width} ${r0.height}`);let d="",dd="";
- for(let k=1;k<pts.length;k++){const a=pts[k-1],b=pts[k];const seg=`M${a[0]},${a[1]} C${a[0]},${(a[1]+b[1])/2} ${b[0]},${(a[1]+b[1])/2} ${b[0]},${b[1]} `;if(a[2]&&b[2])dd+=seg;else d+=seg}
- svg.innerHTML=`<path class="p-todo" d="${d}"/><path class="p-done" d="${dd}"/>`}
+function curHallIndex(){let idx=0;HALLS.forEach((h,i)=>{if(hallOpen(i))idx=i});return idx}
+function mapScreen(hi){view="map";hush();hi=Math.max(0,Math.min(HALLS.length-1,hi));const h=HALLS[hi];const open=hallOpen(hi);const prog=hallProgress(h);
+ const ICON={he:"🅰️",ma:"🔢",en:"🔤"};const STEP_ICON={he1:"🎵",he2:"👏",he3:"🔤",he4:"🧩",he5:"✏️",he6:"אָ",he7:"אֹ",he8:"📖",he9:"🔍",he10:"📚",he11:"👫",he12:"🏁",ma1:"🍎",ma2:"⚖️",ma3:"🔟",ma4:"➕",ma5:"🧮",ma6:"💯",ma7:"⏰",ma8:"🏛️",ma9:"➗",ma10:"✖️",ma11:"🔺",ma12:"📐",ma13:"🚀",ma14:"📊",en1:"🐱",en2:"🙌",en3:"💬",en4:"🔡",en5:"🔊",en6:"📘",en7:"❓",en8:"📗",en9:"🧱",en10:"📙"};
+ const tiles=h.steps.map(st=>{const o=open&&stepOpen(st);const p=stepProgress(st);const done=stepPassed(st);const d=STEPS[st].d;const ic=STEP_ICON[st]||ICON[d];
+  return`<button class="tile2 ${d} ${o?"":"locked"} ${done?"done":""}" data-step="${st}" aria-label="${STEPS[st].n}"><span class="t-ic ${/^[\u0590-\u05FF]/.test(ic)?"he":""}">${o?(done?"🏆":picHtml(ic)):"🔒"}</span><span class="t-n">${STEPS[st].n}</span><span class="stg-bar"><i style="width:${Math.round(p*100)}%"></i></span></button>`}).join("");
+ app.innerHTML=`<div class="top"><button class="x" id="home" aria-label="חזרה">✕</button><h1 style="text-align:center">${h.e} ${h.n}</h1><span class="pill">👥 ${Math.round(prog*50)}/50</span></div>
+ <div class="hall ${open?"":"locked"}"><div class="meter big"><i style="width:${Math.round(prog*100)}%"></i></div>
+ ${open?`<div class="tiles2">${tiles}</div>`:`<p style="color:#fff;text-align:center;font-size:1.1rem;margin:20px 0">🔒 נפתח כש"${HALLS[hi-1].n}" מתמלא במעריצים</p>`}</div>
+ <div class="nav2"><button class="btn light" id="prev" ${hi===0?"disabled":""}>◀ ${hi>0?HALLS[hi-1].e+" "+HALLS[hi-1].n:""}</button><button class="btn light" id="next" ${hi===HALLS.length-1?"disabled":""}>${hi<HALLS.length-1?HALLS[hi+1].e+" "+HALLS[hi+1].n:""} ▶</button></div>`;
+ app.querySelector("#home").onclick=home;app.querySelector("#prev").onclick=()=>mapScreen(hi-1);app.querySelector("#next").onclick=()=>mapScreen(hi+1);
+ app.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const st=b.dataset.step;if(!stepOpen(st)||b.classList.contains("locked")){b.classList.add("wiggle");setTimeout(()=>b.classList.remove("wiggle"),400);const deps=STEPS[st].deps.filter(d=>!stepPassed(d)).map(d=>STEPS[d].n);toast("עוד נעול 🔒 קודם: "+deps.join(" · "),2600);return}levelIntro(st)});
+ scrollTo(0,0)}
 function installHint(){const standalone=navigator.standalone||matchMedia("(display-mode: standalone)").matches;if(standalone||S.hint>=2)return;
  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
  if(!ios||S.q<5)return;S.hint++;save();toast("📲 להורים: כדי להתקין כאפליקציה — לוחצים על שיתוף ⬆️ ואז ״הוסף למסך הבית״",7000)}
@@ -280,7 +282,7 @@ function levelIntro(step){const T=STEPS[step];const st=S.levels[step]||0;view="i
   <div class="bigstars" style="font-size:2.2rem">${[0,1,2].map(k=>`<span style="color:${k<st?"var(--sun)":"#d9e3e7"}">★</span>`).join("")}</div>
   <button class="big" id="play">${st?"עוד הופעה כאן":"יאללה!"}</button>
   <button class="back" id="home" style="align-self:center">→ למפה</button></div>`;
- speak([T.n]);app.querySelector("#play").onclick=()=>start(step);app.querySelector("#home").onclick=home;scrollTo(0,0)}
+ speak([T.n]);app.querySelector("#play").onclick=()=>start(step);app.querySelector("#home").onclick=()=>mapScreen(HALLS.findIndex(h=>h.steps.indexOf(step)>=0));scrollTo(0,0)}
 
 /* ---------- game loop ---------- */
 let G=null,advT=null,quitArm=false;
@@ -304,7 +306,7 @@ function ask(){view="play";quitArm=false;clearTimeout(advT);
  <div class="card play">
   <div class="row-tag"><span class="tag">${STEPS[item.step].n} · ${q.tag}</span>${G.combo>=2?`<span class="combo">🔥 ${G.combo}</span>`:""}</div>
   ${easy?`<div class="feedback good" style="padding:8px 12px">זה בסדר! גם טיקי טועה לפעמים. הנה אחת קלה 💪</div>`:G.cur.retry?`<div class="feedback good" style="padding:8px 12px">עוד ניסיון — הקשיבי שוב 👂</div>`:""}
-  <div class="pz"><div class="prompt">${q.p}</div>
+  <div class="pz">${/class="(emo|he-word|en-word|he-big|en-big|num-big|num-seq|eq|count|calc-pic|pattern|shape|scene|clock|he-seq)/.test(q.p)?"":`<div class="listen">${avatarSvg(avDefaults(),"sing")}<span class="note n1">🎵</span><span class="note n2">🎶</span></div>`}<div class="prompt">${q.p}</div>
   <button class="ear" id="ear">🔊 עוד פעם</button></div>
   ${q.kind==="spell"?`<div class="slots" dir="${q.dir}">${q.ans.map((_,k)=>`<button class="slot ${q.dir==="ltr"?"wordslot":""}" data-k="${k}" aria-label="מקום ${k+1}"></button>`).join("")}</div>
      <div class="tiles" dir="${q.dir}">${q.tiles.map((c,k)=>`<button class="tile ${q.dir==="ltr"?"wordtile":""}" data-t="${k}">${c}</button>`).join("")}</div>`
