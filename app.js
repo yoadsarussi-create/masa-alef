@@ -354,7 +354,7 @@ function introCard(item){view="play";const L=item.focus;const he=/[\u0590-\u05FF
  app.innerHTML=`<div class="hud"><button class="x" id="quit" aria-label="חזרה">✕</button><div class="dots"></div><span class="pill" id="hc">👥 ${S.coins}</span></div>
  <div class="card play"><div class="row-tag"><span class="tag">${item.reteach?"נלמד שוב ביחד 🤝":"אות חדשה ✨"}</span></div>
  <div class="pz"><button class="live ${he?"":"en"}" id="live">${L}${he?"":"<small>"+L.toLowerCase()+"</small>"}</button>
- <div class="prompt">${he?"הָאוֹת "+L:L}</div>
+ ${he?`<div class="prompt">הָאוֹת ${L}</div>`:""}
  ${(w||ew)?`<button class="ans pic ex" id="ex">${picHtml((w||ew).e)}<span class="${he?"he-word":"en-word"}">${he?w.s:ew.w}</span></button>`:""}
  <p class="muted">נוגעים באות ושומעים אותה</p></div>
  <button class="next" id="nx">הבנתי, שואלים! ←</button></div>`;
